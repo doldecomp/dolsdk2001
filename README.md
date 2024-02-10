@@ -30,7 +30,7 @@ Currently this repository supports building the following libraries:
 | mix          | :x: |
 | mtx          | :x: |
 | odemustubs   | :heavy_check_mark: |
-| odenotstub   | :x: |
+| odenotstub   | :heavy_check_mark: |
 | os           | :x: |
 | pad          | :x: |
 | perf         | :x: |
