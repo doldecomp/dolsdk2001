@@ -60,7 +60,7 @@ sudo apt update
 sudo apt install build-essential
 ```
 
-If building any libultra you can install binutils-powerpc-linux-gnu with:
+If building any Dolphin SDK Libraries you can install binutils-powerpc-linux-gnu with:
 
 ```bash
 sudo apt install binutils-powerpc-linux-gnu
