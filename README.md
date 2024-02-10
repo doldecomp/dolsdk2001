@@ -10,7 +10,7 @@ Currently this repository supports building the following libraries:
 | ------------ | ---------- |
 | ai           | :x: |
 | amcnotstub   | :heavy_check_mark: |
-| amcstubs     | :x: |
+| amcstubs     | :heavy_check_mark: |
 | ar           | :x: |
 | ax           | :x: |
 | axfx         | :x: |
