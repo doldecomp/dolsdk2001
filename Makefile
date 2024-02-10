@@ -8,6 +8,9 @@ else
   WINE ?= 
 endif
 
+# If 0, tells the console to chill out. (Quiets the make process.)
+VERBOSE ?= 0
+
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
   HOST_OS := linux
@@ -51,6 +54,12 @@ TARGET_LIBS := G2D              \
                texPalette       \
                vi
 
+ifeq ($(VERBOSE),0)
+  QUIET := @
+endif
+
+PYTHON := python3
+
 # Every file has a debug version. Append D to the list.
 TARGET_LIBS_DEBUG := $(addsuffix D,$(TARGET_LIBS))
 
@@ -91,8 +100,7 @@ ifeq ($(HOST_OS),macos)
 else
   CPP := cpp
 endif
-# TODO: We absolutely dont wanna be doing this. Maybe consider a bashrc variable or whatever other projects do.
-DTK := ./dtk
+DTK     := tools/dtk
 
 CC        = $(MWCC)
 
@@ -115,9 +123,9 @@ A_FILES := $(foreach dir,$(BASEROM_DIR),$(wildcard $(dir)/*.a))
 
 default: all
 
-all:
+all: $(DTK) amcnotstub.a amcnotstubD.a
 
-extract:
+extract: $(DTK)
 	$(info Extracting files...)
 	@$(DTK) ar extract baserom/*.a --out baserom/out
 	find baserom -name '*.o' | while read i; do \
@@ -127,9 +135,16 @@ extract:
 # clean extraction so extraction can be done again.
 distclean:
 	rm -rf $(BASEROM_DIR)/out
+	rm -rf tools/dtk
+	make clean
 
 clean:
 	rm -rf $(BUILD_DIR)
+	rm -rf *.a
+
+$(DTK): tools/dtk_version
+	@echo "Downloading $@"
+	$(QUIET) $(PYTHON) tools/download_dtk.py $< $@
 
 build/debug/src/%.o: src/%.c
 	$(CC) -c -opt level=0 -inline off $(CFLAGS) $< -o $@
