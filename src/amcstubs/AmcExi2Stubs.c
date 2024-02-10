@@ -1,4 +1,4 @@
-#include "global.h"
+#include <dolphin.h>
 
 // EXI error codes
 typedef enum

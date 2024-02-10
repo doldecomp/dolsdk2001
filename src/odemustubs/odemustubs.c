@@ -1,4 +1,4 @@
-#include "global.h"
+#include <dolphin.h>
 
 int Hu_IsStub() {
     return 1;

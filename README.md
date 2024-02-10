@@ -6,7 +6,11 @@ Decompilation of the archive library files of the 5/23/2001 (estimated based on 
 
 Currently this repository supports building the following libraries:
 
-| Library Name | Completed? |
+:heavy_check_mark: = 100% Complete
+:warning: = In Progress, at least 1 or more files done.
+:x: = No code yet
+
+| Library Name | Progress |
 | ------------ | ---------- |
 | ai           | :x: |
 | amcnotstub   | :heavy_check_mark: |
@@ -31,7 +35,7 @@ Currently this repository supports building the following libraries:
 | mtx          | :x: |
 | odemustubs   | :heavy_check_mark: |
 | odenotstub   | :heavy_check_mark: |
-| os           | :x: |
+| os           | :warning: |
 | pad          | :x: |
 | perf         | :x: |
 | seq          | :x: |

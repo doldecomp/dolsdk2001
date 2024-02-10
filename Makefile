@@ -106,9 +106,7 @@ CC        = $(MWCC)
 
 ######################## Flags #############################
 
-OPTFLAGS := -O4,p
-INLINEFLAGS := -inline auto
-CFLAGS := $(OPTFLAGS) $(INLINEFLAGS) -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn pragmas -pragma 'cats off'
+CFLAGS := -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn pragmas -pragma 'cats off'
 INCLUDES := -Isrc -Iinclude
 
 ASFLAGS = -mgekko -I src -I include
@@ -139,8 +137,10 @@ extract: $(DTK)
 			mv "$$subdir" "$${subdir%?}"; \
 		done \
 	done
+	# Disassemble the objects and extract their dwarf info.
 	find baserom -name '*.o' | while read i; do \
 		$(DTK) elf disasm $$i $${i%.o}.s ; \
+		$(DTK) dwarf dump $$i -o $${i%.o}_DWARF.c ; \
 	done
 
 # clean extraction so extraction can be done again.
@@ -159,10 +159,10 @@ $(DTK): tools/dtk_version
 	$(QUIET) $(PYTHON) tools/download_dtk.py $< $@
 
 build/debug/src/%.o: src/%.c
-	$(CC) -c -opt level=0 -inline off $(CFLAGS) $(INCLUDES) $< -o $@
+	$(CC) -c -opt level=0 -inline off $(CFLAGS) -I- $(INCLUDES) -DDEBUG $< -o $@
 
 build/release/src/%.o: src/%.c
-	$(CC) -c -O4,p -inline auto $(CFLAGS) $(INCLUDES) $< -o $@
+	$(CC) -c -O4,p -inline auto $(CFLAGS) -I- $(INCLUDES) -DRELEASE $< -o $@
 
 ################################ Build AR Files ###############################
 
@@ -204,6 +204,16 @@ odenotstub.a: $(odenotstub_o_files)
 odenotstubD_c_files := $(foreach dir,src/odenotstub,$(wildcard $(dir)/*.c))
 odenotstubD_o_files := $(foreach file,$(odenotstubD_c_files),$(BUILD_DIR)/debug/$(file:.c=.o))
 odenotstubD.a: $(odenotstubD_o_files)
+	$(AR) -v -q $@ $?
+
+os_c_files := $(foreach dir,src/os,$(wildcard $(dir)/*.c))
+os_o_files := $(foreach file,$(os_c_files),$(BUILD_DIR)/release/$(file:.c=.o))
+os.a: $(os_o_files)
+	$(AR) -v -q $@ $?
+
+osD_c_files := $(foreach dir,src/os,$(wildcard $(dir)/*.c))
+osD_o_files := $(foreach file,$(osD_c_files),$(BUILD_DIR)/debug/$(file:.c=.o))
+osD.a: $(osD_o_files)
 	$(AR) -v -q $@ $?
 
 # ------------------------------------------------------------------------------
