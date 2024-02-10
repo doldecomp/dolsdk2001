@@ -42,7 +42,7 @@ Currently this repository supports building the following libraries:
 
 ## Preparation
 
-After cloning the repo, you can copy your copies of the .a files to baserom/ and run `make extract` to disassemble these files to source files with DTK. Currently, please put a DTK binary at root in order to run this repository.
+After cloning the repo, you can copy your copies of the .a files to baserom/ and run `make extract` to disassemble these files to source files with DTK.
 
 The build process requires the following packages:
 
@@ -61,3 +61,5 @@ If building any libultra you can install binutils-powerpc-linux-gnu with:
 ```bash
 sudo apt install binutils-powerpc-linux-gnu
 ```
+
+Running `make` will then setup DTK if necessary and build all supported libraries.
