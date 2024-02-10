@@ -29,7 +29,7 @@ Currently this repository supports building the following libraries:
 | mcc          | :x: |
 | mix          | :x: |
 | mtx          | :x: |
-| odemustubs   | :x: |
+| odemustubs   | :heavy_check_mark: |
 | odenotstub   | :x: |
 | os           | :x: |
 | pad          | :x: |

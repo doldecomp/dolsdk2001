@@ -127,7 +127,7 @@ TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a
+all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a odemustubs.a odemustubsD.a
 
 extract: $(DTK)
 	$(info Extracting files...)
@@ -184,6 +184,16 @@ amcstubs.a: $(amcstubs_o_files)
 amcstubsD_c_files := $(foreach dir,src/amcstubs,$(wildcard $(dir)/*.c))
 amcstubsD_o_files := $(foreach file,$(amcstubsD_c_files),$(BUILD_DIR)/debug/$(file:.c=.o))
 amcstubsD.a: $(amcstubsD_o_files)
+	$(AR) -v -q $@ $?
+
+odemustubs_c_files := $(foreach dir,src/odemustubs,$(wildcard $(dir)/*.c))
+odemustubs_o_files := $(foreach file,$(odemustubs_c_files),$(BUILD_DIR)/release/$(file:.c=.o))
+odemustubs.a: $(odemustubs_o_files)
+	$(AR) -v -q $@ $?
+
+odemustubsD_c_files := $(foreach dir,src/odemustubs,$(wildcard $(dir)/*.c))
+odemustubsD_o_files := $(foreach file,$(odemustubsD_c_files),$(BUILD_DIR)/debug/$(file:.c=.o))
+odemustubsD.a: $(odemustubsD_o_files)
 	$(AR) -v -q $@ $?
 
 # ------------------------------------------------------------------------------
