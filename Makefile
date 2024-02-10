@@ -159,7 +159,7 @@ $(DTK): tools/dtk_version
 	$(QUIET) $(PYTHON) tools/download_dtk.py $< $@
 
 build/debug/src/%.o: src/%.c
-	$(CC) -c -opt level=0 -inline off $(CFLAGS) -I- $(INCLUDES) -DDEBUG $< -o $@
+	$(CC) -c -opt level=0 -inline off -schedule off $(CFLAGS) -I- $(INCLUDES) -DDEBUG $< -o $@
 
 build/release/src/%.o: src/%.c
 	$(CC) -c -O4,p -inline auto $(CFLAGS) -I- $(INCLUDES) -DRELEASE $< -o $@

@@ -60,7 +60,7 @@ __declspec(weak) asm void __start(void) {
 
 _check_TRK:
 	cmplwi r6, 0
-	beq _check_debug_flag
+	beq _goto_main
 	lwz r7, OS_BI2_DEBUGFLAG_OFFSET(r6)
 	
 _check_debug_flag:
@@ -147,11 +147,6 @@ asm static void __init_registers(void) {
 	blr
   // clang-format on
 }
-
-// im not sure debug libs pass -schedule off due to matches in other libs.. TODO: Resolve this?
-#ifdef DEBUG
-#pragma scheduling off
-#endif
 
 void __init_data(void) {
   __rom_copy_info* dci;
