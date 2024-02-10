@@ -109,6 +109,7 @@ CC        = $(MWCC)
 OPTFLAGS := -O4,p
 INLINEFLAGS := -inline auto
 CFLAGS := $(OPTFLAGS) $(INLINEFLAGS) -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn pragmas -pragma 'cats off'
+INCLUDES := -Isrc -Iinclude
 
 ASFLAGS = -mgekko -I src -I include
 
@@ -123,7 +124,7 @@ A_FILES := $(foreach dir,$(BASEROM_DIR),$(wildcard $(dir)/*.a))
 
 default: all
 
-all: $(DTK) amcnotstub.a amcnotstubD.a
+all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a
 
 extract: $(DTK)
 	$(info Extracting files...)
@@ -147,10 +148,10 @@ $(DTK): tools/dtk_version
 	$(QUIET) $(PYTHON) tools/download_dtk.py $< $@
 
 build/debug/src/%.o: src/%.c
-	$(CC) -c -opt level=0 -inline off $(CFLAGS) $< -o $@
+	$(CC) -c -opt level=0 -inline off $(CFLAGS) $(INCLUDES) $< -o $@
 
 build/release/src/%.o: src/%.c
-	$(CC) -c -O4,p -inline auto $(CFLAGS) $< -o $@
+	$(CC) -c -O4,p -inline auto $(CFLAGS) $(INCLUDES) $< -o $@
 
 ################################ Build AR Files ###############################
 
@@ -162,6 +163,16 @@ amcnotstub.a: $(amcnotstub_o_files)
 amcnotstubD_c_files := $(foreach dir,src/amcnotstub,$(wildcard $(dir)/*.c))
 amcnotstubD_o_files := $(foreach file,$(amcnotstubD_c_files),$(BUILD_DIR)/debug/$(file:.c=.o))
 amcnotstubD.a: $(amcnotstubD_o_files)
+	$(AR) -v -q $@ $?
+
+amcstubs_c_files := $(foreach dir,src/amcstubs,$(wildcard $(dir)/*.c))
+amcstubs_o_files := $(foreach file,$(amcstubs_c_files),$(BUILD_DIR)/release/$(file:.c=.o))
+amcstubs.a: $(amcstubs_o_files)
+	$(AR) -v -q $@ $?
+
+amcstubsD_c_files := $(foreach dir,src/amcstubs,$(wildcard $(dir)/*.c))
+amcstubsD_o_files := $(foreach file,$(amcstubsD_c_files),$(BUILD_DIR)/debug/$(file:.c=.o))
+amcstubsD.a: $(amcstubsD_o_files)
 	$(AR) -v -q $@ $?
 
 # ------------------------------------------------------------------------------
