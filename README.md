@@ -7,6 +7,7 @@ Decompilation of the archive library files of the 5/23/2001 (estimated based on 
 Currently this repository supports building the following libraries:
 
 | Library Name | Completed? |
+| ------------ | ---------- |
 | ai           | :x: |
 | amcnotstub   | :heavy_check_mark: |
 | amcstubs     | :x: |
