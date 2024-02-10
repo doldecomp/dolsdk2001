@@ -1,0 +1,5 @@
+# Ignore .a files put in this folder.
+*.a
+
+# Ignore the extracted files.
+out/

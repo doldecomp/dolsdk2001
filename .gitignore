@@ -1,0 +1,11 @@
+# Built libraries
+*.a
+
+# Build artifacts
+build/
+
+# Local binary executables
+dtk
+
+# Compiler
+mwcc_compiler/
