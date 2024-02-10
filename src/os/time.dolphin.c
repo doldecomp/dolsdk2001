@@ -1,6 +1,5 @@
 #include <dolphin.h>
-
-extern long long OSGetTime();
+#include <dolphin/os.h>
 
 long long __get_clock() {
     return -1;

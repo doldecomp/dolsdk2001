@@ -1,4 +1,5 @@
 #include <dolphin.h>
+#include <dolphin/os.h>
 
 #define EXCEPTIONMASK_ADDR 0x80000044
 #define BOOTINFO2_ADDR 0x800000F4
@@ -27,7 +28,6 @@ typedef struct __bss_init_info {
 } __bss_init_info;
 
 __declspec(section ".init") extern __bss_init_info _bss_init_info[];
-
 extern int main(int argc, char* argv[]);
 extern void exit(int);
 extern void __init_user(void);

@@ -1,25 +1,13 @@
 #include <dolphin.h>
-
-__declspec(section ".init") extern void __init_hardware(void);
-extern void __init_user(void);
-extern void _ExitProcess(void);													
-__declspec(section ".init") extern void __flush_cache(void *address, unsigned int size);
-__declspec(section ".init") extern void ADSInit();
-extern void __copy_vectors(void);
-
-extern void __OSCacheInit(void);
-extern void __OSPSInit(void);
+#include <dolphin/os.h>
 
 #define MSR_FP 0x2000
 
-/// A @c void callback with no arguments.
-typedef void (*Event)(void);
+void __init_cpp(void);
+void _ExitProcess(void);
 
 __declspec(section ".ctors") extern void (* _ctors[])(); // size: 0x0, address: 0x0
 __declspec(section ".dtors") extern void (* _dtors[])(); // size: 0x0, address: 0x0
-
-void __init_cpp(void);
-void __fini_cpp(void);
 
 __declspec(section ".init") asm void __init_hardware(void)
 { // clang-format off

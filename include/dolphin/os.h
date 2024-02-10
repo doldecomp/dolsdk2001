@@ -70,6 +70,8 @@ void OSSetArenaLo(void *);
 
 u32 OSGetPhysicalMemSize(void);
 
+void __OSPSInit();
+
 typedef struct OSCalendarTime
 {
     /*0x00*/ int sec;
