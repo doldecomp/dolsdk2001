@@ -1,6 +1,6 @@
 # Dolphin SDK 2001 Libraries
 
-Decompilation of the archive library files of the 5/23/2001 (estimated based on build date of the libraries) version of the Dolphin SDK.
+Decompilation of the archive library files of the 5/22/2001 version of the Dolphin SDK.
 
 ## Compatibility
 
