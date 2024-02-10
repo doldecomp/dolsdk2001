@@ -6,6 +6,8 @@ build/
 
 # Local binary executables
 dtk
+objdiff
+*.exe
 
 # Compiler
 mwcc_compiler/

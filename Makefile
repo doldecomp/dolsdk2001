@@ -122,20 +122,31 @@ $(foreach dir,$(SRC_DIRS) $(ASM_DIRS) $(DATA_DIRS),$(shell mkdir -p build/debug/
 
 A_FILES := $(foreach dir,$(BASEROM_DIR),$(wildcard $(dir)/*.a)) 
 
+TARGET_LIBS := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS)))
+TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
+
 default: all
 
 all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a
 
 extract: $(DTK)
 	$(info Extracting files...)
-	@$(DTK) ar extract baserom/*.a --out baserom/out
+	@$(DTK) ar extract $(TARGET_LIBS) --out baserom/release/src
+	@$(DTK) ar extract $(TARGET_LIBS_DEBUG) --out baserom/debug/src
+    # Thank you GPT, very cool. Temporary hack to remove D off of inner src folders to let objdiff work.
+	@for dir in $$(find baserom/debug/src -type d -name 'src'); do \
+		find "$$dir" -mindepth 1 -maxdepth 1 -type d | while read subdir; do \
+			mv "$$subdir" "$${subdir%?}"; \
+		done \
+	done
 	find baserom -name '*.o' | while read i; do \
 		$(DTK) elf disasm $$i $${i%.o}.s ; \
 	done
 
 # clean extraction so extraction can be done again.
 distclean:
-	rm -rf $(BASEROM_DIR)/out
+	rm -rf $(BASEROM_DIR)/release
+	rm -rf $(BASEROM_DIR)/debug
 	rm -rf tools/dtk
 	make clean
 
