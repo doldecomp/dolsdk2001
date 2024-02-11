@@ -3,4 +3,6 @@
 
 #include "dolphin/types.h"
 
+#include "macros.h"
+
 #endif

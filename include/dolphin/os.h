@@ -12,23 +12,10 @@
 #include <dolphin/OSReset.h>
 #include <dolphin/OSResetSW.h>
 #include <dolphin/OSError.h>
+#include <dolphin/OSTime.h>
 
 // private macro, maybe shouldn't be defined here?
 #define OFFSET(addr, align) (((u32)(addr) & ((align)-1)))
-
-#ifdef DEBUG
-#define ASSERTLINE(cond, line) \
-    if (!(cond)) { \
-        OSPanic(__FILE__, line, "Failed assertion " #cond); \
-    }
-//#define ASSERT(cond) ASSERTLINE(cond, __LINE__)
-#else
-#define ASSERTLINE(cond, line)
-//#define ASSERT(exp) ((void)0)
-#define ASSERTMSG(exp, ...) ((void)0)
-#endif
-
-#define ASSERT(cond) ASSERTLINE(cond, __LINE__)
 
 typedef s64 OSTime;
 typedef u32 OSTick;

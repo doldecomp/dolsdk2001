@@ -20,4 +20,6 @@
 #include <dolphin/dtk.h>
 #include <dolphin/ai.h>
 
+#include "macros.h"
+
 #endif
