@@ -1,6 +1,6 @@
 # Dolphin SDK 2001 Libraries
 
-Decompilation of the archive library files of the 5/22/2001 version of the Dolphin SDK.
+Decompilation of the archive library files of the 5/22/2001 version of the Dolphin SDK. **This repository does not provide a complete copy of that version of the SDK.** This repo is focusing on the built code libraries within this version and is *not a complete replacement.*
 
 ## Compatibility
 
