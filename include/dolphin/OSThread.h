@@ -77,4 +77,6 @@ s32 OSSuspendThread(OSThread *thread);
 s32 OSResumeThread(OSThread* thread);
 OSThread* OSGetCurrentThread(void);
 
+#define IsSuspended(suspend) (suspend > 0)
+
 #endif

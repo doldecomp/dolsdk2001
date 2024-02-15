@@ -26,6 +26,9 @@ typedef u32 OSTick;
 #ifdef __MWERKS__
 u32 __OSBusClock  : (OS_BASE_CACHED | 0x00F8);
 u32 __OSCoreClock : (OS_BASE_CACHED | 0x00FC);
+OSThread *__gUnkThread1 : (OS_BASE_CACHED | 0x00D8);
+OSThreadQueue __OSActiveThreadQueue : (OS_BASE_CACHED | 0x00DC);
+OSThread *__gCurrentThread : (OS_BASE_CACHED | 0x00E4);
 #else
 #define __OSBusClock  (*(u32 *)(OS_BASE_CACHED | 0x00F8))
 #define __OSCoreClock (*(u32 *)(OS_BASE_CACHED | 0x00FC))
