@@ -17,6 +17,7 @@
 #include <dolphin/OSSerial.h>
 #include <dolphin/OSRtc.h>
 #include <dolphin/OSMessage.h>
+#include <dolphin/OSMemory.h>
 
 // private macro, maybe shouldn't be defined here?
 #define OFFSET(addr, align) (((u32)(addr) & ((align)-1)))
@@ -28,6 +29,8 @@ typedef u32 OSTick;
 #define OS_BASE_UNCACHED 0xC0000000
 
 #ifdef __MWERKS__
+u32 __OSPhysicalMemSize   : (OS_BASE_CACHED | 0x0028);
+u32 __OSSimulatedMemSize  : (OS_BASE_CACHED | 0x00F0);
 u32 __OSBusClock  : (OS_BASE_CACHED | 0x00F8);
 u32 __OSCoreClock : (OS_BASE_CACHED | 0x00FC);
 OSThread *__gUnkThread1 : (OS_BASE_CACHED | 0x00D8);
@@ -72,6 +75,21 @@ typedef struct OSCalendarTime
     /*0x20*/ int msec;
     /*0x24*/ int usec;
 } OSCalendarTime;
+
+#include <dolphin/dvd.h>
+
+typedef struct OSBootInfo_s {
+    // total size: 0x40
+    DVDDiskID DVDDiskID; // offset 0x0, size 0x20
+    unsigned long magic; // offset 0x20, size 0x4
+    unsigned long version; // offset 0x24, size 0x4
+    unsigned long memorySize; // offset 0x28, size 0x4
+    unsigned long consoleType; // offset 0x2C, size 0x4
+    void * arenaLo; // offset 0x30, size 0x4
+    void * arenaHi; // offset 0x34, size 0x4
+    void * FSTLocation; // offset 0x38, size 0x4
+    unsigned long FSTMaxLength; // offset 0x3C, size 0x4
+} OSBootInfo;
 
 OSTick OSGetTick(void);
 OSTime OSGetTime(void);
