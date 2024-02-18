@@ -18,6 +18,7 @@
 #include <dolphin/OSRtc.h>
 #include <dolphin/OSMessage.h>
 #include <dolphin/OSMemory.h>
+#include <dolphin/OSException.h>
 
 // private macro, maybe shouldn't be defined here?
 #define OFFSET(addr, align) (((u32)(addr) & ((align)-1)))
@@ -109,5 +110,9 @@ void OSPanic(char *file, int line, char *msg, ...);
 
 #define OSRoundUp32B(x)   (((u32)(x) + 32 - 1) & ~(32 - 1))
 #define OSRoundDown32B(x) (((u32)(x)) & ~(32 - 1))
+
+#ifndef DEBUG
+#define OSPhysicalToCached(offset) ((void*)((u32)(OS_BASE_CACHED + offset)))
+#endif
 
 #endif

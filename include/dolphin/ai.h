@@ -29,10 +29,4 @@ void AISetStreamVolRight(u8 volume);
 u8 AIGetStreamVolRight(void);
 void AIInit(u8 *stack);
 
-#ifdef __MWERKS__
-extern volatile u32 __AIRegs[8] : 0xCC006C00;
-#else
-#define __AIRegs ((volatile u32 *)0xCC006C00)
-#endif
-
 #endif

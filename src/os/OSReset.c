@@ -152,5 +152,5 @@ void OSResetSystem(int reset, unsigned long resetCode, int forceMenu) {
 }
 
 unsigned long OSGetResetCode() {
-    return (OS_PI_INTR_CAUSE[9] & 0xFFFFFFF8) / 8;
+    return (__PIRegs[9] & 0xFFFFFFF8) / 8;
 }
