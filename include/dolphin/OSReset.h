@@ -7,6 +7,11 @@
 
 #include <dolphin/types.h>
 
+struct OSResetFunctionQueue {
+    struct OSResetFunctionInfo * head;
+    struct OSResetFunctionInfo * tail;
+};
+
 typedef BOOL (*OSResetFunction)(BOOL);
 
 typedef struct OSResetFunctionInfo OSResetFunctionInfo;
@@ -19,6 +24,8 @@ struct OSResetFunctionInfo
 };
 
 void OSRegisterResetFunction(OSResetFunctionInfo *info);
+void OSUnregisterResetFunction(OSResetFunctionInfo * info);
 void OSResetSystem(int reset, u32 resetCode, BOOL forceMenu);
+unsigned long OSGetResetCode();
 
 #endif
