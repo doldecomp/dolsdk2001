@@ -16,6 +16,7 @@
 #include <dolphin/OSStopwatch.h>
 #include <dolphin/OSSerial.h>
 #include <dolphin/OSRtc.h>
+#include <dolphin/OSMessage.h>
 
 // private macro, maybe shouldn't be defined here?
 #define OFFSET(addr, align) (((u32)(addr) & ((align)-1)))
