@@ -3,30 +3,105 @@
 
 #include <dolphin/types.h>
 
+#define OS_MODULE_VERSION 1
+typedef struct OSModuleHeader OSModuleHeader;
+
 typedef u32 OSModuleID;
-
-struct OSModuleInfo;
+typedef struct OSModuleQueue OSModuleQueue;
+typedef struct OSModuleLink OSModuleLink;
 typedef struct OSModuleInfo OSModuleInfo;
+typedef struct OSSectionInfo OSSectionInfo;
+typedef struct OSImportInfo OSImportInfo;
+typedef struct OSRel OSRel;
 
-typedef struct OSModuleLink
-{
-    OSModuleInfo *next;
-    OSModuleInfo *prev;
-} OSModuleLink;
-
-struct OSModuleInfo
-{
-    /*0x00*/ OSModuleID id;
-    /*0x04*/ OSModuleLink link;
-    /*0x0C*/ u32 numSections;
-    /*0x10*/ u32 sectionInfoOffset;
-    /*0x14*/ u32 nameOffset;
-    /*0x18*/ u32 nameSize;
-    /*0x1C*/ u32 version;
+struct OSModuleQueue {
+  OSModuleInfo* head;
+  OSModuleInfo* tail;
 };
 
-void OSSetStringTable(void *);
-BOOL OSLink(OSModuleInfo *newModule, void *bss);
-BOOL OSUnlink(OSModuleInfo *oldModule);
+struct OSModuleLink {
+  OSModuleInfo* next;
+  OSModuleInfo* prev;
+};
+
+struct OSModuleInfo {
+  OSModuleID id;         // unique identifier for the module
+  OSModuleLink link;     // doubly linked list of modules
+  u32 numSections;       // # of sections
+  u32 sectionInfoOffset; // offset to section info table
+  u32 nameOffset;        // offset to module name
+  u32 nameSize;          // size of module name
+  u32 version;           // version number
+};
+
+struct OSModuleHeader {
+  // CAUTION: info must be the 1st member
+  OSModuleInfo info;
+
+  // OS_MODULE_VERSION == 1
+  u32 bssSize; // total size of bss sections in bytes
+  u32 relOffset;
+  u32 impOffset;
+  u32 impSize;          // size in bytes
+  u8 prologSection;     // section # for prolog function
+  u8 epilogSection;     // section # for epilog function
+  u8 unresolvedSection; // section # for unresolved function
+  u8 bssSection;        // section # for bss section (set at run-time)
+  u32 prolog;           // prolog function offset
+  u32 epilog;           // epilog function offset
+  u32 unresolved;       // unresolved function offset
+
+  // OS_MODULE_VERSION == 2
+#if (2 <= OS_MODULE_VERSION)
+  u32 align;    // module alignment constraint
+  u32 bssAlign; // bss alignment constraint
+#endif
+
+  // OS_MODULE_VERSION == 3
+#if (3 <= OS_MODULE_VERSION)
+  u32 fixSize;
+#endif
+};
+
+#define OSGetSectionInfo(module) ((OSSectionInfo*)(((OSModuleInfo*)(module))->sectionInfoOffset))
+
+struct OSSectionInfo {
+  u32 offset;
+  u32 size;
+};
+
+// OSSectionInfo.offset bit
+#define OS_SECTIONINFO_EXEC 0x1
+#define OS_SECTIONINFO_OFFSET(offset) ((offset) & ~0x1)
+
+struct OSImportInfo {
+  OSModuleID id; // external module id
+  u32 offset;    // offset to OSRel instructions
+};
+
+struct OSRel {
+  u16 offset; // byte offset from the previous entry
+  u8 type;
+  u8 section;
+  u32 addend;
+};
+
+#define R_DOLPHIN_NOP 201     //  C9h current offset += OSRel.offset
+#define R_DOLPHIN_SECTION 202 //  CAh current section = OSRel.section
+#define R_DOLPHIN_END 203     //  CBh
+#define R_DOLPHIN_MRKREF 204  //  CCh
+
+void OSSetStringTable(const void* stringTable);
+BOOL OSLink(OSModuleInfo* newModule, void* bss);
+#if (3 <= OS_MODULE_VERSION)
+BOOL OSLinkFixed(OSModuleInfo* newModule, void* bss);
+#endif
+BOOL OSUnlink(OSModuleInfo* oldModule);
+
+OSModuleInfo* OSSearchModule(void* ptr, u32* section, u32* offset);
+
+// debugger notification
+void OSNotifyLink();
+void OSNotifyUnlink();
 
 #endif
