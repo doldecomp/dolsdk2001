@@ -31,12 +31,13 @@ typedef u32 OSTick;
 
 #ifdef __MWERKS__
 u32 __OSPhysicalMemSize   : (OS_BASE_CACHED | 0x0028);
-u32 __OSSimulatedMemSize  : (OS_BASE_CACHED | 0x00F0);
-u32 __OSBusClock  : (OS_BASE_CACHED | 0x00F8);
-u32 __OSCoreClock : (OS_BASE_CACHED | 0x00FC);
+volatile int __OSTVMode : (OS_BASE_CACHED | 0x00CC);
 OSThread *__gUnkThread1 : (OS_BASE_CACHED | 0x00D8);
 OSThreadQueue __OSActiveThreadQueue : (OS_BASE_CACHED | 0x00DC);
 OSThread *__gCurrentThread : (OS_BASE_CACHED | 0x00E4);
+u32 __OSSimulatedMemSize  : (OS_BASE_CACHED | 0x00F0);
+u32 __OSBusClock  : (OS_BASE_CACHED | 0x00F8);
+u32 __OSCoreClock : (OS_BASE_CACHED | 0x00FC);
 #else
 #define __OSBusClock  (*(u32 *)(OS_BASE_CACHED | 0x00F8))
 #define __OSCoreClock (*(u32 *)(OS_BASE_CACHED | 0x00FC))

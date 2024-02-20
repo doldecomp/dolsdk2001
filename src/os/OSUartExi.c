@@ -52,7 +52,7 @@ int WriteUARTN(void *buf, u32 len) {
     }
 
     while ((u32)ptr - (u32)buf < len) {
-        if (*ptr == 0xA) {
+        if (*(s8*)ptr == 0xA) {
             *ptr = 0xD;
         }
         ptr++;
