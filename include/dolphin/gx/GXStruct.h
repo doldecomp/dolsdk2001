@@ -50,6 +50,11 @@ typedef struct
 
 typedef struct
 {
+    u32 dummy[3];
+} GXTlutObj;
+
+typedef struct
+{
     u32 dummy[4];
 } GXTlutRegion;
 
