@@ -26,8 +26,13 @@
 typedef s64 OSTime;
 typedef u32 OSTick;
 
-#define OS_BASE_CACHED 0x80000000
-#define OS_BASE_UNCACHED 0xC0000000
+// Upper words of the masks, since UIMM is only 16 bits
+#define OS_CACHED_REGION_PREFIX 0x8000
+#define OS_UNCACHED_REGION_PREFIX 0xC000
+#define OS_PHYSICAL_MASK 0x3FFF
+
+#define OS_BASE_CACHED (OS_CACHED_REGION_PREFIX << 16)
+#define OS_BASE_UNCACHED (OS_UNCACHED_REGION_PREFIX << 16)
 
 #ifdef __MWERKS__
 u32 __OSPhysicalMemSize   : (OS_BASE_CACHED | 0x0028);
