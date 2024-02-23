@@ -1,8 +1,6 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
-#define MSR_FP 0x2000
-
 #define ENQUEUE_THREAD(thread, queue, link)       \
     do {                                          \
         struct OSThread * __prev = (queue)->tail; \

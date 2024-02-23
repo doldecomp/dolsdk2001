@@ -1,8 +1,6 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
-#define MSR_FP 0x2000
-
 void __init_cpp(void);
 void _ExitProcess(void);
 
