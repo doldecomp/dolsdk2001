@@ -5,6 +5,8 @@
 #include <dolphin/dsp.h>
 #include <dolphin/dvd.h>
 
+#include <dolphin/card/CARDWrite.h>
+
 #define CARD_RESULT_UNLOCKED       1
 #define CARD_RESULT_READY          0
 #define CARD_RESULT_BUSY          -1
@@ -128,7 +130,6 @@ s32 CARDGetResultCode(s32 chan);
 s32 CARDCheckAsync(s32 chan, CARDCallback callback);
 s32 CARDFreeBlocks(s32 chan, s32 *byteNotUsed, s32 *filesNotUsed);
 s32 CARDCreateAsync(s32 chan, char *fileName, u32 size, CARDFileInfo *fileInfo, CARDCallback callback);
-s32 CARDWriteAsync(CARDFileInfo* fileInfo, void *addr, s32 length, s32 offset, CARDCallback callback);
 s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat *stat, CARDCallback callback);
 s32 CARDReadAsync(CARDFileInfo* fileInfo, void *addr, s32 length, s32 offset, CARDCallback callback);
 s32 CARDGetStatus(s32 chan, s32 fileNo, CARDStat *stat);

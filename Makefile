@@ -125,7 +125,7 @@ TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a
+all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a
 
 extract: $(DTK)
 	$(info Extracting files...)
@@ -214,6 +214,16 @@ os.a: $(os_o_files)
 osD_c_files := $(foreach dir,src/os,$(wildcard $(dir)/*.c))
 osD_o_files := $(foreach file,$(osD_c_files),$(BUILD_DIR)/debug/$(file:.c=.o))
 osD.a: $(osD_o_files)
+	$(AR) -v -q $@ $?
+
+card_c_files := $(foreach dir,src/card,$(wildcard $(dir)/*.c))
+card_o_files := $(foreach file,$(card_c_files),$(BUILD_DIR)/release/$(file:.c=.o))
+card.a: $(card_o_files)
+	$(AR) -v -q $@ $?
+
+cardD_c_files := $(foreach dir,src/card,$(wildcard $(dir)/*.c))
+cardD_o_files := $(foreach file,$(cardD_c_files),$(BUILD_DIR)/debug/$(file:.c=.o))
+cardD.a: $(cardD_o_files)
 	$(AR) -v -q $@ $?
 
 # ------------------------------------------------------------------------------

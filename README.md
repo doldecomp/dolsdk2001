@@ -19,7 +19,7 @@ Currently this repository supports building the following libraries:
 | ax           | :x: |
 | axfx         | :x: |
 | base         | :x: |
-| card         | :x: |
+| card         | :warning: |
 | db           | :x: |
 | demo         | :x: |
 | dolformat    | :x: |
