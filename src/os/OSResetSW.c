@@ -5,9 +5,8 @@ static void (* ResetCallback)();
 static int Down;
 static long long Hold;
 
-void __OSResetSWInterruptHandler() {
+void __OSResetSWInterruptHandler(short exception, struct OSContext *context) {
     void (* callback)();
-    int unused;
 
     Down = 1;
     __PIRegs[0] = 2;
