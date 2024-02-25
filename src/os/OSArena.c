@@ -4,8 +4,8 @@
 #define ROUND(n, a) (((u32)(n) + (a)-1) & ~((a)-1))
 #define TRUNC(n, a) (((u32)(n)) & ~((a)-1))
 
-static void * __OSArenaHi; // size: 0x4, address: 0x0
-static void * __OSArenaLo = (void*)-1; // size: 0x4, address: 0x0
+static void * __OSArenaHi;
+static void * __OSArenaLo = (void*)-1;
 
 void * OSGetArenaHi() {
     ASSERTMSGLINE("OSArena.c", 0x37, (u32)__OSArenaLo != -1, "OSGetArenaHi(): OSInit() must be called in advance.");
