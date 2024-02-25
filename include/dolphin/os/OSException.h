@@ -1,7 +1,7 @@
 #ifndef _DOLPHIN_OSEXCEPTION_H_
 #define _DOLPHIN_OSEXCEPTION_H_
 
-#include <dolphin/OSContext.h>
+#include <dolphin/os/OSContext.h>
 #include <dolphin/types.h>
 
 #define __OS_EXCEPTION_SYSTEM_RESET         0

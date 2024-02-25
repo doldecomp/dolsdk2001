@@ -4,7 +4,7 @@
 typedef s64 OSTime;
 
 #include <dolphin/types.h>
-#include <dolphin/OSException.h>
+#include <dolphin/os/OSException.h>
 
 typedef s16 __OSInterrupt;
 typedef u32  OSInterruptMask;
