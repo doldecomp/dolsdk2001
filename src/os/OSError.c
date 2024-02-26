@@ -1,7 +1,8 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
-extern char * __OSExceptionNames[15];
+// internal include
+#include "__os.h"
 
 static OSErrorHandler OSErrorTable[15];
 

@@ -16,7 +16,7 @@ static unsigned long CompleteTransfer();
 static void SITransferNext(long chan);
 static void SIIntrruptHandler(short unused, struct OSContext * context);
 static int __SITransfer(long chan, void * output, unsigned long outputBytes, void * input, unsigned long inputBytes, void (* callback)(long, unsigned long, struct OSContext *));
-static void AlarmHandler(struct OSAlarm * alarm);
+static void AlarmHandler(struct OSAlarm * alarm, struct OSContext * context);
 
 int SIBusy() {
     return (Si.chan != -1) ? 1 : 0;
@@ -260,10 +260,9 @@ void SIGetResponse(long chan, void * data) {
     ((u32*)data)[1] = __SIRegs[chan * 3 + 2];
 }
 
-static void AlarmHandler(struct OSAlarm * alarm) {
+static void AlarmHandler(struct OSAlarm * alarm, struct OSContext * context) {
     long chan;
     struct SIPacket * packet;
-    long unused;
 
     chan = alarm-Alarm;
 

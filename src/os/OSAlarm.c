@@ -1,8 +1,8 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
-// internal function
-extern __OSExceptionHandler __OSGetExceptionHandler(__OSException exception);
+// internal header
+#include "__os.h"
 
 struct OSAlarmQueue {
     struct OSAlarm * head;
@@ -12,15 +12,8 @@ struct OSAlarmQueue {
 static struct OSAlarmQueue AlarmQueue;
 
 // functions
-int OSCheckAlarmQueue();
 static void SetTimer(struct OSAlarm * alarm);
-void OSInitAlarm(void);
-void OSCreateAlarm(OSAlarm* alarm);
 static void InsertAlarm(OSAlarm* alarm, OSTime fire, OSAlarmHandler handler);
-void OSSetAlarm(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler);
-void OSSetAbsAlarm(struct OSAlarm * alarm, long long time, void (* handler)(struct OSAlarm *, struct OSContext *));
-void OSSetPeriodicAlarm(OSAlarm* alarm, OSTime start, OSTime period, OSAlarmHandler handler);
-void OSCancelAlarm(OSAlarm* alarm);
 static void DecrementerExceptionCallback(register __OSException exception, register OSContext* context);
 static void DecrementerExceptionHandler(__OSException exception, OSContext* context);
 
@@ -54,63 +47,67 @@ static void SetTimer(struct OSAlarm * alarm) {
 }
 
 void OSInitAlarm(void) {
-  if (__OSGetExceptionHandler(8) != DecrementerExceptionHandler) {
-    AlarmQueue.head = AlarmQueue.tail = NULL;
-    __OSSetExceptionHandler(8, DecrementerExceptionHandler);
-  }
+    if (__OSGetExceptionHandler(8) != DecrementerExceptionHandler) {
+        AlarmQueue.head = AlarmQueue.tail = NULL;
+        __OSSetExceptionHandler(8, DecrementerExceptionHandler);
+    }
 }
 
 void OSCreateAlarm(OSAlarm* alarm) {
-  alarm->handler = 0;
+    alarm->handler = 0;
 }
 
 static void InsertAlarm(OSAlarm* alarm, OSTime fire, OSAlarmHandler handler) {
-  OSAlarm* next;
-  OSAlarm* prev;
-
-  if (0 < alarm->period) {
-    OSTime time = OSGetTime();
-
-    fire = alarm->start;
-    if (alarm->start < time) {
-      fire += alarm->period * ((time - alarm->start) / alarm->period + 1);
-    }
-  }
-
-  ASSERTLINE("OSAlarm.c", 0xD6, alarm->handler == 0);
-
-  alarm->handler = handler;
-  alarm->fire = fire;
-
-  for (next = AlarmQueue.head; next; next = next->next) {
+    OSAlarm* next;
+    OSAlarm* prev;
     
-    if (next->fire <= fire) {
-      continue;
+    if (0 < alarm->period) {
+        OSTime time = OSGetTime();
+        
+        fire = alarm->start;
+        if (alarm->start < time) {
+            fire += alarm->period * ((time - alarm->start) / alarm->period + 1);
+        }
     }
     
-    alarm->prev = next->prev;
-    next->prev = alarm;
-    alarm->next = next;
-    prev = alarm->prev;
+    ASSERTLINE("OSAlarm.c", 0xD6, alarm->handler == 0);
+    
+    alarm->handler = handler;
+    alarm->fire = fire;
+    
+    for (next = AlarmQueue.head; next; next = next->next) {
+        if (next->fire <= fire) {
+            continue;
+        }
+        
+        alarm->prev = next->prev;
+        next->prev = alarm;
+        alarm->next = next;
+        prev = alarm->prev;
+
+        if (prev) {
+            prev->next = alarm;
+        } else {
+            AlarmQueue.head = alarm;
+            SetTimer(alarm);
+        }
+
+        return;
+    }
+
+    ASSERTLINE("OSAlarm.c", 0xF3, next == 0);
+
+    alarm->next = 0;
+    prev = AlarmQueue.tail;
+    AlarmQueue.tail = alarm;
+    alarm->prev = prev;
+
     if (prev) {
-      prev->next = alarm;
+        prev->next = alarm;
     } else {
-      AlarmQueue.head = alarm;
-      SetTimer(alarm);
+        AlarmQueue.head = AlarmQueue.tail = alarm;
+        SetTimer(alarm);
     }
-    return;
-  }
-  ASSERTLINE("OSAlarm.c", 0xF3, next == 0);
-  alarm->next = 0;
-  prev = AlarmQueue.tail;
-  AlarmQueue.tail = alarm;
-  alarm->prev = prev;
-  if (prev) {
-    prev->next = alarm;
-  } else {
-    AlarmQueue.head = AlarmQueue.tail = alarm;
-    SetTimer(alarm);
-  }
 }
 
 void OSSetAlarm(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler) {
@@ -223,8 +220,7 @@ static void DecrementerExceptionCallback(register __OSException exception,
 
 static asm void DecrementerExceptionHandler(register __OSException exception,
                                             register OSContext* context) {
-
-  nofralloc 
-  OS_EXCEPTION_SAVE_GPRS(context)
-  b DecrementerExceptionCallback
+    nofralloc 
+    OS_EXCEPTION_SAVE_GPRS(context)
+    b DecrementerExceptionCallback
 }

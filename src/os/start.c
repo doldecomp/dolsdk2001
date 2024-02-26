@@ -1,6 +1,9 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+// internal header
+#include "__os.h"
+
 #define EXCEPTIONMASK_ADDR 0x80000044
 #define BOOTINFO2_ADDR 0x800000F4
 #define OS_BI2_DEBUGFLAG_OFFSET 0xC
@@ -30,13 +33,7 @@ typedef struct __bss_init_info {
 __declspec(section ".init") extern __bss_init_info _bss_init_info[];
 extern int main(int argc, char* argv[]);
 extern void exit(int);
-extern void __init_user(void);
 
-__declspec(section ".init") extern void __start(void);
-__declspec(section ".init") void __copy_rom_section(void* dst, const void* src, unsigned long size);
-__declspec(section ".init") void __init_bss_section(void* dst, unsigned long size);
-__declspec(section ".init") extern void __init_registers(void);
-__declspec(section ".init") extern void __init_data(void);
 __declspec(section ".init") extern void __init_hardware(void);
 __declspec(section ".init") extern void __flush_cache(void* address, unsigned int size);
 

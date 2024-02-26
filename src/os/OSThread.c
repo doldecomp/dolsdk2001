@@ -81,9 +81,7 @@ static long Reschedule;
 #define ALIGN8(val) (((val) + 0x7) & ~0x7)
 
 // functions
-
 static void OSInitMutexQueue(struct OSMutexQueue * queue);;
-void __OSThreadInit();
 void OSInitThreadQueue(struct OSThreadQueue * queue);
 struct OSThread * OSGetCurrentThread();
 static void __OSSwitchThread(struct OSThread * nextThread);
@@ -94,12 +92,9 @@ long OSDisableScheduler();
 long OSEnableScheduler();
 static void SetRun(struct OSThread * thread);
 static void UnsetRun(struct OSThread * thread);
-long __OSGetEffectivePriority(struct OSThread * thread);
-static struct OSThread * SetEffectivePriority(struct OSThread * thread /* r31 */, long priority /* r24 */);
+static struct OSThread * SetEffectivePriority(struct OSThread * thread, long priority);
 static void UpdatePriority(struct OSThread * thread);
-void __OSPromoteThread(struct OSThread * thread, long priority);
 static struct OSThread * SelectThread(int yield);
-void __OSReschedule(void);
 void OSYieldThread(void);
 int OSCreateThread(struct OSThread * thread, void * (* func)(void *), void * param, void * stack, unsigned long stackSize, long priority, unsigned short attr);
 void OSExitThread(void * val);

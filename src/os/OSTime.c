@@ -71,7 +71,7 @@ long long __OSGetSystemTime() {
     return result;
 }
 
-asm void __OSSetTick(register unsigned long newTicks /* r3 */) {
+asm void __OSSetTick(register unsigned long newTicks) {
     // clang-format off
     nofralloc
     mttbl newTicks

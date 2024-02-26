@@ -107,7 +107,7 @@ CC        = $(MWCC)
 ######################## Flags #############################
 
 CFLAGS := -char unsigned -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn pragmas -pragma 'cats off'
-INCLUDES := -Isrc -Iinclude
+INCLUDES := -Iinclude -ir src
 
 ASFLAGS = -mgekko -I src -I include
 

@@ -2,6 +2,9 @@
 #include <dolphin/os.h>
 #include <dolphin/db.h>
 
+// internal headers
+#include "__os.h"
+
 #define OS_BI2_DEBUG_ADDRESS 0x800000F4
 #define DEBUGFLAG_ADDR 0x800030E8
 #define OS_DEBUG_ADDRESS_2 0x800030E9
@@ -49,15 +52,9 @@ static int AreWeInitialized;
 static void (* * OSExceptionTable)(unsigned char, struct OSContext *);
 
 // functions
-unsigned long __OSIsDebuggerPresent();
 static asm void __OSInitFPRs(void);
-unsigned long OSGetConsoleType();
-void OSInit();
 static void OSExceptionInit(void);
-__OSExceptionHandler __OSSetExceptionHandler(__OSException exception, __OSExceptionHandler handler);
-__OSExceptionHandler __OSGetExceptionHandler(__OSException exception);
 static void OSDefaultExceptionHandler(unsigned char exception /* r3 */, struct OSContext * context /* r4 */);
-void __OSPSInit(void);
 
 unsigned long __OSIsDebuggerPresent() {
     return *(u32*)OSPhysicalToCached(0x40);

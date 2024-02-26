@@ -17,9 +17,12 @@ struct OSAlarm
     OSTime start;
 };
 
+int OSCheckAlarmQueue(void);
 void OSInitAlarm(void);
 void OSCreateAlarm(OSAlarm *alarm);
 void OSSetAlarm(OSAlarm *alarm, OSTime tick, OSAlarmHandler handler);
+void OSSetAbsAlarm(struct OSAlarm * alarm, long long time, void (* handler)(struct OSAlarm *, struct OSContext *));
+void OSSetPeriodicAlarm(OSAlarm* alarm, OSTime start, OSTime period, OSAlarmHandler handler);
 void OSCancelAlarm(OSAlarm *alarm);
 
 #endif // _DOLPHIN_OSALARM_H_

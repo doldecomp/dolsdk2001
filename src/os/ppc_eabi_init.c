@@ -43,8 +43,7 @@ void __init_user(void) {
     __init_cpp();
 }
 
-void __init_cpp(void)
-{
+void __init_cpp(void) {
 	void (* * constructor)();
 
 	/*
@@ -55,8 +54,7 @@ void __init_cpp(void)
 	}
 }
 
-void __fini_cpp(void)
-{
+void __fini_cpp(void) {
     void (* * destructor)();
 
 	/*
@@ -72,7 +70,7 @@ __declspec(weak) void abort () {
 }
 
 __declspec(weak) void exit () {
-    int unused; // what. ugh. The DWARF says this doesnt exist, but whatever. Stupid stack issues.
+    int unused;
     __fini_cpp();
     _ExitProcess();
 }

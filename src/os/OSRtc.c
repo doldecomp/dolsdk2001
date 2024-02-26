@@ -1,27 +1,18 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+// internal include
+#include "__os.h"
+
 static struct SramControl Scb;
 
 static int GetRTC(unsigned long * rtc);
-int __OSGetRTC(unsigned long * rtc);
-int __OSSetRTC(unsigned long rtc);
 static int ReadSram(void * buffer);
 static void WriteSramCallback();
 static int WriteSram(void * buffer, unsigned long offset, unsigned long size);
-void __OSInitSram();
 static void * LockSram(unsigned long offset);
-struct OSSram * __OSLockSram();
-struct OSSramEx * __OSLockSramEx(void);
 static int UnlockSram(int commit, unsigned long offset);
-int __OSUnlockSram(int commit);
-int __OSUnlockSramEx(int commit);
-int __OSSyncSram();
-int __OSCheckSram();
-int __OSReadROM(void * buffer, long length, long offset);
 static void __OSReadROMCallback(long chan);
-unsigned char __OSGetBootMode();
-void __OSSetBootMode(unsigned char ntd);
 
 static int GetRTC(unsigned long * rtc) {
     int err;
