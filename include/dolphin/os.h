@@ -142,7 +142,8 @@ void OSPanic(char *file, int line, char *msg, ...);
 #define OSRoundDown32B(x) (((u32)(x)) & ~(32 - 1))
 
 #ifndef DEBUG
-#define OSPhysicalToCached(offset) ((void*)((u32)(OS_BASE_CACHED + offset)))
+#define OSPhysicalToCached(offset) ((void*)((u32)(OS_BASE_CACHED + (u32)offset)))
+#define OSCachedToPhysical(offset) ((void*)((u32)((u32)offset - OS_BASE_CACHED)))
 #endif
 
 #endif

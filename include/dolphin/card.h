@@ -118,6 +118,23 @@ typedef struct CARDControl
     OSAlarm alarm;
 } CARDControl;
 
+typedef struct CARDDecParam {
+    /* 0x00 */ u8 * inputAddr;
+    /* 0x04 */ u32 inputLength;
+    /* 0x08 */ u32 aramAddr;
+    /* 0x0C */ u8 * outputAddr;
+} CARDDecParam;
+
+typedef struct CARDID {
+    /* 0x000 */ u8 serial[32];
+    /* 0x020 */ u16 deviceID;
+    /* 0x022 */ u16 size;
+    /* 0x024 */ u16 encode;
+    /* 0x026 */ u8 padding[470];
+    /* 0x1FC */ u16 checkSum;
+    /* 0x1FE */ u16 checkSumInv;
+} CARDID;
+
 void CARDInit(void);
 s32 CARDUnmount(s32 chan);
 s32 CARDCancel(CARDFileInfo *fileInfo);
@@ -140,5 +157,8 @@ s32 CARDRenameAsync(s32 chan, char *oldName, char *newName, CARDCallback callbac
 s32 CARDMount(s32 chan, void *workArea, CARDCallback detachCallback);
 s32 CARDDelete(s32 chan, char *fileName);
 s32 CARDRename(s32 chan, char *oldName, char *newName);
+
+// unsorted externs
+extern struct CARDControl __CARDBlock[2];
 
 #endif

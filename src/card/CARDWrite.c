@@ -10,8 +10,6 @@ extern long __CARDSeek(struct CARDFileInfo *, long, long, struct CARDControl **)
 extern void __CARDDefaultApiCallback();
 extern void __CARDSyncCallback();
 
-extern struct CARDControl __CARDBlock[2];
-
 // functions
 static void WriteCallback(long chan, long result);
 static void EraseCallback(long chan, long result);
