@@ -2,6 +2,8 @@
 #include <dolphin/os.h>
 #include <dolphin/card.h>
 
+#include "__card.h"
+
 #define CARD_SYSTEM_BLOCK_SIZE (8 * 1024u)
 
 #define CARD_STAT_SPEED_END 0
@@ -9,10 +11,6 @@
 #define CARD_STAT_SPEED_MIDDLE 2
 #define CARD_STAT_SPEED_SLOW 3
 #define CARD_STAT_SPEED_MASK 3
-    
-// externally used internals
-extern struct CARDDir *__CARDGetDirBlock(struct CARDControl *card);
-extern void __CARDSyncCallback();
 
 #define CARD_READ_SIZE 512
 #define CARD_COMMENT_SIZE 64
@@ -38,6 +36,9 @@ extern void __CARDSyncCallback();
 
 // functions
 static void UpdateIconOffsets(CARDDir *ent, CARDStat *stat);
+s32 CARDGetStatus(s32 chan, s32 fileNo, CARDStat *stat);
+s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat *stat, CARDCallback callback);
+long CARDSetStatus(long chan, long fileNo, struct CARDStat * stat);
 
 static void UpdateIconOffsets(CARDDir *ent, CARDStat *stat) {
     u32 offset;

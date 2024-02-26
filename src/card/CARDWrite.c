@@ -1,14 +1,8 @@
 #include <dolphin.h>
 #include <dolphin/card.h>
 
-// externally used internals
-extern struct CARDDir *__CARDGetDirBlock(struct CARDControl *card);
-extern long __CARDUpdateDir(long chan, void (*callback)(long, long));
-extern unsigned short *__CARDGetFatBlock(struct CARDControl *card);
-extern long __CARDEraseSector(long chan, int size, void *callback);
-extern long __CARDSeek(struct CARDFileInfo *, long, long, struct CARDControl **);
-extern void __CARDDefaultApiCallback();
-extern void __CARDSyncCallback();
+// internal includes
+#include "__card.h"
 
 // functions
 static void WriteCallback(long chan, long result);
