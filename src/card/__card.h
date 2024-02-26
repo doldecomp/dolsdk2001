@@ -4,6 +4,8 @@
 #include <dolphin/card.h>
 
 // unsorted includes
+extern DVDDiskID * __CARDDiskID;
+
 extern struct CARDDir *__CARDGetDirBlock(struct CARDControl *card);
 extern long __CARDUpdateDir(long chan, void (*callback)(long, long));
 extern unsigned short *__CARDGetFatBlock(struct CARDControl *card);
@@ -15,6 +17,7 @@ extern long __CARDGetControlBlock(long chan, struct CARDControl **card);
 extern long __CARDAccess(struct CARDDir *dir);
 extern long __CARDIsPublic(struct CARDDir *dir);
 extern long __CARDPutControlBlock(struct CARDControl *card, long result);
+extern CARDDir * __CARDGetDirBlock(struct CARDControl *card);
 
 // CARDStatEx.c
 long __CARDGetStatusEx(long chan, long fileNo, struct CARDDir * dirent);

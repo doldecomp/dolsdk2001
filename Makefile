@@ -106,7 +106,9 @@ CC        = $(MWCC)
 
 ######################## Flags #############################
 
-CFLAGS := -char unsigned -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn pragmas -pragma 'cats off'
+CHARFLAGS := -char unsigned
+
+CFLAGS = $(CHARFLAGS) -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn pragmas -pragma 'cats off'
 INCLUDES := -Iinclude -ir src
 
 ASFLAGS = -mgekko -I src -I include
@@ -115,6 +117,10 @@ ASFLAGS = -mgekko -I src -I include
 
 $(foreach dir,$(SRC_DIRS) $(ASM_DIRS) $(DATA_DIRS),$(shell mkdir -p build/release/$(dir)))
 $(foreach dir,$(SRC_DIRS) $(ASM_DIRS) $(DATA_DIRS),$(shell mkdir -p build/debug/$(dir)))
+
+# why. Did some SDK libs prefer char signed over unsigned? TODO: Figure out consistency behind this.
+build/debug/src/card/CARDRename.o: CHARFLAGS := -char signed
+build/release/src/card/CARDRename.o: CHARFLAGS := -char signed
 
 ######################## Build #############################
 
