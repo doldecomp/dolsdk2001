@@ -5,6 +5,8 @@
 #include <dolphin/dsp.h>
 #include <dolphin/dvd.h>
 
+#include <dolphin/card/CARDStatEx.h>
+#include <dolphin/card/CARDUnlock.h>
 #include <dolphin/card/CARDWrite.h>
 
 #define CARD_RESULT_UNLOCKED       1

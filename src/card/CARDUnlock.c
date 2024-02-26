@@ -30,7 +30,6 @@ static u32 bitrev(u32 data);
 static s32 ReadArrayUnlock(s32 chan, u32 data, void *rbuf, s32 rlen, s32 mode);
 static u32 GetInitVal(void);
 static s32 DummyLen(void);
-s32 __CARDUnlock(s32 chan, u8 flashID[12]);
 static void InitCallback(void * _task);
 static void DoneCallback(void * _task);
 
