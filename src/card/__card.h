@@ -5,23 +5,28 @@
 
 // unsorted includes
 extern DVDDiskID * __CARDDiskID;
+extern struct CARDControl __CARDBlock[2];
 
-extern struct CARDDir *__CARDGetDirBlock(struct CARDControl *card);
+extern CARDDir *__CARDGetDirBlock(struct CARDControl *card);
 extern long __CARDUpdateDir(long chan, void (*callback)(long, long));
 extern unsigned short *__CARDGetFatBlock(struct CARDControl *card);
 extern long __CARDEraseSector(long chan, int size, void *callback);
-extern long __CARDSeek(struct CARDFileInfo *, long, long, struct CARDControl **);
 extern void __CARDDefaultApiCallback();
 extern void __CARDSyncCallback();
 extern long __CARDGetControlBlock(long chan, struct CARDControl **card);
 extern long __CARDAccess(struct CARDDir *dir);
 extern long __CARDIsPublic(struct CARDDir *dir);
 extern long __CARDPutControlBlock(struct CARDControl *card, long result);
-extern CARDDir * __CARDGetDirBlock(struct CARDControl *card);
 
 // CARDStatEx.c
 long __CARDGetStatusEx(long chan, long fileNo, struct CARDDir * dirent);
 long __CARDSetStatusExAsync(long chan, long fileNo, struct CARDDir * dirent, void (* callback)(long, long));
 long __CARDSetStatusEx(long chan, long fileNo, struct CARDDir * dirent);
+
+// CARDUnlock.c
+s32 __CARDUnlock(s32 chan, u8 flashID[12]);
+
+// CARDRead.c
+s32 __CARDSeek(CARDFileInfo *fileInfo, s32 length, s32 offset, CARDControl **pcard);
 
 #endif // _DOLPHIN_CARD_INTERNAL_H_
