@@ -34,6 +34,9 @@ struct EXIControl {
 #define EXI_WRITE 1
 
 static struct EXIControl Ecb[3];
+#if DOLPHIN_REVISION >= 37
+static u8 bssFiller[0x10];
+#endif
 
 static void SetExiInterruptMask(long chan, struct EXIControl * exi);
 static void CompleteTransfer(long chan);

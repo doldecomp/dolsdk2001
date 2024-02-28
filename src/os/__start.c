@@ -37,6 +37,7 @@ extern void exit(int);
 __declspec(section ".init") extern void __init_hardware(void);
 __declspec(section ".init") extern void __flush_cache(void* address, unsigned int size);
 
+__declspec(section ".init")
 __declspec(weak) asm void __start(void) {
   // clang-format off
 	nofralloc

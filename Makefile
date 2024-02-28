@@ -214,10 +214,10 @@ odenotstubD_o_files := $(foreach file,$(odenotstubD_c_files),$(BUILD_DIR)/debug/
 odenotstubD.a: $(odenotstubD_o_files)
 	$(AR) -v -q $@ $?
 
-os_c_files := $(foreach dir,src/os,$(wildcard $(dir)/*.c))
+os_c_files := $(foreach dir,src/os,$(wildcard $(dir)/OS*.c) $(dir)/time.dolphin.c $(dir)/__start.c $(dir)/__ppc_eabi_init.c)
 os_o_files := $(foreach file,$(os_c_files),$(BUILD_DIR)/release/$(file:.c=.o))
 os.a: $(os_o_files)
-	$(AR) -v -q $@ $?
+	$(AR) -v -r $@ $?
 
 osD_c_files := $(foreach dir,src/os,$(wildcard $(dir)/*.c))
 osD_o_files := $(foreach file,$(osD_c_files),$(BUILD_DIR)/debug/$(file:.c=.o))

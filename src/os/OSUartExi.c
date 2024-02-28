@@ -52,7 +52,11 @@ int WriteUARTN(void *buf, u32 len) {
     }
 
     while ((u32)ptr - (u32)buf < len) {
+#if DOLPHIN_REVISION >= 37
+        if (*(u8*)ptr == 0xA) {
+#else
         if (*(s8*)ptr == 0xA) {
+#endif
             *ptr = 0xD;
         }
         ptr++;
