@@ -115,8 +115,7 @@ ASFLAGS = -mgekko -I src -I include
 
 ######################## Targets #############################
 
-$(foreach dir,$(SRC_DIRS) $(ASM_DIRS) $(DATA_DIRS),$(shell mkdir -p build/release/$(dir)))
-$(foreach dir,$(SRC_DIRS) $(ASM_DIRS) $(DATA_DIRS),$(shell mkdir -p build/debug/$(dir)))
+$(foreach dir,$(SRC_DIRS) $(ASM_DIRS) $(DATA_DIRS),$(shell mkdir -p build/release/$(dir) build/debug/$(dir)))
 
 # why. Did some SDK libs prefer char signed over unsigned? TODO: Figure out consistency behind this.
 build/debug/src/card/CARDRename.o: CHARFLAGS := -char signed
@@ -172,69 +171,37 @@ build/release/src/%.o: src/%.c
 
 ################################ Build AR Files ###############################
 
-amcnotstub_c_files := $(foreach dir,src/amcnotstub,$(wildcard $(dir)/*.c))
-amcnotstub_o_files := $(foreach file,$(amcnotstub_c_files),$(BUILD_DIR)/release/$(file:.c=.o))
-amcnotstub.a: $(amcnotstub_o_files)
-	$(AR) -v -q $@ $?
+amcnotstub_c_files := $(wildcard src/amcnotstub/*.c)
+amcnotstub.a  : $(addprefix $(BUILD_DIR)/release/,$(amcnotstub_c_files:.c=.o))
+amcnotstubD.a : $(addprefix $(BUILD_DIR)/debug/,$(amcnotstub_c_files:.c=.o))
 
-amcnotstubD_c_files := $(foreach dir,src/amcnotstub,$(wildcard $(dir)/*.c))
-amcnotstubD_o_files := $(foreach file,$(amcnotstubD_c_files),$(BUILD_DIR)/debug/$(file:.c=.o))
-amcnotstubD.a: $(amcnotstubD_o_files)
-	$(AR) -v -q $@ $?
+amcstubs_c_files := $(wildcard src/amcstubs/*.c)
+amcstubs.a  : $(addprefix $(BUILD_DIR)/release/,$(amcstubs_c_files:.c=.o))
+amcstubsD.a : $(addprefix $(BUILD_DIR)/debug/,$(amcstubs_c_files:.c=.o))
 
-amcstubs_c_files := $(foreach dir,src/amcstubs,$(wildcard $(dir)/*.c))
-amcstubs_o_files := $(foreach file,$(amcstubs_c_files),$(BUILD_DIR)/release/$(file:.c=.o))
-amcstubs.a: $(amcstubs_o_files)
-	$(AR) -v -q $@ $?
+odemustubs_c_files := $(wildcard src/odemustubs/*.c)
+odemustubs.a  : $(addprefix $(BUILD_DIR)/release/,$(odemustubs_c_files:.c=.o))
+odemustubsD.a : $(addprefix $(BUILD_DIR)/debug/,$(odemustubs_c_files:.c=.o))
 
-amcstubsD_c_files := $(foreach dir,src/amcstubs,$(wildcard $(dir)/*.c))
-amcstubsD_o_files := $(foreach file,$(amcstubsD_c_files),$(BUILD_DIR)/debug/$(file:.c=.o))
-amcstubsD.a: $(amcstubsD_o_files)
-	$(AR) -v -q $@ $?
+odenotstub_c_files := $(wildcard src/odenotstub/*.c)
+odenotstub.a  : $(addprefix $(BUILD_DIR)/release/,$(odenotstub_c_files:.c=.o))
+odenotstubD.a : $(addprefix $(BUILD_DIR)/debug/,$(odenotstub_c_files:.c=.o))
 
-odemustubs_c_files := $(foreach dir,src/odemustubs,$(wildcard $(dir)/*.c))
-odemustubs_o_files := $(foreach file,$(odemustubs_c_files),$(BUILD_DIR)/release/$(file:.c=.o))
-odemustubs.a: $(odemustubs_o_files)
-	$(AR) -v -q $@ $?
+os_c_files := $(wildcard src/os/OS*.c) src/os/time.dolphin.c src/os/__start.c src/os/__ppc_eabi_init.c
+os.a  : $(addprefix $(BUILD_DIR)/release/,$(os_c_files:.c=.o))
+osD.a : $(addprefix $(BUILD_DIR)/debug/,$(os_c_files:.c=.o))
 
-odemustubsD_c_files := $(foreach dir,src/odemustubs,$(wildcard $(dir)/*.c))
-odemustubsD_o_files := $(foreach file,$(odemustubsD_c_files),$(BUILD_DIR)/debug/$(file:.c=.o))
-odemustubsD.a: $(odemustubsD_o_files)
-	$(AR) -v -q $@ $?
+card_c_files := $(wildcard src/card/*.c)
+card.a  : $(addprefix $(BUILD_DIR)/release/,$(card_c_files:.c=.o))
+cardD.a : $(addprefix $(BUILD_DIR)/debug/,$(card_c_files:.c=.o))
 
-odenotstub_c_files := $(foreach dir,src/odenotstub,$(wildcard $(dir)/*.c))
-odenotstub_o_files := $(foreach file,$(odenotstub_c_files),$(BUILD_DIR)/release/$(file:.c=.o))
-odenotstub.a: $(odenotstub_o_files)
-	$(AR) -v -q $@ $?
-
-odenotstubD_c_files := $(foreach dir,src/odenotstub,$(wildcard $(dir)/*.c))
-odenotstubD_o_files := $(foreach file,$(odenotstubD_c_files),$(BUILD_DIR)/debug/$(file:.c=.o))
-odenotstubD.a: $(odenotstubD_o_files)
-	$(AR) -v -q $@ $?
-
-os_c_files := $(foreach dir,src/os,$(wildcard $(dir)/*.c))
-os_o_files := $(foreach file,$(os_c_files),$(BUILD_DIR)/release/$(file:.c=.o))
-os.a: $(os_o_files)
-	$(AR) -v -q $@ $?
-
-osD_c_files := $(foreach dir,src/os,$(wildcard $(dir)/*.c))
-osD_o_files := $(foreach file,$(osD_c_files),$(BUILD_DIR)/debug/$(file:.c=.o))
-osD.a: $(osD_o_files)
-	$(AR) -v -q $@ $?
-
-card_c_files := $(foreach dir,src/card,$(wildcard $(dir)/*.c))
-card_o_files := $(foreach file,$(card_c_files),$(BUILD_DIR)/release/$(file:.c=.o))
-card.a: $(card_o_files)
-	$(AR) -v -q $@ $?
-
-cardD_c_files := $(foreach dir,src/card,$(wildcard $(dir)/*.c))
-cardD_o_files := $(foreach file,$(cardD_c_files),$(BUILD_DIR)/debug/$(file:.c=.o))
-cardD.a: $(cardD_o_files)
-	$(AR) -v -q $@ $?
+%.a:
+	@ test ! -z '$?' || { echo 'no object files for $@'; return 1; }
+	$(AR) -v -r $@ $(filter %.o,$?)
 
 # ------------------------------------------------------------------------------
 
-.PHONY: asset_files o_files all clean distclean default split setup
+.PHONY: all clean distclean default split setup extract
 
 print-% : ; $(info $* is a $(flavor $*) variable set to [$($*)]) @true
 
