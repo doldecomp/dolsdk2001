@@ -195,6 +195,10 @@ card_c_files := $(wildcard src/card/*.c)
 card.a  : $(addprefix $(BUILD_DIR)/release/,$(card_c_files:.c=.o))
 cardD.a : $(addprefix $(BUILD_DIR)/debug/,$(card_c_files:.c=.o))
 
+db_c_files := $(wildcard src/db/*.c)
+db.a  : $(addprefix $(BUILD_DIR)/release/,$(db_c_files:.c=.o))
+dbD.a : $(addprefix $(BUILD_DIR)/debug/,$(db_c_files:.c=.o))
+
 %.a:
 	@ test ! -z '$?' || { echo 'no object files for $@'; return 1; }
 	$(AR) -v -r $@ $(filter %.o,$?)
