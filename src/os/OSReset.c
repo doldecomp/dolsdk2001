@@ -1,6 +1,8 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+#include "__os.h"
+
 // These macros are copied from OSThread.c. Or ARE they the same
 // macros? They dont seem to be in the SDK headers.
 #define ENQUEUE_INFO(info, queue)                            \
@@ -143,10 +145,33 @@ void OSResetSystem(int reset, unsigned long resetCode, int forceMenu) {
     enabled = OSDisableInterrupts();
     rc = CallResetFunctions(1);
     ASSERTLINE("OSReset.c", 0x117, rc);
+#if DOLPHIN_REVISION >= 37
+    if (reset == 1) {
+        OSDisableInterrupts();
+        __VIRegs[1] = 0;
+        ICFlashInvalidate();
+        Reset(resetCode * 8);
+    } else {
+        OSThread *thread = UNK_800000DC;
+        while (thread != NULL) {
+            OSThread *next = thread->linkActive.next;
+            switch (thread->state) {
+            case 1:
+            case 4:
+                OSCancelThread(thread);
+                break;
+            }
+            thread = next;
+        }
+        OSEnableScheduler();
+        __OSReboot(resetCode, forceMenu);
+    }
+#else
     if (reset != 0) {
         ICFlashInvalidate();
         Reset(resetCode * 8);
     }
+#endif
     OSRestoreInterrupts(enabled);
     OSEnableScheduler();
 }

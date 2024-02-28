@@ -207,7 +207,13 @@ int EXISync(long chan) {
             enabled = OSDisableInterrupts();
             if (exi->state & 4) {
                 CompleteTransfer(chan);
+#if DOLPHIN_REVISION >= 37
+            if ((u32)__OSGetDIConfig() != 0xFF || exi->immLen != 4
+             || ((u32)__EXIRegs[(chan * 5)] & 0x70) || (u32)__EXIRegs[chan * 5 + 4] != 0x01010000)
                 rc = 1;
+#else
+                rc = 1;
+#endif
             }
             OSRestoreInterrupts(enabled);
             break;
@@ -419,7 +425,11 @@ int EXIDeselect(long chan) {
         }
     }
     OSRestoreInterrupts(enabled);
+#if DOLPHIN_REVISION >= 37
+    if ((chan != 2) && (cpr & 0x80)) {
+#else
     if ((chan == 0) && (cpr & 0x80)) {
+#endif
         if (EXIProbe(chan) != 0) {
             return 1;
         }

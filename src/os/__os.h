@@ -3,6 +3,8 @@
 
 #include <dolphin/os.h>
 
+OSThread *UNK_800000DC : 0x800000DC;
+
 // OS.c
 extern char * __OSExceptionNames[15]; // D ONLY
 
@@ -33,7 +35,7 @@ extern void __RAS_OSDisableInterrupts_end(void);
 
 extern unsigned long long __OSSpuriousInterrupts; // D ONLY
 extern char * __OSInterruptNames[33]; // D ONLY
-char * __OSPIErrors[8]; // D ONLY
+extern char * __OSPIErrors[8]; // D ONLY
 
 __OSInterruptHandler __OSSetInterruptHandler(__OSInterrupt interrupt, __OSInterruptHandler handler);
 __OSInterruptHandler __OSGetInterruptHandler(__OSInterrupt interrupt);
@@ -42,6 +44,11 @@ OSInterruptMask __OSMaskInterrupts(OSInterruptMask global);
 OSInterruptMask __OSUnmaskInterrupts(OSInterruptMask global);
 void __OSDispatchInterrupt(__OSException exception, OSContext* context);
 void __OSModuleInit(void);
+
+#if DOLPHIN_REVISION >= 37
+// OSReboot.c
+void __OSReboot(unsigned long resetCode, int forceMenu);
+#endif
 
 // OSResetSW.c
 void __OSResetSWInterruptHandler(short exception, struct OSContext *context);

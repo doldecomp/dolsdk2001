@@ -198,7 +198,11 @@ asm void DCZeroRange(register void* addr, register u32 nBytes) {
   mtctr nBytes
 
 @1
+#if DOLPHIN_REVISION >= 37
+  dcbst r0, addr
+#else
   dcbz r0, addr
+#endif
   addi addr, addr, 32
   bdnz @1
 

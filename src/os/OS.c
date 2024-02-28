@@ -24,6 +24,7 @@ extern int __DBIsExceptionMarked(u8);
 #define OS_DEBUG_ADDRESS_2 0x800030E9
 #define DB_EXCEPTIONRET_OFFSET 0xC
 #define DB_EXCEPTIONDEST_OFFSET 0x8
+extern u32 UNK_REG_CC006000[] : 0xCC006000;
 
 extern unsigned long __DVDLongFileNameFlag;
 extern unsigned long __PADSpec;
@@ -448,3 +449,9 @@ void __OSPSInit(void)
     }
   // clang-format on
 }
+
+#if DOLPHIN_REVISION >= 37
+u8 __OSGetDIConfig(void) {
+    return UNK_REG_CC006000[9];
+}
+#endif

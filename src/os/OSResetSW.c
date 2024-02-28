@@ -3,10 +3,37 @@
 
 static void (* ResetCallback)();
 static int Down;
+#if DOLPHIN_REVISION >= 37
+static int LastState;
+static long long HoldUp;
+static long long HoldDown;
+#define Hold HoldUp  // Hold was renamed to HoldUp
+#else
 static long long Hold;
+#endif
 
 void __OSResetSWInterruptHandler(short exception, struct OSContext *context) {
     void (* callback)();
+
+#if DOLPHIN_REVISION >= 37
+    HoldDown = __OSGetSystemTime();  // return value unused?
+    do {
+        if (__OSGetSystemTime() - HoldDown >= OSMicrosecondsToTicks(100))
+            break;
+    } while (!(__PIRegs[0] & 0x10000));
+
+    if (!(__PIRegs[0] & 0x10000)) {
+        Down = 1;
+        LastState = 1;
+        __OSMaskInterrupts(0x200);
+        if (ResetCallback != NULL) {
+            callback = ResetCallback;
+            ResetCallback = NULL;
+            callback();
+        }
+    }
+    __PIRegs[0] = 2;
+#else
 
     Down = 1;
     __PIRegs[0] = 2;
@@ -17,6 +44,7 @@ void __OSResetSWInterruptHandler(short exception, struct OSContext *context) {
         ResetCallback = NULL;
         callback();
     }
+#endif
 }
 
 void (* OSSetResetCallback(void (* callback)()))() {

@@ -20,6 +20,8 @@ else
   $(error Unsupported host/building OS <$(UNAME_S)>)
 endif
 
+DOLPHIN_REVISION ?= 36
+
 BUILD_DIR := build
 BASEROM_DIR := baserom
 TARGET_LIBS := G2D              \
@@ -108,7 +110,7 @@ CC        = $(MWCC)
 
 CHARFLAGS := -char unsigned
 
-CFLAGS = $(CHARFLAGS) -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn pragmas -pragma 'cats off'
+CFLAGS = $(CHARFLAGS) -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn pragmas -pragma 'cats off' -DDOLPHIN_REVISION=$(DOLPHIN_REVISION)
 INCLUDES := -Iinclude -ir src
 
 ASFLAGS = -mgekko -I src -I include
