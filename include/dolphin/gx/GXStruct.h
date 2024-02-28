@@ -3,6 +3,7 @@
 
 #include <dolphin/types.h>
 #include <dolphin/vitypes.h>
+#include <dolphin/gx/GXEnum.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,6 +63,11 @@ typedef struct
 {
     u16 r[10];
 } GXFogAdjTable;
+
+typedef struct _GXVtxDescList {
+    GXAttr attr;
+    GXAttrType type;
+} GXVtxDescList;
 
 #ifdef __cplusplus
 }
