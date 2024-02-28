@@ -127,6 +127,15 @@ L_00000208:
     b L_000001A0
 }
 
+#if DOLPHIN_REVISION >= 37
+void __OSDoHotReset(u32 resetCode) {
+    OSDisableInterrupts();
+    __VIRegs[1] = 0;
+    ICFlashInvalidate();
+    Reset(resetCode << 3);
+}
+#endif
+
 void OSResetSystem(int reset, unsigned long resetCode, int forceMenu) {
     int rc;
     int enabled;

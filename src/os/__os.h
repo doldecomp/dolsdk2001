@@ -50,6 +50,11 @@ void __OSModuleInit(void);
 void __OSReboot(unsigned long resetCode, int forceMenu);
 #endif
 
+// OSReset.c
+#if DOLPHIN_REVISION >= 37
+void __OSDoHotReset(u32 resetCode);
+#endif
+
 // OSResetSW.c
 void __OSResetSWInterruptHandler(short exception, struct OSContext *context);
 
