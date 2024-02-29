@@ -69,6 +69,13 @@ typedef struct _GXVtxDescList {
     GXAttrType type;
 } GXVtxDescList;
 
+typedef struct _GXVtxAttrFmtList {
+    GXAttr attr;
+    GXCompCnt cnt;
+    GXCompType type;
+    u8 frac;
+} GXVtxAttrFmtList;
+
 #ifdef __cplusplus
 }
 #endif

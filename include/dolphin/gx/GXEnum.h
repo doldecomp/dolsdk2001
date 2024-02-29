@@ -76,7 +76,7 @@ typedef enum
     GX_POINTS = 0xB8,
 } GXPrimitive;
 
-typedef enum
+typedef enum _GXVtxFmt
 {
     GX_VTXFMT0,
     GX_VTXFMT1,
@@ -89,7 +89,7 @@ typedef enum
     GX_MAX_VTXFMT,
 } GXVtxFmt;
 
-typedef enum
+typedef enum _GXAttr
 {
     GX_VA_PNMTXIDX,
     GX_VA_TEX0MTXIDX,
@@ -121,7 +121,7 @@ typedef enum
     GX_VA_NULL = 0xFF,
 } GXAttr;
 
-typedef enum
+typedef enum _GXAttrType
 {
     GX_NONE,
     GX_DIRECT,
@@ -199,7 +199,7 @@ typedef enum
     GX_MAX_ANISOTROPY,
 } GXAnisotropy;
 
-typedef enum
+typedef enum _GXTexMapID
 {
     GX_TEXMAP0,
     GX_TEXMAP1,
@@ -214,7 +214,7 @@ typedef enum
     GX_TEX_DISABLE = 0x100,
 } GXTexMapID;
 
-typedef enum
+typedef enum _GXTexCoordID
 {
     GX_TEXCOORD0,
     GX_TEXCOORD1,
@@ -228,7 +228,7 @@ typedef enum
     GX_TEXCOORD_NULL = 0xFF,
 } GXTexCoordID;
 
-typedef enum
+typedef enum _GXTevStageID
 {
     GX_TEVSTAGE0,
     GX_TEVSTAGE1,
@@ -264,7 +264,7 @@ typedef enum
     GX_MTX2x4,
 } GXTexMtxType;
 
-typedef enum
+typedef enum _GXTexGenType
 {
     GX_TG_MTX3x4,
     GX_TG_MTX2x4,
@@ -279,7 +279,7 @@ typedef enum
     GX_TG_SRTG,
 } GXTexGenType;
 
-typedef enum
+typedef enum _GXPosNrmMtx
 {
     GX_PNMTX0 = 0,
     GX_PNMTX1 = 3,
@@ -293,7 +293,7 @@ typedef enum
     GX_PNMTX9 = 27,
 } GXPosNrmMtx;
 
-typedef enum
+typedef enum _GXTexMtx
 {
     GX_TEXMTX0 = 30,
     GX_TEXMTX1 = 33,
@@ -322,7 +322,7 @@ typedef enum
     GX_COLOR_NULL = 0xFF,
 } GXChannelID;
 
-typedef enum
+typedef enum _GXTexGenSrc
 {
     GX_TG_POS,
     GX_TG_NRM,
@@ -347,7 +347,7 @@ typedef enum
     GX_TG_COLOR1,
 } GXTexGenSrc;
 
-typedef enum
+typedef enum _GXBlendMode
 {
     GX_BM_NONE,
     GX_BM_BLEND,
@@ -356,7 +356,7 @@ typedef enum
     GX_MAX_BLENDMODE,
 } GXBlendMode;
 
-typedef enum
+typedef enum _GXBlendFactor
 {
     GX_BL_ZERO,
     GX_BL_ONE,
@@ -370,7 +370,7 @@ typedef enum
     GX_BL_INVDSTCLR = GX_BL_INVSRCCLR,
 } GXBlendFactor;
 
-typedef enum
+typedef enum _GXLogicOp
 {
     GX_LO_CLEAR,
     GX_LO_AND,
@@ -390,7 +390,7 @@ typedef enum
     GX_LO_SET,
 } GXLogicOp;
 
-typedef enum
+typedef enum _GXCompCnt
 {
     GX_POS_XY   = 0,
     GX_POS_XYZ  = 1,
@@ -403,7 +403,7 @@ typedef enum
     GX_TEX_ST = 1,
 } GXCompCnt;
 
-typedef enum
+typedef enum _GXCompType
 {
     GX_U8 = 0,
     GX_S8 = 1,
