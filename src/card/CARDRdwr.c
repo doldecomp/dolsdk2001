@@ -6,7 +6,6 @@
 // functions
 static void BlockReadCallback(long chan, long result);
 static void BlockWriteCallback(long chan, long result);
-long CARDGetXferredBytes(long chan);
 
 static void BlockReadCallback(long chan, long result) {
     struct CARDControl * card;
@@ -43,7 +42,7 @@ long __CARDRead(long chan, unsigned long addr, long length, void * dst, void (* 
     ASSERTLINE(0x59, 0 <= chan && chan < 2);
     card = &__CARDBlock[chan];
     if (card->attached == 0) {
-        return -3;
+        return CARD_RESULT_NOCARD;
     }
     card->xferCallback = callback;
     card->repeat = (length / 512u);
@@ -86,7 +85,7 @@ long __CARDWrite(long chan, unsigned long addr, long length, void * dst, void (*
     ASSERTLINE(0x96, 0 <= chan && chan < 2);
     card = &__CARDBlock[chan];
     if (card->attached == 0) {
-        return -3;
+        return CARD_RESULT_NOCARD;
     }
     card->xferCallback = callback;
     card->repeat = (length / 128u);

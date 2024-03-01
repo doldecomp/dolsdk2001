@@ -153,6 +153,28 @@ typedef struct CARDID {
 
 #define CARDIsValidBlockNo(card, blockNo) ((blockNo) >= CARD_NUM_SYSTEM_BLOCK && (blockNo) < (card)->cBlock)
 
+#define CARD_READ_SIZE 512
+#define CARD_COMMENT_SIZE 64
+
+#define CARD_ICON_WIDTH 32
+#define CARD_ICON_HEIGHT 32
+
+#define CARD_BANNER_WIDTH 96
+#define CARD_BANNER_HEIGHT 32
+
+#define CARD_STAT_ICON_NONE 0
+#define CARD_STAT_ICON_C8 1
+#define CARD_STAT_ICON_RGB5A3 2
+#define CARD_STAT_ICON_MASK 3
+
+#define CARD_STAT_BANNER_NONE 0
+#define CARD_STAT_BANNER_C8 1
+#define CARD_STAT_BANNER_RGB5A3 2
+#define CARD_STAT_BANNER_MASK 3
+
+#define CARDGetBannerFormat(stat) (((stat)->bannerFormat) & CARD_STAT_BANNER_MASK)
+#define CARDGetIconFormat(stat, n) (((stat)->iconFormat >> (2 * (n))) & CARD_STAT_ICON_MASK)
+
 void CARDInit(void);
 s32 CARDUnmount(s32 chan);
 s32 CARDProbeEx(s32 chan, s32 *memSize, s32 *sectorSize);
