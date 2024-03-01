@@ -7,14 +7,14 @@ long __CARDRawReadAsync(long chan, void * buf, long length, long offset, void (*
     struct CARDControl * card;
     long result;
 
-    ASSERTLINE("CARDRaw.c", 0x36, buf && ((u32) buf % 32) == 0);
+    ASSERTLINE(0x36, buf && ((u32) buf % 32) == 0);
 
     result = __CARDGetControlBlock(chan, &card);
     if (result < 0) {
         return __CARDPutControlBlock(card, result);
     }
-    ASSERTLINE("CARDRaw.c", 0x3E, 0 < length && (length % CARD_SEG_SIZE) == 0 && length < CARD_MAX_SIZE);
-    ASSERTLINE("CARDRaw.c", 0x3F, (offset % card->sectorSize) == 0);
+    ASSERTLINE(0x3E, 0 < length && (length % CARD_SEG_SIZE) == 0 && length < CARD_MAX_SIZE);
+    ASSERTLINE(0x3F, (offset % card->sectorSize) == 0);
     DCInvalidateRange(buf, length);
     result = __CARDRead(chan, offset, length, buf, callback);
     if (result < 0) {
