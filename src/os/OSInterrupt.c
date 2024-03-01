@@ -124,8 +124,8 @@ __OSInterruptHandler
   __OSInterruptHandler oldHandler;
   
         
-  ASSERTMSGLINE("OSInterrupt.c", 0x188, InterruptHandlerTable, "__OSSetInterruptHandler(): OSInit() must be called in advance.");
-  ASSERTMSGLINE("OSInterrupt.c", 0x18A, interrupt < 0x20, "__OSSetInterruptHandler(): unknown interrupt.");
+  ASSERTMSGLINE(0x188, InterruptHandlerTable, "__OSSetInterruptHandler(): OSInit() must be called in advance.");
+  ASSERTMSGLINE(0x18A, interrupt < 0x20, "__OSSetInterruptHandler(): unknown interrupt.");
 
   oldHandler = InterruptHandlerTable[interrupt];
   InterruptHandlerTable[interrupt] = handler;
@@ -133,8 +133,8 @@ __OSInterruptHandler
 }
 
 __OSInterruptHandler __OSGetInterruptHandler(__OSInterrupt interrupt) {
-  ASSERTMSGLINE("OSInterrupt.c", 0x19E, InterruptHandlerTable, "__OSGetInterruptHandler(): OSInit() must be called in advance.");
-  ASSERTMSGLINE("OSInterrupt.c", 0x1A0, interrupt < 0x20, "__OSGetInterruptHandler(): unknown interrupt.");
+  ASSERTMSGLINE(0x19E, InterruptHandlerTable, "__OSGetInterruptHandler(): OSInit() must be called in advance.");
+  ASSERTMSGLINE(0x1A0, interrupt < 0x20, "__OSGetInterruptHandler(): unknown interrupt.");
   return InterruptHandlerTable[interrupt];
 }
 

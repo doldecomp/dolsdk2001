@@ -52,7 +52,7 @@ static void normalize(f32 v[3])
 {
     f32 d = sqrtf((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
 
-    ASSERTMSGLINE(__FILE__, 0x89, d != 0.0f, "normalize: zero length vector");
+    ASSERTMSGLINE(0x89, d != 0.0f, "normalize: zero length vector");
     v[0] /= d;
     v[1] /= d;
     v[2] /= d;
@@ -119,7 +119,7 @@ void GXDrawCylinder(u8 numEdges)
 
     top = 1.0f;
     bottom = -top;
-    ASSERTMSGLINE(__FILE__, 0xD8, numEdges <= 99, "GXDrawCylinder: too many edges");
+    ASSERTMSGLINE(0xD8, numEdges <= 99, "GXDrawCylinder: too many edges");
 
     GetVertState();
 
@@ -170,7 +170,7 @@ void GXDrawTorus(f32 rc, u8 numc, u8 numt)
     f32 twopi = 6.2831855f;
     f32 rt;
 
-    ASSERTMSGLINE(__FILE__, 0x13C, rc < 1.0f, "GXDrawTorus: doughnut too fat");
+    ASSERTMSGLINE(0x13C, rc < 1.0f, "GXDrawTorus: doughnut too fat");
 
     rt = 1.0f - rc;
     GXGetVtxDesc(GX_VA_TEX0, &ttype);

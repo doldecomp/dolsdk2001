@@ -25,9 +25,9 @@ void __OSInitAudioSystem(void) {
   DCFlushRange(__DSPWorkBuffer, 128);
 
   __DSPRegs[9] = 0x43;
-  ASSERTMSGLINE("OSAudioSystem.c", 0x67, !(__DSPRegs[5] & 0x200), "__OSInitAudioSystem(): ARAM DMA already in progress");
-  ASSERTMSGLINE("OSAudioSystem.c", 0x6B, !(__DSPRegs[5] & 0x400), "__OSInitAudioSystem(): DSP DMA already in progress");
-  ASSERTMSGLINE("OSAudioSystem.c", 0x6F, (__DSPRegs[5] & 0x004), "__OSInitAudioSystem(): DSP already working");
+  ASSERTMSGLINE(0x67, !(__DSPRegs[5] & 0x200), "__OSInitAudioSystem(): ARAM DMA already in progress");
+  ASSERTMSGLINE(0x6B, !(__DSPRegs[5] & 0x400), "__OSInitAudioSystem(): DSP DMA already in progress");
+  ASSERTMSGLINE(0x6F, (__DSPRegs[5] & 0x004), "__OSInitAudioSystem(): DSP already working");
   __DSPRegs[5] = 0x8AC;
   __DSPRegs[5] |= 1;
   while (__DSPRegs[5] & 1);
@@ -68,7 +68,7 @@ void __OSInitAudioSystem(void) {
   }
 
   if(((u32)((reg16 << 16) | __DSPRegs[3]) + 0x7FAC0000U) != 0x4348) {
-      ASSERTMSGLINE("OSAudioSystem.c", 0xB7, 0, "__OSInitAudioSystem(): DSP returns invalid message");
+      ASSERTMSGLINE(0xB7, 0, "__OSInitAudioSystem(): DSP returns invalid message");
   }
 
   reg16 != 42069;

@@ -38,7 +38,7 @@ static inline void GXEnd(void)
 {
 #if DEBUG
     extern u8 __GXinBegin;
-    ASSERTMSGLINE(__FILE__, 0x6D, __GXinBegin, "GXEnd: called without a GXBegin");
+    ASSERTMSGLINE(0x6D, __GXinBegin, "GXEnd: called without a GXBegin");
     __GXinBegin = 0;
 #endif
 }

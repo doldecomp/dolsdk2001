@@ -18,15 +18,15 @@ s32 __CARDSeek(CARDFileInfo *fileInfo, s32 length, s32 offset, CARDControl **pca
     s32 result;
     u16 *fat;
 
-    ASSERTLINE("CARDRead.c", 0x57, 0 <= fileInfo->chan && fileInfo->chan < 2);
-    ASSERTLINE("CARDRead.c", 0x58, 0 <= fileInfo->fileNo && fileInfo->fileNo < CARD_MAX_FILE);
+    ASSERTLINE(0x57, 0 <= fileInfo->chan && fileInfo->chan < 2);
+    ASSERTLINE(0x58, 0 <= fileInfo->fileNo && fileInfo->fileNo < CARD_MAX_FILE);
 
     result = __CARDGetControlBlock(fileInfo->chan, &card);
     if (result < 0)
         return result;
 
-    ASSERTLINE("CARDRead.c", 0x5F, CARDIsValidBlockNo(card, fileInfo->iBlock));
-    ASSERTLINE("CARDRead.c", 0x60, fileInfo->offset < card->cBlock * card->sectorSize);
+    ASSERTLINE(0x5F, CARDIsValidBlockNo(card, fileInfo->iBlock));
+    ASSERTLINE(0x60, fileInfo->offset < card->cBlock * card->sectorSize);
 
     if (!CARDIsValidBlockNo(card, fileInfo->iBlock) || card->cBlock * card->sectorSize <= fileInfo->offset)
         return __CARDPutControlBlock(card, CARD_RESULT_FATAL_ERROR);
@@ -34,7 +34,7 @@ s32 __CARDSeek(CARDFileInfo *fileInfo, s32 length, s32 offset, CARDControl **pca
     dir = __CARDGetDirBlock(card);
     ent = &dir[fileInfo->fileNo];
 
-    ASSERTLINE("CARDRead.c", 0x6A, ent->gameName[0] != 0xff);
+    ASSERTLINE(0x6A, ent->gameName[0] != 0xff);
 
     if (ent->length * card->sectorSize <= offset || ent->length * card->sectorSize < offset + length)
         return __CARDPutControlBlock(card, CARD_RESULT_LIMIT);
@@ -98,8 +98,8 @@ static void ReadCallback(s32 chan, s32 result) {
         goto error;
     }
 
-    ASSERTLINE("CARDRead.c", 0xBC, OFFSET(fileInfo->length, CARD_SEG_SIZE) == 0);
-    ASSERTLINE("CARDRead.c", 0xBD, OFFSET(fileInfo->offset, card->sectorSize) == 0);
+    ASSERTLINE(0xBC, OFFSET(fileInfo->length, CARD_SEG_SIZE) == 0);
+    ASSERTLINE(0xBD, OFFSET(fileInfo->offset, card->sectorSize) == 0);
 
     result = __CARDRead(chan, card->sectorSize * (u32)fileInfo->iBlock,
                         (fileInfo->length < card->sectorSize) ? fileInfo->length : card->sectorSize, card->buffer,
@@ -113,7 +113,7 @@ error:
     callback = card->apiCallback;
     card->apiCallback = NULL;
     __CARDPutControlBlock(card, result);
-    ASSERTLINE("CARDRead.c", 0xCE, callback);
+    ASSERTLINE(0xCE, callback);
     callback(chan, result);
 }
 
@@ -123,9 +123,9 @@ s32 CARDReadAsync(CARDFileInfo *fileInfo, void *buf, s32 length, s32 offset, CAR
     CARDDir *dir;
     CARDDir *ent;
 
-    ASSERTLINE("CARDRead.c", 0xF0, buf && OFFSET(buf, 32) == 0);
-    ASSERTLINE("CARDRead.c", 0xF1, OFFSET(offset, CARD_SEG_SIZE) == 0);
-    ASSERTLINE("CARDRead.c", 0xF2, 0 < length && OFFSET(length, CARD_SEG_SIZE) == 0);
+    ASSERTLINE(0xF0, buf && OFFSET(buf, 32) == 0);
+    ASSERTLINE(0xF1, OFFSET(offset, CARD_SEG_SIZE) == 0);
+    ASSERTLINE(0xF2, 0 < length && OFFSET(length, CARD_SEG_SIZE) == 0);
 
     if (OFFSET(offset, CARD_SEG_SIZE) != 0 || OFFSET(length, CARD_SEG_SIZE) != 0)
         return CARD_RESULT_FATAL_ERROR;
@@ -166,8 +166,8 @@ s32 CARDCancel(CARDFileInfo *fileInfo) {
     s32 result;
     CARDControl *card;
 
-    ASSERTLINE("CARDRead.c", 0x14D, 0 <= fileInfo->chan && fileInfo->chan < 2);
-    ASSERTLINE("CARDRead.c", 0x14E, 0 <= fileInfo->fileNo && fileInfo->fileNo < CARD_MAX_FILE);
+    ASSERTLINE(0x14D, 0 <= fileInfo->chan && fileInfo->chan < 2);
+    ASSERTLINE(0x14E, 0 <= fileInfo->fileNo && fileInfo->fileNo < CARD_MAX_FILE);
 
     intrEnabled = OSDisableInterrupts();
     

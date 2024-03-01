@@ -8,14 +8,14 @@ static void * __OSArenaHi;
 static void * __OSArenaLo = (void*)-1;
 
 void * OSGetArenaHi() {
-    ASSERTMSGLINE("OSArena.c", 0x37, (u32)__OSArenaLo != -1, "OSGetArenaHi(): OSInit() must be called in advance.");
-    ASSERTMSGLINE("OSArena.c", 0x39, (u32)__OSArenaLo <= (u32)__OSArenaHi, "OSGetArenaHi(): invalid arena (hi < lo).");
+    ASSERTMSGLINE(0x37, (u32)__OSArenaLo != -1, "OSGetArenaHi(): OSInit() must be called in advance.");
+    ASSERTMSGLINE(0x39, (u32)__OSArenaLo <= (u32)__OSArenaHi, "OSGetArenaHi(): invalid arena (hi < lo).");
     return __OSArenaHi;
 }
 
 void * OSGetArenaLo() {
-    ASSERTMSGLINE("OSArena.c", 0x49, (u32)__OSArenaLo != -1, "OSGetArenaLo(): OSInit() must be called in advance.");
-    ASSERTMSGLINE("OSArena.c", 0x4B, (u32)__OSArenaLo <= (u32)__OSArenaHi, "OSGetArenaLo(): invalid arena (hi < lo).");
+    ASSERTMSGLINE(0x49, (u32)__OSArenaLo != -1, "OSGetArenaLo(): OSInit() must be called in advance.");
+    ASSERTMSGLINE(0x4B, (u32)__OSArenaLo <= (u32)__OSArenaHi, "OSGetArenaLo(): invalid arena (hi < lo).");
     return __OSArenaLo;
 }
 

@@ -97,6 +97,7 @@ typedef struct CARDID {
     /* 0x1FE */ u16 checkSumInv;
 } CARDID;
 
+#include <dolphin/card/CARDRdwr.h>
 #include <dolphin/card/CARDRead.h>
 #include <dolphin/card/CARDStat.h>
 #include <dolphin/card/CARDWrite.h>
@@ -116,8 +117,9 @@ typedef struct CARDID {
 
 #define CARD_WORKAREA_SIZE (5 * 8 * 1024)
 
-#define CARD_SEG_SIZE 0x200
-#define CARD_PAGE_SIZE 0x80
+#define CARD_SEG_SIZE 0x200u
+#define CARD_PAGE_SIZE 0x80u
+#define CARD_MAX_SIZE 0x01000000U
 
 #define CARD_NUM_SYSTEM_BLOCK 5
 #define CARD_SYSTEM_BLOCK_SIZE (8 * 1024u)
