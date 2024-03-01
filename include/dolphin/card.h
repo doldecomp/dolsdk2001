@@ -97,6 +97,7 @@ typedef struct CARDID {
     /* 0x1FE */ u16 checkSumInv;
 } CARDID;
 
+#include <dolphin/card/CARDFormat.h>
 #include <dolphin/card/CARDMount.h>
 #include <dolphin/card/CARDOpen.h>
 #include <dolphin/card/CARDRdwr.h>

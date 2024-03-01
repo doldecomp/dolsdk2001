@@ -18,7 +18,7 @@ struct SramControl {
     void (* callback)();
 };
 
-struct OSSram {
+typedef struct OSSram {
     unsigned short checkSum;
     unsigned short checkSumInv;
     unsigned long ead0;
@@ -28,7 +28,7 @@ struct OSSram {
     unsigned char ntd;
     unsigned char language;
     unsigned char flags;
-};
+} OSSram;
 
 typedef struct OSSramEx {
     unsigned char flashID[2][12];
