@@ -130,7 +130,7 @@ TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a
+all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a gx.a gxD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a
 
 extract: $(DTK)
 	$(info Extracting files...)
@@ -178,6 +178,10 @@ amcnotstubD.a : $(addprefix $(BUILD_DIR)/debug/,$(amcnotstub_c_files:.c=.o))
 amcstubs_c_files := $(wildcard src/amcstubs/*.c)
 amcstubs.a  : $(addprefix $(BUILD_DIR)/release/,$(amcstubs_c_files:.c=.o))
 amcstubsD.a : $(addprefix $(BUILD_DIR)/debug/,$(amcstubs_c_files:.c=.o))
+
+gx_c_files := $(wildcard src/gx/*.c)
+gx.a  : $(addprefix $(BUILD_DIR)/release/,$(gx_c_files:.c=.o))
+gxD.a : $(addprefix $(BUILD_DIR)/debug/,$(gx_c_files:.c=.o))
 
 odemustubs_c_files := $(wildcard src/odemustubs/*.c)
 odemustubs.a  : $(addprefix $(BUILD_DIR)/release/,$(odemustubs_c_files:.c=.o))
