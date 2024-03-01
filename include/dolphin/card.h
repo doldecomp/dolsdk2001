@@ -97,6 +97,7 @@ typedef struct CARDID {
     /* 0x1FE */ u16 checkSumInv;
 } CARDID;
 
+#include <dolphin/card/CARDDir.h>
 #include <dolphin/card/CARDFormat.h>
 #include <dolphin/card/CARDMount.h>
 #include <dolphin/card/CARDOpen.h>
@@ -176,6 +177,7 @@ typedef struct CARDID {
 
 #define CARDGetBannerFormat(stat) (((stat)->bannerFormat) & CARD_STAT_BANNER_MASK)
 #define CARDGetIconFormat(stat, n) (((stat)->iconFormat >> (2 * (n))) & CARD_STAT_ICON_MASK)
+#define CARDGetDirCheck(dir) ((CARDDirCheck *)&(dir)[CARD_MAX_FILE])
 
 void CARDInit(void);
 s32 CARDUnmount(s32 chan);

@@ -4,17 +4,7 @@
 #include "os/__os.h"
 #include "__card.h"
 
-typedef struct CARDDirCheck {
-    /* 0x00 */ u8 padding0[56];
-    /* 0x38 */ u16 padding1;
-    /* 0x3A */ s16 checkCode;
-    /* 0x3C */ u16 checkSum;
-    /* 0x3E */ u16 checkSumInv;
-} CARDDirCheck;
-
 #define formatStep mountStep // huh?
-
-#define CARDGetDirCheck(dir) ((CARDDirCheck *)&(dir)[CARD_MAX_FILE])
 
 // functions
 static void FormatCallback(s32 chan, s32 result);
