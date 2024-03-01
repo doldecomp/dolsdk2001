@@ -33,4 +33,8 @@ s32 __CARDSeek(CARDFileInfo *fileInfo, s32 length, s32 offset, CARDControl **pca
 long __CARDRead(long chan, unsigned long addr, long length, void * dst, void (* callback)(long, long));
 long __CARDWrite(long chan, unsigned long addr, long length, void * dst, void (* callback)(long, long));
 
+// CARDRaw.c
+long __CARDRawReadAsync(long chan, void * buf, long length, long offset, void (* callback)(long, long));
+long __CARDRawRead(long chan, void * buf, long length, long offset);
+
 #endif // _DOLPHIN_CARD_INTERNAL_H_

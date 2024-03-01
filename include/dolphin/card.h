@@ -119,6 +119,7 @@ typedef struct CARDID {
 
 #define CARD_SEG_SIZE 0x200u
 #define CARD_PAGE_SIZE 0x80u
+#define CARD_MAX_SIZE 0x01000000U
 
 #define CARD_NUM_SYSTEM_BLOCK 5
 #define CARD_SYSTEM_BLOCK_SIZE (8 * 1024u)
