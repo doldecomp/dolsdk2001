@@ -47,4 +47,7 @@ s32 __CARDIsPublic(CARDDir *ent);
 s32 __CARDGetFileNo(CARDControl* card, const char* fileName, s32* pfileNo);
 BOOL __CARDIsOpened(CARDControl *card, s32 fileNo);
 
+// CARDMount.c
+void __CARDMountCallback(s32 chan, s32 result);
+
 #endif // _DOLPHIN_CARD_INTERNAL_H_

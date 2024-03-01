@@ -18,14 +18,8 @@ static u32 LatencyTable[8] =
 };
 
 // functions
-int CARDProbe(long chan);
-s32 CARDProbeEx(s32 chan, s32 *memSize, s32 *sectorSize);
 static s32 DoMount(s32 chan);
-void __CARDMountCallback(s32 chan, s32 result);
-s32 CARDMountAsync(s32 chan, void *workArea, CARDCallback detachCallback, CARDCallback attachCallback);
-s32 CARDMount(s32 chan, void *workArea, CARDCallback detachCallback);
 static void DoUnmount(s32 chan);
-s32 CARDUnmount(s32 chan);
 
 int CARDProbe(long chan) {
     EXIProbe(chan);
