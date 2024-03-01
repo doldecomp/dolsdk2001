@@ -31,7 +31,9 @@ typedef int BOOL;
 
 #define INT_MAX 2147483647
 
-#define NULL (void*)0
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
 
 #include "libc/stdarg.h"
 

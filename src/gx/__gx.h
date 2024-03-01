@@ -174,3 +174,5 @@ extern struct __GXData_struct {
     unsigned char dirtyVAT; // offset 0x4EE, size 0x1
     unsigned long dirtyState; // offset 0x4F0, size 0x4
 } *gx;  // size = 0x4F4
+
+extern volatile u32 *__piReg;

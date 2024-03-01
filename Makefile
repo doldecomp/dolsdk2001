@@ -109,7 +109,7 @@ CC        = $(MWCC)
 CHARFLAGS := -char unsigned
 
 CFLAGS = $(CHARFLAGS) -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn pragmas -pragma 'cats off'
-INCLUDES := -Iinclude -ir src
+INCLUDES := -Iinclude -Iinclude/libc -ir src
 
 ASFLAGS = -mgekko -I src -I include
 
