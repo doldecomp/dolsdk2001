@@ -9,7 +9,7 @@
 do { \
     GX_WRITE_U8(a); \
     GX_WRITE_U32(b); \
-    __gxVerif->rasRegs[GET_REG_FIELD(b, 8, 24)] = b; \
+    __gxVerif->rasRegs[(b >> 24) & 0xFF] = b; \
 } while (0)
 #else
 #define GX_WRITE_SOME_REG5(a, b) \
@@ -304,7 +304,7 @@ void __GXUpdateBPMask(void)
     new_dmask = 0;
     nIndStages = GET_REG_FIELD(gx->genMode, 3, 16);
     for (i = 0; i < nIndStages; i++) {
-        switch ((s32) i) {
+        switch (i) {
         case 0: tmap = GET_REG_FIELD(gx->iref, 3, 0); break;
         case 1: tmap = GET_REG_FIELD(gx->iref, 3, 6); break;
         case 2: tmap = GET_REG_FIELD(gx->iref, 3, 12); break;
