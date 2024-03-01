@@ -46,14 +46,14 @@ typedef enum
     GX_ZC_FAR,
 } GXZFmt16;
 
-typedef enum
+typedef enum _GXGamma
 {
     GX_GM_1_0,
     GX_GM_1_7,
     GX_GM_2_2,
 } GXGamma;
 
-typedef enum
+typedef enum _GXPixelFmt
 {
     GX_PF_RGB8_Z24,
     GX_PF_RGBA6_Z24,
@@ -65,7 +65,7 @@ typedef enum
     GX_PF_YUV420,
 } GXPixelFmt;
 
-typedef enum
+typedef enum _GXPrimitive
 {
     GX_QUADS = 0x80,
     GX_TRIANGLES = 0x90,
