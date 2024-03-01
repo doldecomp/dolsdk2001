@@ -61,7 +61,7 @@ static int CallResetFunctions(int final);
 static asm void Reset(unsigned long resetCode);
 
 void OSRegisterResetFunction(struct OSResetFunctionInfo * info) {
-    ASSERTLINE("OSReset.c", 0x76, info->func);
+    ASSERTLINE(0x76, info->func);
 
     ENQUEUE_INFO_PRIO(info, &ResetFunctionQueue);
 }
@@ -142,7 +142,7 @@ void OSResetSystem(int reset, unsigned long resetCode, int forceMenu) {
     }
     enabled = OSDisableInterrupts();
     rc = CallResetFunctions(1);
-    ASSERTLINE("OSReset.c", 0x117, rc);
+    ASSERTLINE(0x117, rc);
     if (reset != 0) {
         ICFlashInvalidate();
         Reset(resetCode * 8);

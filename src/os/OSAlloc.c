@@ -120,10 +120,10 @@ void * OSAllocFromHeap(int heap, unsigned long size) {
     long requested;
 
     requested = size;
-    ASSERTMSGLINE("OSAlloc.c", 0x14D, HeapArray, "OSAllocFromHeap(): heap is not initialized.");
-    ASSERTMSGLINE("OSAlloc.c", 0x14E, (signed long)size > 0, "OSAllocFromHeap(): invalid size.");
-    ASSERTMSGLINE("OSAlloc.c", 0x14F, heap >= 0 && heap < NumHeaps, "OSAllocFromHeap(): invalid heap handle.");
-    ASSERTMSGLINE("OSAlloc.c", 0x150, HeapArray[heap].size >= 0, "OSAllocFromHeap(): invalid heap handle.");
+    ASSERTMSGLINE(0x14D, HeapArray, "OSAllocFromHeap(): heap is not initialized.");
+    ASSERTMSGLINE(0x14E, (signed long)size > 0, "OSAllocFromHeap(): invalid size.");
+    ASSERTMSGLINE(0x14F, heap >= 0 && heap < NumHeaps, "OSAllocFromHeap(): invalid heap handle.");
+    ASSERTMSGLINE(0x150, HeapArray[heap].size >= 0, "OSAllocFromHeap(): invalid heap handle.");
 
     hd = &HeapArray[heap];
     size += 0x20;
@@ -141,8 +141,8 @@ void * OSAllocFromHeap(int heap, unsigned long size) {
 #endif
         return NULL;
     }
-    ASSERTMSGLINE("OSAlloc.c", 0x168, !((s32)cell & 0x1F), "OSAllocFromHeap(): heap is broken.");
-    ASSERTMSGLINE("OSAlloc.c", 0x169, cell->hd == NULL, "OSAllocFromHeap(): heap is broken.");
+    ASSERTMSGLINE(0x168, !((s32)cell & 0x1F), "OSAllocFromHeap(): heap is broken.");
+    ASSERTMSGLINE(0x169, cell->hd == NULL, "OSAllocFromHeap(): heap is broken.");
 
     leftoverSize = cell->size - size;
     if (leftoverSize < 0x40U) {
@@ -162,7 +162,7 @@ void * OSAllocFromHeap(int heap, unsigned long size) {
         if (newCell->prev != NULL) {
             newCell->prev->next = newCell; 
         } else {
-            ASSERTMSGLINE("OSAlloc.c", 0x186, hd->free == cell, "OSAllocFromHeap(): heap is broken.");
+            ASSERTMSGLINE(0x186, hd->free == cell, "OSAllocFromHeap(): heap is broken.");
             hd->free = newCell;
         }
     }
@@ -190,9 +190,9 @@ void * OSAllocFixed(void * rstart, void * rend) {
     start = (void*)((*(u32*)rstart) & ~((32)-1));
     end = (void*)((*(u32*)rend + 0x1FU) & ~((32)-1));
 
-    ASSERTMSGLINE("OSAlloc.c", 0x1B0, HeapArray, "OSAllocFixed(): heap is not initialized.");
-    ASSERTMSGLINE("OSAlloc.c", 0x1B1, (u32)start < (u32)end, "OSAllocFixed(): invalid range.");
-    ASSERTMSGLINE("OSAlloc.c", 0x1B3, ((u32) ArenaStart <= (u32) start) && ((u32) end <= (u32) ArenaEnd), "OSAllocFixed(): invalid range.");
+    ASSERTMSGLINE(0x1B0, HeapArray, "OSAllocFixed(): heap is not initialized.");
+    ASSERTMSGLINE(0x1B1, (u32)start < (u32)end, "OSAllocFixed(): invalid range.");
+    ASSERTMSGLINE(0x1B3, ((u32) ArenaStart <= (u32) start) && ((u32) end <= (u32) ArenaEnd), "OSAllocFixed(): invalid range.");
 
     for(i = 0; i < NumHeaps; i++) {
         hd = &HeapArray[i];
@@ -228,7 +228,7 @@ void * OSAllocFixed(void * rstart, void * rend) {
                             if (cell < start) {
                                 start = cell;
                             }
-                            ASSERTLINE("OSAlloc.c", 0x1F3, MINOBJSIZE <= (char*) cellEnd - (char*) end);
+                            ASSERTLINE(0x1F3, MINOBJSIZE <= (char*) cellEnd - (char*) end);
                             newCell = (struct Cell*)end;
 
                             newCell->size = (s32) ((char*)cellEnd - (char*)end);
@@ -252,11 +252,11 @@ void * OSAllocFixed(void * rstart, void * rend) {
                             if (end < cellEnd) {
                                 end = cellEnd;
                             }
-                            ASSERTLINE("OSAlloc.c", 0x20C, MINOBJSIZE <= (char*) start - (char*) cell);
+                            ASSERTLINE(0x20C, MINOBJSIZE <= (char*) start - (char*) cell);
                             hd->size -= ((char*)cellEnd - (char*)start);
                             cell->size = ((char*)start - (char*)cell);
                         } else {
-                            ASSERTLINE("OSAlloc.c", 0x213, MINOBJSIZE <= (char*) cellEnd - (char*) end);
+                            ASSERTLINE(0x213, MINOBJSIZE <= (char*) cellEnd - (char*) end);
                             newCell = (struct Cell*)end;
                             newCell->size = ((char*)cellEnd - (char*)end);
 #ifdef ENABLE_HEAPDESC
@@ -275,12 +275,12 @@ void * OSAllocFixed(void * rstart, void * rend) {
                     }
                 }
             }
-            ASSERTLINE("OSAlloc.c", 0x222, 0 <= hd->size);
+            ASSERTLINE(0x222, 0 <= hd->size);
         }
     }
-    ASSERTLINE("OSAlloc.c", 0x225, OFFSET(start, ALIGNMENT) == 0);
-    ASSERTLINE("OSAlloc.c", 0x226, OFFSET(end, ALIGNMENT) == 0);
-    ASSERTLINE("OSAlloc.c", 0x227, start < end);
+    ASSERTLINE(0x225, OFFSET(start, ALIGNMENT) == 0);
+    ASSERTLINE(0x226, OFFSET(end, ALIGNMENT) == 0);
+    ASSERTLINE(0x227, start < end);
     *(u32*)rstart = (u32)start;
     *(u32*)rend = (u32)end;
     return (void*)*(u32*)rstart;
@@ -290,14 +290,14 @@ void OSFreeToHeap(int heap, void * ptr) {
     struct HeapDesc * hd;
     struct Cell * cell;
 
-    ASSERTMSGLINE("OSAlloc.c", 0x23D, HeapArray, "OSFreeToHeap(): heap is not initialized.");
-    ASSERTMSGLINE("OSAlloc.c", 0x23F, ((u32)ArenaStart+0x20) <= (u32)ptr && (u32)ptr < (u32)ArenaEnd, "OSFreeToHeap(): invalid pointer.");
-    ASSERTMSGLINE("OSAlloc.c", 0x240, OFFSET(ptr, ALIGNMENT) == 0, "OSFreeToHeap(): invalid pointer.");
-    ASSERTMSGLINE("OSAlloc.c", 0x241, HeapArray[heap].size >= 0, "OSFreeToHeap(): invalid heap handle.");
+    ASSERTMSGLINE(0x23D, HeapArray, "OSFreeToHeap(): heap is not initialized.");
+    ASSERTMSGLINE(0x23F, ((u32)ArenaStart+0x20) <= (u32)ptr && (u32)ptr < (u32)ArenaEnd, "OSFreeToHeap(): invalid pointer.");
+    ASSERTMSGLINE(0x240, OFFSET(ptr, ALIGNMENT) == 0, "OSFreeToHeap(): invalid pointer.");
+    ASSERTMSGLINE(0x241, HeapArray[heap].size >= 0, "OSFreeToHeap(): invalid heap handle.");
     cell = (void*)((u32)ptr-0x20);
     hd = &HeapArray[heap];
-    ASSERTMSGLINE("OSAlloc.c", 0x246, cell->hd == hd, "OSFreeToHeap(): invalid pointer.");
-    ASSERTMSGLINE("OSAlloc.c", 0x247, DLLookup(hd->allocated, cell), "OSFreeToHeap(): invalid pointer.");
+    ASSERTMSGLINE(0x246, cell->hd == hd, "OSFreeToHeap(): invalid pointer.");
+    ASSERTMSGLINE(0x247, DLLookup(hd->allocated, cell), "OSFreeToHeap(): invalid pointer.");
 #ifdef ENABLE_HEAPDESC
     cell->hd = 0;
     hd->headerBytes -= 0x20;
@@ -311,9 +311,9 @@ void OSFreeToHeap(int heap, void * ptr) {
 int OSSetCurrentHeap(int heap) {
     int prev;
 
-    ASSERTMSGLINE("OSAlloc.c", 0x267, HeapArray, "OSSetCurrentHeap(): heap is not initialized.");
-    ASSERTMSGLINE("OSAlloc.c", 0x268, (heap >= 0) && (heap < NumHeaps), "OSSetCurrentHeap(): invalid heap handle.");
-    ASSERTMSGLINE("OSAlloc.c", 0x269, HeapArray[heap].size >= 0, "OSSetCurrentHeap(): invalid heap handle.");
+    ASSERTMSGLINE(0x267, HeapArray, "OSSetCurrentHeap(): heap is not initialized.");
+    ASSERTMSGLINE(0x268, (heap >= 0) && (heap < NumHeaps), "OSSetCurrentHeap(): invalid heap handle.");
+    ASSERTMSGLINE(0x269, HeapArray[heap].size >= 0, "OSSetCurrentHeap(): invalid heap handle.");
     prev = __OSCurrHeap;
     __OSCurrHeap = heap;
     return prev;
@@ -324,9 +324,9 @@ void * OSInitAlloc(void * arenaStart, void * arenaEnd, int maxHeaps) {
     int i;
     struct HeapDesc * hd;
 
-    ASSERTMSGLINE("OSAlloc.c", 0x283, maxHeaps > 0, "OSInitAlloc(): invalid number of heaps.");
-    ASSERTMSGLINE("OSAlloc.c", 0x285, (u32)arenaStart < (u32)arenaEnd, "OSInitAlloc(): invalid range.");
-    ASSERTMSGLINE("OSAlloc.c", 0x288, maxHeaps <= (((u32)arenaEnd - (u32)arenaStart) / 24U), "OSInitAlloc(): too small range.");
+    ASSERTMSGLINE(0x283, maxHeaps > 0, "OSInitAlloc(): invalid number of heaps.");
+    ASSERTMSGLINE(0x285, (u32)arenaStart < (u32)arenaEnd, "OSInitAlloc(): invalid range.");
+    ASSERTMSGLINE(0x288, maxHeaps <= (((u32)arenaEnd - (u32)arenaStart) / 24U), "OSInitAlloc(): too small range.");
     arraySize = maxHeaps * sizeof(struct HeapDesc);
     HeapArray = arenaStart;
     NumHeaps = maxHeaps;
@@ -344,7 +344,7 @@ void * OSInitAlloc(void * arenaStart, void * arenaEnd, int maxHeaps) {
     arenaStart = (void*) (((u32)arenaStart + 0x1F) & 0xFFFFFFE0);
     ArenaStart = arenaStart;
     ArenaEnd = (void*) ((u32)arenaEnd & 0xFFFFFFE0);
-    ASSERTMSGLINE("OSAlloc.c", 0x2A4, ((u32)ArenaEnd - (u32)ArenaStart) >= 0x40U, "OSInitAlloc(): too small range.");
+    ASSERTMSGLINE(0x2A4, ((u32)ArenaEnd - (u32)ArenaStart) >= 0x40U, "OSInitAlloc(): too small range.");
     return arenaStart;
 }
 
@@ -353,21 +353,21 @@ int OSCreateHeap(void * start, void * end) {
     struct HeapDesc * hd;
     struct Cell * cell;
 
-    ASSERTMSGLINE("OSAlloc.c", 0x2BD, HeapArray, "OSCreateHeap(): heap is not initialized.");
-    ASSERTMSGLINE("OSAlloc.c", 0x2BE, (u32)start < (u32)end, "OSCreateHeap(): invalid range.");
+    ASSERTMSGLINE(0x2BD, HeapArray, "OSCreateHeap(): heap is not initialized.");
+    ASSERTMSGLINE(0x2BE, (u32)start < (u32)end, "OSCreateHeap(): invalid range.");
 
     start = (void*)(((u32)start + 0x1FU) & ~((32)-1));
     end = (void*)(((u32)end) & ~((32)-1));
 
-    ASSERTMSGLINE("OSAlloc.c", 0x2C1, (u32)start < (u32)end, "OSCreateHeap(): invalid range.");
-    ASSERTMSGLINE("OSAlloc.c", 0x2C3, (u32)ArenaStart <= (u32)start && (u32)end <= (u32)ArenaEnd, "OSCreateHeap(): invalid range.");
-    ASSERTMSGLINE("OSAlloc.c", 0x2C5, ((u32)end - (u32)start) >= 0x40U, "OSCreateHeap(): too small range.");
+    ASSERTMSGLINE(0x2C1, (u32)start < (u32)end, "OSCreateHeap(): invalid range.");
+    ASSERTMSGLINE(0x2C3, (u32)ArenaStart <= (u32)start && (u32)end <= (u32)ArenaEnd, "OSCreateHeap(): invalid range.");
+    ASSERTMSGLINE(0x2C5, ((u32)end - (u32)start) >= 0x40U, "OSCreateHeap(): too small range.");
 
 #if DEBUG
     for(heap = 0; heap < NumHeaps; heap++) {
         if (HeapArray[heap].size >= 0) {
-            ASSERTMSGLINE("OSAlloc.c", 0x2CF, !DLOverlap(HeapArray[heap].free, start, end), "OSCreateHeap(): invalid range.");
-            ASSERTMSGLINE("OSAlloc.c", 0x2D1, !DLOverlap(HeapArray[heap].allocated, start, end), "OSCreateHeap(): invalid range.");
+            ASSERTMSGLINE(0x2CF, !DLOverlap(HeapArray[heap].free, start, end), "OSCreateHeap(): invalid range.");
+            ASSERTMSGLINE(0x2D1, !DLOverlap(HeapArray[heap].allocated, start, end), "OSCreateHeap(): invalid range.");
         }
     }
 #endif
@@ -401,9 +401,9 @@ void OSDestroyHeap(int heap) {
     struct HeapDesc * hd;
     long size;
 
-    ASSERTMSGLINE("OSAlloc.c", 0x30A, HeapArray, "OSDestroyHeap(): heap is not initialized.");
-    ASSERTMSGLINE("OSAlloc.c", 0x30B, (heap >= 0) && (heap < NumHeaps), "OSDestroyHeap(): invalid heap handle.");
-    ASSERTMSGLINE("OSAlloc.c", 0x30C, HeapArray[heap].size >= 0, "OSDestroyHeap(): invalid heap handle.");
+    ASSERTMSGLINE(0x30A, HeapArray, "OSDestroyHeap(): heap is not initialized.");
+    ASSERTMSGLINE(0x30B, (heap >= 0) && (heap < NumHeaps), "OSDestroyHeap(): invalid heap handle.");
+    ASSERTMSGLINE(0x30C, HeapArray[heap].size >= 0, "OSDestroyHeap(): invalid heap handle.");
 
     hd = &HeapArray[heap];
 #if DEBUG
@@ -428,25 +428,25 @@ void OSAddToHeap(int heap, void * start, void * end) {
     struct Cell * cell;
     int i;
 
-    ASSERTMSGLINE("OSAlloc.c", 0x339, HeapArray, "OSAddToHeap(): heap is not initialized.");
-    ASSERTMSGLINE("OSAlloc.c", 0x33A, (heap >= 0) && (heap < NumHeaps), "OSAddToHeap(): invalid heap handle.");
-    ASSERTMSGLINE("OSAlloc.c", 0x33B, HeapArray[heap].size >= 0, "OSAddToHeap(): invalid heap handle.");
+    ASSERTMSGLINE(0x339, HeapArray, "OSAddToHeap(): heap is not initialized.");
+    ASSERTMSGLINE(0x33A, (heap >= 0) && (heap < NumHeaps), "OSAddToHeap(): invalid heap handle.");
+    ASSERTMSGLINE(0x33B, HeapArray[heap].size >= 0, "OSAddToHeap(): invalid heap handle.");
 
     hd = &HeapArray[heap];
 
-    ASSERTMSGLINE("OSAlloc.c", 0x33F, (u32)start < (u32)end, "OSAddToHeap(): invalid range.");
+    ASSERTMSGLINE(0x33F, (u32)start < (u32)end, "OSAddToHeap(): invalid range.");
 
     start = (void*)(((u32)start + 0x1F) & ~((32)-1));
     end = (void*)(((u32)end) & ~((32)-1));
 
-    ASSERTMSGLINE("OSAlloc.c", 0x343, ((u32)end - (u32)start) >= 0x40U, "OSAddToHeap(): too small range.");
-    ASSERTMSGLINE("OSAlloc.c", 0x345, (u32)ArenaStart <= (u32)start && (u32)end <= (u32)ArenaEnd, "OSAddToHeap(): invalid range.");
+    ASSERTMSGLINE(0x343, ((u32)end - (u32)start) >= 0x40U, "OSAddToHeap(): too small range.");
+    ASSERTMSGLINE(0x345, (u32)ArenaStart <= (u32)start && (u32)end <= (u32)ArenaEnd, "OSAddToHeap(): invalid range.");
 
 #if DEBUG
     for(i = 0; i < NumHeaps; i++) {
         if (HeapArray[i].size >= 0) {
-            ASSERTMSGLINE("OSAlloc.c", 0x34F, !DLOverlap(HeapArray[i].free, start, end), "OSAddToHeap(): invalid range.");
-            ASSERTMSGLINE("OSAlloc.c", 0x351, !DLOverlap(HeapArray[i].allocated, start, end), "OSAddToHeap(): invalid range.");
+            ASSERTMSGLINE(0x34F, !DLOverlap(HeapArray[i].free, start, end), "OSAddToHeap(): invalid range.");
+            ASSERTMSGLINE(0x351, !DLOverlap(HeapArray[i].allocated, start, end), "OSAddToHeap(): invalid range.");
         }
     }
 #endif
@@ -460,7 +460,7 @@ void OSAddToHeap(int heap, void * start, void * end) {
 } 
 
 // custom macro for OSCheckHeap
-#define ASSERTREPORT(file, line, cond) \
+#define ASSERTREPORT(line, cond) \
     if (!(cond)) { OSReport("OSCheckHeap: Failed " #cond " in %d", line); return -1; }
 
 long OSCheckHeap(int heap) {
@@ -469,61 +469,61 @@ long OSCheckHeap(int heap) {
     long total = 0;
     long free = 0;
 
-    ASSERTREPORT("OSAlloc.c", 0x37D, HeapArray);
-    ASSERTREPORT("OSAlloc.c", 0x37E, 0 <= heap && heap < NumHeaps);
+    ASSERTREPORT(0x37D, HeapArray);
+    ASSERTREPORT(0x37E, 0 <= heap && heap < NumHeaps);
     hd = &HeapArray[heap];
-    ASSERTREPORT("OSAlloc.c", 0x381, 0 <= hd->size);
+    ASSERTREPORT(0x381, 0 <= hd->size);
     
-    ASSERTREPORT("OSAlloc.c", 0x383, hd->allocated == NULL || hd->allocated->prev == NULL);
+    ASSERTREPORT(0x383, hd->allocated == NULL || hd->allocated->prev == NULL);
 
     for(cell = hd->allocated; cell; cell = cell->next) {
-        ASSERTREPORT("OSAlloc.c", 0x386, InRange(cell, ArenaStart, ArenaEnd));
-        ASSERTREPORT("OSAlloc.c", 0x387, OFFSET(cell, ALIGNMENT) == 0);
-        ASSERTREPORT("OSAlloc.c", 0x388, cell->next == NULL || cell->next->prev == cell);
-        ASSERTREPORT("OSAlloc.c", 0x389, MINOBJSIZE <= cell->size);
-        ASSERTREPORT("OSAlloc.c", 0x38A, OFFSET(cell->size, ALIGNMENT) == 0);
+        ASSERTREPORT(0x386, InRange(cell, ArenaStart, ArenaEnd));
+        ASSERTREPORT(0x387, OFFSET(cell, ALIGNMENT) == 0);
+        ASSERTREPORT(0x388, cell->next == NULL || cell->next->prev == cell);
+        ASSERTREPORT(0x389, MINOBJSIZE <= cell->size);
+        ASSERTREPORT(0x38A, OFFSET(cell->size, ALIGNMENT) == 0);
         total += cell->size;
-        ASSERTREPORT("OSAlloc.c", 0x38D, 0 < total && total <= hd->size);
+        ASSERTREPORT(0x38D, 0 < total && total <= hd->size);
 #ifdef ENABLE_HEAPDESC
-        ASSERTREPORT("OSAlloc.c", 0x390, cell->hd == hd);
-        ASSERTREPORT("OSAlloc.c", 0x391, HEADERSIZE + cell->requested <= cell->size);
+        ASSERTREPORT(0x390, cell->hd == hd);
+        ASSERTREPORT(0x391, HEADERSIZE + cell->requested <= cell->size);
 #endif
     }
 
     
-    ASSERTREPORT("OSAlloc.c", 0x395, hd->free == NULL || hd->free->prev == NULL); 
+    ASSERTREPORT(0x395, hd->free == NULL || hd->free->prev == NULL); 
     
     for(cell = hd->free; cell; cell = cell->next) {
-        ASSERTREPORT("OSAlloc.c", 0x398, InRange(cell, ArenaStart, ArenaEnd));
-        ASSERTREPORT("OSAlloc.c", 0x399, OFFSET(cell, ALIGNMENT) == 0);
-        ASSERTREPORT("OSAlloc.c", 0x39A, cell->next == NULL || cell->next->prev == cell);
-        ASSERTREPORT("OSAlloc.c", 0x39B, MINOBJSIZE <= cell->size);
-        ASSERTREPORT("OSAlloc.c", 0x39C, OFFSET(cell->size, ALIGNMENT) == 0);
-        ASSERTREPORT("OSAlloc.c", 0x39D, cell->next == NULL || (char*) cell + cell->size < (char*) cell->next);
+        ASSERTREPORT(0x398, InRange(cell, ArenaStart, ArenaEnd));
+        ASSERTREPORT(0x399, OFFSET(cell, ALIGNMENT) == 0);
+        ASSERTREPORT(0x39A, cell->next == NULL || cell->next->prev == cell);
+        ASSERTREPORT(0x39B, MINOBJSIZE <= cell->size);
+        ASSERTREPORT(0x39C, OFFSET(cell->size, ALIGNMENT) == 0);
+        ASSERTREPORT(0x39D, cell->next == NULL || (char*) cell + cell->size < (char*) cell->next);
         total += cell->size;
         free = (cell->size + free);
         free -= HEADERSIZE;
-        ASSERTREPORT("OSAlloc.c", 0x3A1, 0 < total && total <= hd->size);
+        ASSERTREPORT(0x3A1, 0 < total && total <= hd->size);
 #ifdef ENABLE_HEAPDESC
-        ASSERTREPORT("OSAlloc.c", 0x3A4, cell->hd == NULL);
+        ASSERTREPORT(0x3A4, cell->hd == NULL);
 #endif
     }
-    ASSERTREPORT("OSAlloc.c", 0x3A8, total == hd->size);
+    ASSERTREPORT(0x3A8, total == hd->size);
     return free;
 }
 
 unsigned long OSReferentSize(void * ptr) {
     struct Cell * cell;
 
-    ASSERTMSGLINE("OSAlloc.c", 0x3BB, HeapArray, "OSReferentSize(): heap is not initialized.");
-    ASSERTMSGLINE("OSAlloc.c", 0x3BD, InRange(ptr, ArenaStart+HEADERSIZE, ArenaEnd), "OSReferentSize(): invalid pointer.");
-    ASSERTMSGLINE("OSAlloc.c", 0x3BE, !OFFSET(ptr, 32), "OSReferentSize(): invalid pointer.");
+    ASSERTMSGLINE(0x3BB, HeapArray, "OSReferentSize(): heap is not initialized.");
+    ASSERTMSGLINE(0x3BD, InRange(ptr, ArenaStart+HEADERSIZE, ArenaEnd), "OSReferentSize(): invalid pointer.");
+    ASSERTMSGLINE(0x3BE, !OFFSET(ptr, 32), "OSReferentSize(): invalid pointer.");
     cell = (void*)((u32)ptr-HEADERSIZE);
-    ASSERTMSGLINE("OSAlloc.c", 0x3C2, cell->hd, "OSReferentSize(): invalid pointer.");
-    ASSERTMSGLINE("OSAlloc.c", 0x3C4, !(((u32)cell->hd - (u32)HeapArray) % 24), "OSReferentSize(): invalid pointer.");
-    ASSERTMSGLINE("OSAlloc.c", 0x3C6, ((u32)HeapArray <= (u32)cell->hd) && ((u32)cell->hd < (u32)((u32)HeapArray + (NumHeaps * 0x18))), "OSReferentSize(): invalid pointer.");
-    ASSERTMSGLINE("OSAlloc.c", 0x3C7, cell->hd->size >= 0, "OSReferentSize(): invalid pointer.");
-    ASSERTMSGLINE("OSAlloc.c", 0x3C9, DLLookup(cell->hd->allocated, cell), "OSReferentSize(): invalid pointer.");
+    ASSERTMSGLINE(0x3C2, cell->hd, "OSReferentSize(): invalid pointer.");
+    ASSERTMSGLINE(0x3C4, !(((u32)cell->hd - (u32)HeapArray) % 24), "OSReferentSize(): invalid pointer.");
+    ASSERTMSGLINE(0x3C6, ((u32)HeapArray <= (u32)cell->hd) && ((u32)cell->hd < (u32)((u32)HeapArray + (NumHeaps * 0x18))), "OSReferentSize(): invalid pointer.");
+    ASSERTMSGLINE(0x3C7, cell->hd->size >= 0, "OSReferentSize(): invalid pointer.");
+    ASSERTMSGLINE(0x3C9, DLLookup(cell->hd->allocated, cell), "OSReferentSize(): invalid pointer.");
     return (long)((u32)cell->size-HEADERSIZE);
 }
 
@@ -532,14 +532,14 @@ void OSDumpHeap(int heap) {
     struct Cell * cell;
 
     OSReport("\nOSDumpHeap(%d):\n", heap);
-    ASSERTMSGLINE("OSAlloc.c", 0x3DE, HeapArray, "OSDumpHeap(): heap is not initialized.");
-    ASSERTMSGLINE("OSAlloc.c", 0x3DF, (heap >= 0) && (heap < NumHeaps), "OSDumpHeap(): invalid heap handle.");
+    ASSERTMSGLINE(0x3DE, HeapArray, "OSDumpHeap(): heap is not initialized.");
+    ASSERTMSGLINE(0x3DF, (heap >= 0) && (heap < NumHeaps), "OSDumpHeap(): invalid heap handle.");
     hd = &HeapArray[heap];
     if (hd->size < 0) {
         OSReport("--------Inactive\n");
         return;
     }
-    ASSERTMSGLINE("OSAlloc.c", 0x3E8, OSCheckHeap(heap) >= 0, "OSDumpHeap(): heap is broken.");
+    ASSERTMSGLINE(0x3E8, OSCheckHeap(heap) >= 0, "OSDumpHeap(): heap is broken.");
 #ifdef ENABLE_HEAPDESC
     OSReport("padding %d/(%f%%) header %d/(%f%%) payload %d/(%f%%)\n", 
         hd->paddingBytes, (100.0 * hd->paddingBytes / hd->size), hd->headerBytes, (100.0 * hd->headerBytes / hd->size), hd->payloadBytes,
@@ -548,7 +548,7 @@ void OSDumpHeap(int heap) {
     OSReport("addr	size		end	prev	next\n");
     OSReport("--------Allocated\n");
 
-    ASSERTMSGLINE("OSAlloc.c", 0x3F5, hd->allocated == NULL || hd->allocated->prev == NULL, "OSDumpHeap(): heap is broken.");
+    ASSERTMSGLINE(0x3F5, hd->allocated == NULL || hd->allocated->prev == NULL, "OSDumpHeap(): heap is broken.");
 
     for(cell = hd->allocated; cell; cell = cell->next) {
         OSReport("%x	%d	%x	%x	%x\n", cell, cell->size, (char*)cell + cell->size, cell->prev, cell->next);

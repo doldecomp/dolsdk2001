@@ -39,8 +39,8 @@ static void BlockReadCallback(long chan, long result) {
 long __CARDRead(long chan, unsigned long addr, long length, void * dst, void (* callback)(long, long)) {
     struct CARDControl * card;
 
-    ASSERTLINE("CARDRdwr.c", 0x58, 0 < length && length % CARD_SEG_SIZE == 0);
-    ASSERTLINE("CARDRdwr.c", 0x59, 0 <= chan && chan < 2);
+    ASSERTLINE(0x58, 0 < length && length % CARD_SEG_SIZE == 0);
+    ASSERTLINE(0x59, 0 <= chan && chan < 2);
     card = &__CARDBlock[chan];
     if (card->attached == 0) {
         return -3;
@@ -82,8 +82,8 @@ static void BlockWriteCallback(long chan, long result) {
 long __CARDWrite(long chan, unsigned long addr, long length, void * dst, void (* callback)(long, long)) {
     struct CARDControl * card;
 
-    ASSERTLINE("CARDRdwr.c", 0x95, 0 < length && length % CARD_PAGE_SIZE == 0);
-    ASSERTLINE("CARDRdwr.c", 0x96, 0 <= chan && chan < 2);
+    ASSERTLINE(0x95, 0 < length && length % CARD_PAGE_SIZE == 0);
+    ASSERTLINE(0x96, 0 <= chan && chan < 2);
     card = &__CARDBlock[chan];
     if (card->attached == 0) {
         return -3;
@@ -96,6 +96,6 @@ long __CARDWrite(long chan, unsigned long addr, long length, void * dst, void (*
 }
 
 long CARDGetXferredBytes(long chan) {
-    ASSERTLINE("CARDRdwr.c", 0xB4, 0 <= chan && chan < 2);
+    ASSERTLINE(0xB4, 0 <= chan && chan < 2);
     return __CARDBlock[chan].xferred;
 }

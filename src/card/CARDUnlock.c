@@ -102,7 +102,7 @@ static s32 ReadArrayUnlock(s32 chan, u32 data, void *rbuf, s32 rlen, s32 mode) {
     BOOL err;
     u8 cmd[5];
 
-    ASSERTLINE("CARDUnlock.c", 0xD1, 0 <= chan && chan < 2);
+    ASSERTLINE(0xD1, 0 <= chan && chan < 2);
 
     card = &__CARDBlock[chan];
     if (!EXISelect(chan, 0, 4))
@@ -311,7 +311,7 @@ static void InitCallback(void *_task)
             break;
     }
 
-    ASSERTLINE("CARDUnlock.c", 0x1E3, 0 <= chan && chan < 2);
+    ASSERTLINE(0x1E3, 0 <= chan && chan < 2);
     
     param = (CARDDecParam *)card->workArea;
 
@@ -352,7 +352,7 @@ static void DoneCallback(void *_task)
             break;
     }
 
-    ASSERTLINE("CARDUnlock.c", 0x214, 0 <= chan && chan < 2);
+    ASSERTLINE(0x214, 0 <= chan && chan < 2);
 
     param = (CARDDecParam *)card->workArea;
     input = (u8 *)((u8 *)param + sizeof(CARDDecParam));

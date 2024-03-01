@@ -80,7 +80,7 @@ static void SIIntrruptHandler(short unused, struct OSContext * context) {
     unsigned long sr;
     void (* callback)(long, unsigned long, struct OSContext *);
 
-    ASSERTLINE("OSSerial.c", 0xE2, Si.chan != CHAN_NONE);
+    ASSERTLINE(0xE2, Si.chan != CHAN_NONE);
 
     chan = Si.chan;
     sr = CompleteTransfer();
@@ -124,16 +124,16 @@ static int __SITransfer(long chan, void * output, unsigned long outputBytes, voi
         } f;
     } comcsr;
 
-    ASSERTMSGLINE("OSSerial.c", 0x12A, (chan >= 0) && (chan < 4), "SITransfer(): invalid channel.");
-    ASSERTMSGLINE("OSSerial.c", 0x12C, (outputBytes != 0) && (outputBytes <= 128), "SITransfer(): output size is out of range (must be 1 to 128).");
-    ASSERTMSGLINE("OSSerial.c", 0x12E, (inputBytes != 0) && (inputBytes <= 128), "SITransfer(): input size is out of range (must be 1 to 128).");
+    ASSERTMSGLINE(0x12A, (chan >= 0) && (chan < 4), "SITransfer(): invalid channel.");
+    ASSERTMSGLINE(0x12C, (outputBytes != 0) && (outputBytes <= 128), "SITransfer(): output size is out of range (must be 1 to 128).");
+    ASSERTMSGLINE(0x12E, (inputBytes != 0) && (inputBytes <= 128), "SITransfer(): input size is out of range (must be 1 to 128).");
 
     enabled = OSDisableInterrupts();
     if (Si.chan != -1) {
         OSRestoreInterrupts(enabled);
         return 0;
     }
-    ASSERTLINE("OSSerial.c", 0x138, (__SIRegs[SI_COMCSR_IDX] & (SI_COMCSR_TSTART_MASK | SI_COMCSR_TCINT_MASK)) == 0);
+    ASSERTLINE(0x138, (__SIRegs[SI_COMCSR_IDX] & (SI_COMCSR_TSTART_MASK | SI_COMCSR_TCINT_MASK)) == 0);
     sr = __SIRegs[SI_STATUS_IDX];
     sr &= (0x0F000000 >> (chan * 8));
     __SIRegs[SI_STATUS_IDX] = sr;
@@ -179,12 +179,12 @@ unsigned long SIGetStatus() {
 }
 
 void SISetCommand(long chan, unsigned long command) {
-    ASSERTMSGLINE("OSSerial.c", 0x197, (chan >= 0) && (chan < 4), "SISetCommand(): invalid channel.");
+    ASSERTMSGLINE(0x197, (chan >= 0) && (chan < 4), "SISetCommand(): invalid channel.");
     __SIRegs[chan * 3] = command;
 }
 
 unsigned long SIGetCommand(long chan) {
-    ASSERTMSGLINE("OSSerial.c", 0x1A9, (chan >= 0) && (chan < 4), "SIGetCommand(): invalid channel.");
+    ASSERTMSGLINE(0x1A9, (chan >= 0) && (chan < 4), "SIGetCommand(): invalid channel.");
     return __SIRegs[chan * 3];
 }
 
@@ -196,9 +196,9 @@ unsigned long SISetXY(unsigned long x, unsigned long y) {
     unsigned long poll;
     int enabled;
 
-    ASSERTMSGLINE("OSSerial.c", 0x1CA, x >= 8, "SISetXY(): x is out of range (8 <= x <= 255)");
-    ASSERTMSGLINE("OSSerial.c", 0x1CB, x <= 255, "SISetXY(): x is out of range (8 <= x <= 255)");
-    ASSERTMSGLINE("OSSerial.c", 0x1CC, y <= 255, "SISetXY(): y is out of range (0 <= y <= 255)");
+    ASSERTMSGLINE(0x1CA, x >= 8, "SISetXY(): x is out of range (8 <= x <= 255)");
+    ASSERTMSGLINE(0x1CB, x <= 255, "SISetXY(): x is out of range (8 <= x <= 255)");
+    ASSERTMSGLINE(0x1CC, y <= 255, "SISetXY(): y is out of range (0 <= y <= 255)");
 
     poll = x << 0x10;
     poll |= y << 8;
@@ -214,7 +214,7 @@ unsigned long SIEnablePolling(unsigned long poll) {
     int enabled;
     unsigned long en;
 
-    ASSERTMSGLINE("OSSerial.c", 0x1E8, !(poll & 0x0FFFFFFF), "SIEnablePolling(): invalid chan bit(s).");
+    ASSERTMSGLINE(0x1E8, !(poll & 0x0FFFFFFF), "SIEnablePolling(): invalid chan bit(s).");
     if (poll == 0) {
         return Si.poll;
     }
@@ -223,7 +223,7 @@ unsigned long SIEnablePolling(unsigned long poll) {
     __SIRegs[0x30/4] = 0;
     poll = poll >> 24;
     en = poll & 0xF0;
-    ASSERTLINE("OSSerial.c", 0x202, en);
+    ASSERTLINE(0x202, en);
     poll &= ((en >> 4) | 0x03FFFFF0);
     poll &= 0xFC0000FF;
     
@@ -239,14 +239,14 @@ unsigned long SIEnablePolling(unsigned long poll) {
 unsigned long SIDisablePolling(unsigned long poll) {
     int enabled;
 
-    ASSERTMSGLINE("OSSerial.c", 0x22D, !(poll & 0x0FFFFFFF), "SIDisablePolling(): invalid chan bit(s).");
+    ASSERTMSGLINE(0x22D, !(poll & 0x0FFFFFFF), "SIDisablePolling(): invalid chan bit(s).");
     if (poll == 0) {
         return Si.poll;
     }
     enabled = OSDisableInterrupts();
     poll = poll >> 24;
     poll &= 0xF0;
-    ASSERTLINE("OSSerial.c", 0x23A, poll);
+    ASSERTLINE(0x23A, poll);
     poll = Si.poll & ~poll;
     __SIRegs[0x30/4] = poll;
     Si.poll = poll;
@@ -255,7 +255,7 @@ unsigned long SIDisablePolling(unsigned long poll) {
 }
 
 void SIGetResponse(long chan, void * data) {
-    ASSERTMSGLINE("OSSerial.c", 0x250, ((chan >= 0) && (chan < 4)), "SIGetResponse(): invalid channel.");
+    ASSERTMSGLINE(0x250, ((chan >= 0) && (chan < 4)), "SIGetResponse(): invalid channel.");
     ((u32*)data)[0] = __SIRegs[chan * 3 + 1];
     ((u32*)data)[1] = __SIRegs[chan * 3 + 2];
 }
@@ -266,8 +266,8 @@ static void AlarmHandler(struct OSAlarm * alarm, struct OSContext * context) {
 
     chan = alarm-Alarm;
 
-    ASSERTLINE("OSSerial.c", 0x266, 0 <= chan && chan < SI_MAX_CHAN);
-    ASSERTLINE("OSSerial.c", 0x267, packet->time <= OSGetTime()); // WTF? Dereferencing a NULL POINTER?
+    ASSERTLINE(0x266, 0 <= chan && chan < SI_MAX_CHAN);
+    ASSERTLINE(0x267, packet->time <= OSGetTime()); // WTF? Dereferencing a NULL POINTER?
     packet = &Packet[chan];
 
     if (packet->chan != -1 && __SITransfer(packet->chan, packet->output, packet->outputBytes, packet->input, packet->inputBytes, packet->callback)) {

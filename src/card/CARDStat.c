@@ -108,8 +108,8 @@ s32 CARDGetStatus(s32 chan, s32 fileNo, CARDStat *stat) {
     CARDDir *ent;
     s32 result;
 
-    ASSERTLINE("CARDStat.c", 0x97, 0 <= chan && chan < 2);
-    ASSERTLINE("CARDStat.c", 0x98, 0 <= fileNo && fileNo < CARD_MAX_FILE);
+    ASSERTLINE(0x97, 0 <= chan && chan < 2);
+    ASSERTLINE(0x98, 0 <= fileNo && fileNo < CARD_MAX_FILE);
 
     if (fileNo < 0 || CARD_MAX_FILE <= fileNo)
         return CARD_RESULT_FATAL_ERROR;
@@ -149,8 +149,8 @@ s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat *stat, CARDCallback callba
     CARDDir *ent;
     s32 result;
 
-    ASSERTLINE("CARDStat.c", 0xD5, 0 <= fileNo && fileNo < CARD_MAX_FILE);
-    ASSERTLINE("CARDStat.c", 0xD6, 0 <= chan && chan < 2);
+    ASSERTLINE(0xD5, 0 <= fileNo && fileNo < CARD_MAX_FILE);
+    ASSERTLINE(0xD6, 0 <= chan && chan < 2);
 
     if (fileNo < 0 || CARD_MAX_FILE <= fileNo)
         return CARD_RESULT_FATAL_ERROR;
