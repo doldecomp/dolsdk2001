@@ -249,7 +249,7 @@ typedef enum _GXTevStageID
     GX_MAX_TEVSTAGE,
 } GXTevStageID;
 
-typedef enum
+typedef enum _GXTevMode
 {
     GX_MODULATE,
     GX_DECAL,
@@ -258,7 +258,7 @@ typedef enum
     GX_PASSCLR,
 } GXTevMode;
 
-typedef enum
+typedef enum _GXTexMtxType
 {
     GX_MTX3x4,
     GX_MTX2x4,
@@ -308,7 +308,7 @@ typedef enum _GXTexMtx
     GX_IDENTITY = 60,
 } GXTexMtx;
 
-typedef enum
+typedef enum _GXChannelID
 {
     GX_COLOR0,
     GX_COLOR1,
@@ -418,7 +418,7 @@ typedef enum _GXCompType
     GX_RGBA8 = 5,
 } GXCompType;
 
-typedef enum
+typedef enum _GXPTTexMtx
 {
     GX_PTTEXMTX0 = 64,
     GX_PTTEXMTX1 = 67,
@@ -443,7 +443,7 @@ typedef enum
     GX_PTIDENTITY = 125,
 } GXPTTexMtx;
 
-typedef enum
+typedef enum _GXTevRegID
 {
     GX_TEVPREV,
     GX_TEVREG0,
@@ -452,27 +452,27 @@ typedef enum
     GX_MAX_TEVREG,
 } GXTevRegID;
 
-typedef enum
+typedef enum _GXDiffuseFn
 {
     GX_DF_NONE,
     GX_DF_SIGN,
     GX_DF_CLAMP,
 } GXDiffuseFn;
 
-typedef enum
+typedef enum _GXColorSrc
 {
     GX_SRC_REG,
     GX_SRC_VTX,
 } GXColorSrc;
 
-typedef enum
+typedef enum _GXAttnFn
 {
     GX_AF_SPEC,
     GX_AF_SPOT,
     GX_AF_NONE,
 } GXAttnFn;
 
-typedef enum
+typedef enum _GXLightID
 {
     GX_LIGHT0 = 0x001,
     GX_LIGHT1 = 0x002,
@@ -486,7 +486,7 @@ typedef enum
     GX_LIGHT_NULL = 0,
 } GXLightID;
 
-typedef enum
+typedef enum _GXTexOffset
 {
     GX_TO_ZERO,
     GX_TO_SIXTEENTH,
@@ -694,7 +694,7 @@ typedef enum
     GX_MAX_ZTEXOP,
 } GXZTexOp;
 
-typedef enum
+typedef enum _GXIndTexFormat
 {
     GX_ITF_8,
     GX_ITF_5,
@@ -703,7 +703,7 @@ typedef enum
     GX_MAX_ITFORMAT,
 } GXIndTexFormat;
 
-typedef enum
+typedef enum _GXIndTexBiasSel
 {
     GX_ITB_NONE,
     GX_ITB_S,
@@ -716,7 +716,7 @@ typedef enum
     GX_MAX_ITBIAS,
 } GXIndTexBiasSel;
 
-typedef enum
+typedef enum _GXIndTexAlphaSel
 {
     GX_ITBA_OFF,
     GX_ITBA_S,
@@ -725,7 +725,7 @@ typedef enum
     GX_MAX_ITBALPHA,
 } GXIndTexAlphaSel;
 
-typedef enum
+typedef enum _GXIndTexMtxID
 {
     GX_ITM_OFF,
     GX_ITM_0,
@@ -739,7 +739,7 @@ typedef enum
     GX_ITM_T2,
 } GXIndTexMtxID;
 
-typedef enum
+typedef enum _GXIndTexWrap
 {
     GX_ITW_OFF,
     GX_ITW_256,
@@ -751,7 +751,7 @@ typedef enum
     GX_MAX_ITWRAP,
 } GXIndTexWrap;
 
-typedef enum
+typedef enum _GXIndTexStageID
 {
     GX_INDTEXSTAGE0,
     GX_INDTEXSTAGE1,
@@ -760,7 +760,7 @@ typedef enum
     GX_MAX_INDTEXSTAGE,
 } GXIndTexStageID;
 
-typedef enum
+typedef enum _GXIndTexScale
 {
     GX_ITS_1,
     GX_ITS_2,

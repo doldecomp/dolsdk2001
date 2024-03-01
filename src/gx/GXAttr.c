@@ -4,7 +4,6 @@
 
 #include "__gx.h"
 
-#define CHECK_GXBEGIN(line, name)    ASSERTMSGLINE(__FILE__, line, !__GXinBegin, "'" name "' is not allowed between GXBegin/GXEnd")
 #define CHECK_ATTRPTR(line, attrPtr) ASSERTMSGLINE(__FILE__, line, (attrPtr) != NULL, "GXSetVtxDescv: attrPtr is NULL")
 #define CHECK_ATTRNAME(line, attr)   ASSERTMSGLINE(__FILE__, line, (attr) >= GX_VA_PNMTXIDX && (attr) < GX_VA_MAX_ATTR, "GXSetVtxDesc: Invalid vertex attribute name")
 #define CHECK_ATTRNAME2(line, attr)  ASSERTMSGLINE(__FILE__, line, (attr) >= GX_VA_POS && (attr) <= GX_VA_MAX_ATTR, "GXSetVtxAttrFmt: Invalid vertex attribute name")

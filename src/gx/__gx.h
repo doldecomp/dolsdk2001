@@ -69,9 +69,11 @@ do { \
 
 #define SET_REG_FIELD(line, reg, size, shift, val) \
 do { \
-    ASSERTMSGLINE("GXAttr.c", line, ((val) & ~((1 << (size)) - 1)) == 0, "GX Internal: Register field out of range"); \
+    ASSERTMSGLINE(__FILE__, line, ((val) & ~((1 << (size)) - 1)) == 0, "GX Internal: Register field out of range"); \
     (reg) = ((u32)(reg) & ~(((1 << (size)) - 1) << (shift))) | ((u32)(val) << (shift)); \
 } while (0)
+
+#define CHECK_GXBEGIN(line, name) ASSERTMSGLINE(__FILE__, line, !__GXinBegin, "'" name "' is not allowed between GXBegin/GXEnd")
 
 struct __GXVerifyData {
     // total size: 0x13F8
