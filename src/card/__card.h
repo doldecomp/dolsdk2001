@@ -2,6 +2,7 @@
 #define _DOLPHIN_CARD_INTERNAL_H_
 
 #include <dolphin/card.h>
+#include <dolphin/exi.h>
 
 // unsorted includes
 extern DVDDiskID * __CARDDiskID;
@@ -14,6 +15,9 @@ extern unsigned short *__CARDGetFatBlock(struct CARDControl *card);
 extern long __CARDEraseSector(long chan, int size, void *callback);
 extern void __CARDDefaultApiCallback();
 extern void __CARDSyncCallback();
+extern void __CARDUnlockedHandler();
+extern void __CARDExtHandler();
+extern void __CARDExiHandler(s32 chan, OSContext *context);
 extern long __CARDGetControlBlock(long chan, struct CARDControl **card);
 extern long __CARDPutControlBlock(struct CARDControl *card, long result);
 
