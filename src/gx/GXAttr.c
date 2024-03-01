@@ -2,117 +2,7 @@
 #include <dolphin/os.h>
 #include <macros.h>
 
-#define GX_WRITE_U8(ub)	    \
-    GXWGFifo.u8 = (u8)(ub)
-
-#define GX_WRITE_U16(us)   \
-   GXWGFifo.u16 = (u16)(us)
-
-#define GX_WRITE_U32(ui)   \
-   GXWGFifo.u32 = (u32)(ui)
-
-#define GX_WRITE_F32(f)	 	\
-   GXWGFifo.f32 = (f32)(f);
-
-struct __GXVerifyData {
-    // total size: 0x13F8
-    void (* cb)(GXAttr, unsigned long, char *); // offset 0x0, size 0x4
-    GXAttr verifyLevel; // offset 0x4, size 0x4
-    unsigned long xfRegs[80]; // offset 0x8, size 0x140
-    unsigned long xfMtx[256]; // offset 0x148, size 0x400
-    unsigned long xfNrm[96]; // offset 0x548, size 0x180
-    unsigned long xfDMtx[256]; // offset 0x6C8, size 0x400
-    unsigned long xfLight[128]; // offset 0xAC8, size 0x200
-    unsigned long rasRegs[256]; // offset 0xCC8, size 0x400
-    unsigned char xfRegsDirty[80]; // offset 0x10C8, size 0x50
-    unsigned char xfMtxDirty[256]; // offset 0x1118, size 0x100
-    unsigned char xfNrmDirty[96]; // offset 0x1218, size 0x60
-    unsigned char xfDMtxDirty[256]; // offset 0x1278, size 0x100
-    unsigned char xfLightDirty[128]; // offset 0x1378, size 0x80
-};
-
-extern struct __GXVerifyData *__gxVerif;
-
-extern u8 __GXinBegin;
-
-extern struct __GXData_struct {
-    // total size: 0x4F4
-    unsigned short vNum; // offset 0x0, size 0x2
-    unsigned short bpSent; // offset 0x2, size 0x2
-    unsigned long vLim; // offset 0x4, size 0x4
-    unsigned long cpEnable; // offset 0x8, size 0x4
-    unsigned long cpStatus; // offset 0xC, size 0x4
-    unsigned long cpClr; // offset 0x10, size 0x4
-    unsigned long vcdLo; // offset 0x14, size 0x4
-    unsigned long vcdHi; // offset 0x18, size 0x4
-    unsigned long vatA[8]; // offset 0x1C, size 0x20
-    unsigned long vatB[8]; // offset 0x3C, size 0x20
-    unsigned long vatC[8]; // offset 0x5C, size 0x20
-    unsigned long lpSize; // offset 0x7C, size 0x4
-    unsigned long matIdxA; // offset 0x80, size 0x4
-    unsigned long matIdxB; // offset 0x84, size 0x4
-    unsigned long indexBase[4]; // offset 0x88, size 0x10
-    unsigned long indexStride[4]; // offset 0x98, size 0x10
-    unsigned long ambColor[2]; // offset 0xA8, size 0x8
-    unsigned long matColor[2]; // offset 0xB0, size 0x8
-    unsigned long suTs0[8]; // offset 0xB8, size 0x20
-    unsigned long suTs1[8]; // offset 0xD8, size 0x20
-    unsigned long suScis0; // offset 0xF8, size 0x4
-    unsigned long suScis1; // offset 0xFC, size 0x4
-    unsigned long tref[8]; // offset 0x100, size 0x20
-    unsigned long iref; // offset 0x120, size 0x4
-    unsigned long bpMask; // offset 0x124, size 0x4
-    unsigned long IndTexScale0; // offset 0x128, size 0x4
-    unsigned long IndTexScale1; // offset 0x12C, size 0x4
-    unsigned long tevc[16]; // offset 0x130, size 0x40
-    unsigned long teva[16]; // offset 0x170, size 0x40
-    unsigned long tevKsel[8]; // offset 0x1B0, size 0x20
-    unsigned long cmode0; // offset 0x1D0, size 0x4
-    unsigned long cmode1; // offset 0x1D4, size 0x4
-    unsigned long zmode; // offset 0x1D8, size 0x4
-    unsigned long peCtrl; // offset 0x1DC, size 0x4
-    unsigned long cpDispSrc; // offset 0x1E0, size 0x4
-    unsigned long cpDispSize; // offset 0x1E4, size 0x4
-    unsigned long cpDispStride; // offset 0x1E8, size 0x4
-    unsigned long cpDisp; // offset 0x1EC, size 0x4
-    unsigned long cpTexSrc; // offset 0x1F0, size 0x4
-    unsigned long cpTexSize; // offset 0x1F4, size 0x4
-    unsigned long cpTexStride; // offset 0x1F8, size 0x4
-    unsigned long cpTex; // offset 0x1FC, size 0x4
-    unsigned char cpTexZ; // offset 0x200, size 0x1
-    unsigned long genMode; // offset 0x204, size 0x4
-    GXTexRegion TexRegions[8]; // offset 0x208, size 0x80
-    GXTexRegion TexRegionsCI[4]; // offset 0x288, size 0x40
-    unsigned long nextTexRgn; // offset 0x2C8, size 0x4
-    unsigned long nextTexRgnCI; // offset 0x2CC, size 0x4
-    GXTlutRegion TlutRegions[20]; // offset 0x2D0, size 0x140
-    GXTexRegion * (* texRegionCallback)(GXTexObj *, GXTexMapID); // offset 0x410, size 0x4
-    GXTlutRegion * (* tlutRegionCallback)(unsigned long); // offset 0x414, size 0x4
-    GXAttrType nrmType; // offset 0x418, size 0x4
-    unsigned char hasNrms; // offset 0x41C, size 0x1
-    unsigned char hasBiNrms; // offset 0x41D, size 0x1
-    unsigned long projType; // offset 0x420, size 0x4
-    float projMtx[6]; // offset 0x424, size 0x18
-    float vpLeft; // offset 0x43C, size 0x4
-    float vpTop; // offset 0x440, size 0x4
-    float vpWd; // offset 0x444, size 0x4
-    float vpHt; // offset 0x448, size 0x4
-    float vpNearz; // offset 0x44C, size 0x4
-    float vpFarz; // offset 0x450, size 0x4
-    unsigned char fgRange; // offset 0x454, size 0x1
-    float fgSideX; // offset 0x458, size 0x4
-    unsigned long tImage0[8]; // offset 0x45C, size 0x20
-    unsigned long tMode0[8]; // offset 0x47C, size 0x20
-    unsigned long texmapId[16]; // offset 0x49C, size 0x40
-    unsigned long tcsManEnab; // offset 0x4DC, size 0x4
-    GXPerf0 perf0; // offset 0x4E0, size 0x4
-    GXPerf1 perf1; // offset 0x4E4, size 0x4
-    unsigned long perfSel; // offset 0x4E8, size 0x4
-    unsigned char inDispList; // offset 0x4EC, size 0x1
-    unsigned char dlSaveContext; // offset 0x4ED, size 0x1
-    unsigned char dirtyVAT; // offset 0x4EE, size 0x1
-    unsigned long dirtyState; // offset 0x4F0, size 0x4
-} *gx;  // size = 0x4F4
+#include "__gx.h"
 
 #define CHECK_GXBEGIN(line, name)    ASSERTMSGLINE(__FILE__, line, !__GXinBegin, "'" name "' is not allowed between GXBegin/GXEnd")
 #define CHECK_ATTRPTR(line, attrPtr) ASSERTMSGLINE(__FILE__, line, (attrPtr) != NULL, "GXSetVtxDescv: attrPtr is NULL")
@@ -124,30 +14,12 @@ extern struct __GXData_struct {
 #define CHECK_FRAC(line, frac)       ASSERTMSGLINE(__FILE__, line, (frac) < 32, "GXSetVtxAttrFmt: Frac value is >= 32")
 #define CHECK_LISTPTR(line, list)    ASSERTMSGLINE(__FILE__, line, (list) != NULL, "GXSetVtxAttrFmt: list pointer is NULL")
 
-#define GET_REG_FIELD(reg, size, shift) ((int)((reg) >> (shift)) & ((1 << (size)) - 1))
-
-#define SET_REG_FIELD(line, reg, size, shift, val) \
-do { \
-    ASSERTMSGLINE("GXAttr.c", line, ((val) & ~((1 << (size)) - 1)) == 0, "GX Internal: Register field out of range"); \
-    (reg) = ((reg) & ~(((1 << (size)) - 1) << (shift))) | ((val) << (shift)); \
-} while (0)
-
-#define SET_REG_FIELD2(line, reg, size, shift, val) \
-do { \
-    if (((val) & ~((1 << (size)) - 1))) \
-        OSPanic("GXAttr.c", line, "GX Internal: Register field out of range"); \
-    (reg) = ((reg) & ~(((1 << (size)) - 1) << (shift))) | ((val) << (shift)); \
-} while (0)
-
-static void SETVCDATTR(GXAttr Attr, GXAttrType Type);
-
 static void __GXXfVtxSpecs(void)
 {
     u32 nCols = 0;
     u32 nNrm;
     u32 nTex;
     u32 reg;
-    long regAddr;
 
     nCols = GET_REG_FIELD(gx->vcdLo, 2, 13) ? 1 : 0;
     nCols += GET_REG_FIELD(gx->vcdLo, 2, 15) ? 1 : 0;
@@ -162,33 +34,11 @@ static void __GXXfVtxSpecs(void)
     nTex += GET_REG_FIELD(gx->vcdHi, 2, 12) ? 1 : 0;
     nTex += GET_REG_FIELD(gx->vcdHi, 2, 14) ? 1 : 0;
     reg = (nCols) | (nNrm << 2) | (nTex << 4);
-    GX_WRITE_U8(0x10);
-    GX_WRITE_U32(0x1008);
-    GX_WRITE_U32(reg);
-    regAddr = 8;
-    if ((regAddr >= 0) && (regAddr < 0x50)) {
-		__gxVerif->xfRegs[regAddr] = reg;
-		__gxVerif->xfRegsDirty[regAddr] = TRUE;
-    }
+    GX_WRITE_SOME_REG1(0x10, 0x1008, reg, 8);
     gx->bpSent = 0;
 }
 
-void GXSetVtxDesc(GXAttr attr, GXAttrType type)
-{
-	CHECK_GXBEGIN(0xCC, "GXSetVtxDesc");
-	CHECK_ATTRNAME(0xCF, attr);
-	CHECK_ATTRTYPE(0xD1, type);
-
-    SETVCDATTR(attr, type);
-    if ((gx->hasNrms != 0) || (gx->hasBiNrms != 0)) {
-		SET_REG_FIELD(0xD7, gx->vcdLo, 2, 11, gx->nrmType);
-    } else {
-        SET_REG_FIELD(0x00, gx->vcdLo, 2, 11, 0);
-    }
-    gx->dirtyState |= 8;
-}
-
-static void SETVCDATTR(GXAttr Attr, GXAttrType Type)
+static inline void SETVCDATTR(GXAttr Attr, GXAttrType Type)
 {
     switch (Attr) {
     case GX_VA_PNMTXIDX:   SET_REG_FIELD(0xA8, gx->vcdLo, 1, 0, Type); break;
@@ -226,7 +76,22 @@ static void SETVCDATTR(GXAttr Attr, GXAttrType Type)
     }
 }
 
-void GXSetVtxDescv(struct _GXVtxDescList * attrPtr)
+void GXSetVtxDesc(GXAttr attr, GXAttrType type)
+{
+	CHECK_GXBEGIN(0xCC, "GXSetVtxDesc");
+	CHECK_ATTRNAME(0xCF, attr);
+	CHECK_ATTRTYPE(0xD1, type);
+
+    SETVCDATTR(attr, type);
+    if (gx->hasNrms || gx->hasBiNrms) {
+		SET_REG_FIELD(0xD7, gx->vcdLo, 2, 11, gx->nrmType);
+    } else {
+        SET_REG_FIELD(0x00, gx->vcdLo, 2, 11, 0);
+    }
+    gx->dirtyState |= 8;
+}
+
+void GXSetVtxDescv(GXVtxDescList * attrPtr)
 {
 	CHECK_GXBEGIN(0xF5, "GXSetVtxDescv");
 	CHECK_ATTRPTR(0xF6, attrPtr);
@@ -254,40 +119,34 @@ void __GXSetVCD(void)
     unsigned long vl;
     unsigned long vh;
 
-	GX_WRITE_U8(8);
-	GX_WRITE_U8(0x50);
-	GX_WRITE_U32(gx->vcdLo);
-    { volatile long regAddr = -12; }
-    GX_WRITE_U8(8);
-	GX_WRITE_U8(0x60);
-	GX_WRITE_U32(gx->vcdHi);
-    { volatile long regAddr = -12; }
+	GX_WRITE_SOME_REG4(8, 0x50, gx->vcdLo, -12);
+	GX_WRITE_SOME_REG4(8, 0x60, gx->vcdHi, -12);
     __GXXfVtxSpecs();
     if (gx->vNum != 0) {
         vl = gx->vcdLo;
         vh = gx->vcdHi;
         vlm  = GET_REG_FIELD(vl, 1, 0);
-        vlm += GET_REG_FIELD(vl, 1, 1);
-        vlm += GET_REG_FIELD(vl, 1, 2);
-        vlm += GET_REG_FIELD(vl, 1, 3);
-        vlm += GET_REG_FIELD(vl, 1, 4);
-        vlm += GET_REG_FIELD(vl, 1, 5);
-        vlm += GET_REG_FIELD(vl, 1, 6);
-        vlm += GET_REG_FIELD(vl, 1, 7);
-        vlm += GET_REG_FIELD(vl, 1, 8);
-        vlm += tbl3[GET_REG_FIELD(vl, 2, 9)];
+        vlm += (u8)GET_REG_FIELD(vl, 1, 1);
+        vlm += (u8)GET_REG_FIELD(vl, 1, 2);
+        vlm += (u8)GET_REG_FIELD(vl, 1, 3);
+        vlm += (u8)GET_REG_FIELD(vl, 1, 4);
+        vlm += (u8)GET_REG_FIELD(vl, 1, 5);
+        vlm += (u8)GET_REG_FIELD(vl, 1, 6);
+        vlm += (u8)GET_REG_FIELD(vl, 1, 7);
+        vlm += (u8)GET_REG_FIELD(vl, 1, 8);
+        vlm += tbl3[(u8)GET_REG_FIELD(vl, 2, 9)];
         b = (gx->hasBiNrms << 1) + 1;
-        vlm += tbl3[GET_REG_FIELD(vl, 2, 11)] * b;
-        vlm += tbl1[GET_REG_FIELD(vl, 2, 13)];
-        vlm += tbl1[GET_REG_FIELD(vl, 2, 15)];
-        vlm += tbl2[GET_REG_FIELD(vh, 2, 0)];
-        vlm += tbl2[GET_REG_FIELD(vh, 2, 2)];
-        vlm += tbl2[GET_REG_FIELD(vh, 2, 4)];
-        vlm += tbl2[GET_REG_FIELD(vh, 2, 6)];
-        vlm += tbl2[GET_REG_FIELD(vh, 2, 8)];
-        vlm += tbl2[GET_REG_FIELD(vh, 2, 10)];
-        vlm += tbl2[GET_REG_FIELD(vh, 2, 12)];
-        vlm += tbl2[GET_REG_FIELD(vh, 2, 14)];
+        vlm += tbl3[(u8)GET_REG_FIELD(vl, 2, 11)] * b;
+        vlm += tbl1[(u8)GET_REG_FIELD(vl, 2, 13)];
+        vlm += tbl1[(u8)GET_REG_FIELD(vl, 2, 15)];
+        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 0)];
+        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 2)];
+        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 4)];
+        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 6)];
+        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 8)];
+        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 10)];
+        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 12)];
+        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 14)];
         gx->vLim = vlm;
     }
 }
@@ -351,7 +210,75 @@ void GXClearVtxDesc(void)
     gx->dirtyState |= 8;
 }
 
-static void SETVAT(u32 *va, u32 *vb, u32 *vc, GXAttr attr, GXCompCnt cnt, GXCompType type, u8 shft);
+static inline void SETVAT(u32 *va, u32 *vb, u32 *vc, GXAttr attr, GXCompCnt cnt, GXCompType type, u8 shft)
+{
+    switch (attr) {
+    case GX_VA_POS:
+        SET_REG_FIELD(511, *va, 1, 0, cnt);
+        SET_REG_FIELD(512, *va, 3, 1, type);
+        SET_REG_FIELD(513, *va, 5, 4, shft);
+        break;
+    case GX_VA_NRM:
+    case GX_VA_NBT:
+        SET_REG_FIELD(521, *va, 3, 10, type);
+        if (cnt == GX_NRM_NBT3) {
+            SET_REG_FIELD(0, *va, 1, 9, 1);
+            SET_REG_FIELD(0, *va, 1, 31, 1);
+        } else {
+            SET_REG_FIELD(527, *va, 1, 9, cnt);
+            SET_REG_FIELD(528, *va, 1, 31, 0);
+        }
+        break;
+    case GX_VA_CLR0:
+        SET_REG_FIELD(0x215, *va, 1, 13, cnt);
+        SET_REG_FIELD(0x216, *va, 3, 14, type);
+        break;
+    case GX_VA_CLR1:
+        SET_REG_FIELD(0x219, *va, 1, 0x11, cnt);
+        SET_REG_FIELD(0x21A, *va, 3, 18, type);
+        break;
+    case GX_VA_TEX0:
+        SET_REG_FIELD(0x21D, *va, 1, 0x15, cnt);
+        SET_REG_FIELD(0x21E, *va, 3, 0x16, type);
+        SET_REG_FIELD(0x21F, *va, 5, 0x19, shft);
+        break;
+    case GX_VA_TEX1:
+        SET_REG_FIELD(0x222, *vb, 1, 0, cnt);
+        SET_REG_FIELD(0x223, *vb, 3, 1, type);
+        SET_REG_FIELD(0x224, *vb, 5, 4, shft);
+        break;
+    case GX_VA_TEX2:
+        SET_REG_FIELD(0x227, *vb, 1, 9, cnt);
+        SET_REG_FIELD(0x228, *vb, 3, 10, type);
+        SET_REG_FIELD(0x229, *vb, 5, 13, shft);
+        break;
+    case GX_VA_TEX3:
+        SET_REG_FIELD(0x22C, *vb, 1, 18, cnt);
+        SET_REG_FIELD(0x22D, *vb, 3, 19, type);
+        SET_REG_FIELD(0x22E, *vb, 5, 22, shft);
+        break;
+    case GX_VA_TEX4:
+        SET_REG_FIELD(0x231, *vb, 1, 27, cnt);
+        SET_REG_FIELD(0x232, *vb, 3, 28, type);
+        SET_REG_FIELD(0x233, *vc, 5, 0, shft);
+        break;
+    case GX_VA_TEX5:
+        SET_REG_FIELD(0x236, *vc, 1, 5, cnt);
+        SET_REG_FIELD(0x237, *vc, 3, 6, type);
+        SET_REG_FIELD(0x238, *vc, 5, 9, shft);
+        break;
+    case GX_VA_TEX6:
+        SET_REG_FIELD(0x23B, *vc, 1, 14, cnt);
+        SET_REG_FIELD(0x23C, *vc, 3, 15, type);
+        SET_REG_FIELD(0x23D, *vc, 5, 18, shft);
+        break;
+    case GX_VA_TEX7:
+        SET_REG_FIELD(0x240, *vc, 1, 23, cnt);
+        SET_REG_FIELD(0x241, *vc, 3, 24, type);
+        SET_REG_FIELD(0x242, *vc, 5, 27, shft);
+        break;
+    }
+}
 
 void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType type, u8 frac)
 {
@@ -369,177 +296,6 @@ void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType typ
     SETVAT(va, vb, vc, attr, cnt, type, frac);
     gx->dirtyState |= 0x10;
     gx->dirtyVAT |= (u8)(1 << (u8)vtxfmt);
-}
-
-static void SETVAT(unsigned long * va /* r30 */, unsigned long * vb /* r27 */, unsigned long * vc /* r26 */, enum _GXAttr attr /* r1+0x14 */, enum _GXCompCnt cnt /* r29 */, enum _GXCompType type /* r28 */, unsigned char shft /* r25 */)
-{
-    switch (attr - 9) {
-    case 0:
-        if ((cnt & ~1) != 0) {
-            OSPanic("GXAttr.c", 0x1FF, "GX Internal: Register field out of range");
-        }
-        *va = (*va & ~1) | cnt;
-        if (type & ~7) {
-            OSPanic("GXAttr.c", 0x200, "GX Internal: Register field out of range");
-        }
-        *va = (*va & 0xFFFFFFF1) | (type << 1);
-        if (shft & 0xE0) {
-            OSPanic("GXAttr.c", 0x201, "GX Internal: Register field out of range");
-        }
-        *va = (*va & 0xFFFFFE0F) | ((shft << 4) & 0xFF0);
-        return;
-    case 1:
-    case 16:
-        if (type & 0xFFFFFFF8) {
-            OSPanic("GXAttr.c", 0x209, "GX Internal: Register field out of range");
-        }
-        *va = (*va & 0xFFFFE3FF) | (type << 0xA);
-        if (cnt == GX_NRM_NBT3) {
-            *va = (*va & 0xFFFFFDFF) | 0x200;
-            *va = (*va & 0x7FFFFFFF) | 0x80000000;
-            return;
-        }
-        if (cnt & 0xFFFFFFFE) {
-            OSPanic("GXAttr.c", 0x20F, "GX Internal: Register field out of range");
-        }
-        *va = (*va & 0xFFFFFDFF) | (cnt << 9);
-        *va &= 0x7FFFFFFF;
-        return;
-    case 2:
-        if (cnt & 0xFFFFFFFE) {
-            OSPanic("GXAttr.c", 0x215, "GX Internal: Register field out of range");
-        }
-        *va = (*va & 0xFFFFDFFF) | (cnt << 0xD);
-        if (type & 0xFFFFFFF8) {
-            OSPanic("GXAttr.c", 0x216, "GX Internal: Register field out of range");
-        }
-        *va = (*va & 0xFFFE3FFF) | (type << 0xE);
-        return;
-    case 3:
-        if (cnt & 0xFFFFFFFE) {
-            OSPanic("GXAttr.c", 0x219, "GX Internal: Register field out of range");
-        }
-        *va = (*va & 0xFFFDFFFF) | (cnt << 0x11);
-        if (type & 0xFFFFFFF8) {
-            OSPanic("GXAttr.c", 0x21A, "GX Internal: Register field out of range");
-        }
-        *va = (*va & 0xFFE3FFFF) | (type << 0x12);
-        return;
-    case 4:
-        if (cnt & 0xFFFFFFFE) {
-            OSPanic("GXAttr.c", 0x21D, "GX Internal: Register field out of range");
-        }
-        *va = (*va & 0xFFDFFFFF) | (cnt << 0x15);
-        if (type & 0xFFFFFFF8) {
-            OSPanic("GXAttr.c", 0x21E, "GX Internal: Register field out of range");
-        }
-        *va = (*va & 0xFE3FFFFF) | (type << 0x16);
-        if (shft & 0xE0) {
-            OSPanic("GXAttr.c", 0x21F, "GX Internal: Register field out of range");
-        }
-        *va = (*va & 0xC1FFFFFF) | (shft << 0x19);
-        return;
-    case 5:
-        if (cnt & 0xFFFFFFFE) {
-            OSPanic("GXAttr.c", 0x222, "GX Internal: Register field out of range");
-        }
-        *vb = (*vb & 0xFFFFFFFE) | cnt;
-        if (type & 0xFFFFFFF8) {
-            OSPanic("GXAttr.c", 0x223, "GX Internal: Register field out of range");
-        }
-        *vb = (*vb & 0xFFFFFFF1) | (type * 2);
-        if (shft & 0xE0) {
-            OSPanic("GXAttr.c", 0x224, "GX Internal: Register field out of range");
-        }
-        *vb = (*vb & 0xFFFFFE0F) | ((shft * 0x10) & 0xFF0);
-        return;
-    case 6:
-        if (cnt & 0xFFFFFFFE) {
-            OSPanic("GXAttr.c", 0x227, "GX Internal: Register field out of range");
-        }
-        *vb = (*vb & 0xFFFFFDFF) | (cnt << 9);
-        if (type & 0xFFFFFFF8) {
-            OSPanic("GXAttr.c", 0x228, "GX Internal: Register field out of range");
-        }
-        *vb = (*vb & 0xFFFFE3FF) | (type << 0xA);
-        if (shft & 0xE0) {
-            OSPanic("GXAttr.c", 0x229, "GX Internal: Register field out of range");
-        }
-        *vb = (*vb & 0xFFFC1FFF) | ((shft << 0xD) & 0x1FE000);
-        return;
-    case 7:
-        if (cnt & 0xFFFFFFFE) {
-            OSPanic("GXAttr.c", 0x22C, "GX Internal: Register field out of range");
-        }
-        *vb = (*vb & 0xFFFBFFFF) | (cnt << 0x12);
-        if (type & 0xFFFFFFF8) {
-            OSPanic("GXAttr.c", 0x22D, "GX Internal: Register field out of range");
-        }
-        *vb = (*vb & 0xFFC7FFFF) | (type << 0x13);
-        if (shft & 0xE0) {
-            OSPanic("GXAttr.c", 0x22E, "GX Internal: Register field out of range");
-        }
-        *vb = (*vb & 0xF83FFFFF) | ((shft << 0x16) & 0x3FC00000);
-        return;
-    case 8:
-        if (cnt & 0xFFFFFFFE) {
-            OSPanic("GXAttr.c", 0x231, "GX Internal: Register field out of range");
-        }
-        *vb = (*vb & 0xF7FFFFFF) | (cnt << 0x1B);
-        if (type & 0xFFFFFFF8) {
-            OSPanic("GXAttr.c", 0x232, "GX Internal: Register field out of range");
-        }
-        *vb = (*vb & 0x8FFFFFFF) | (type << 0x1C);
-        if (shft & 0xE0) {
-            OSPanic("GXAttr.c", 0x233, "GX Internal: Register field out of range");
-        }
-        *vc = (*vc & 0xFFFFFFE0) | shft;
-        return;
-    case 9:
-        if (cnt & 0xFFFFFFFE) {
-            OSPanic("GXAttr.c", 0x236, "GX Internal: Register field out of range");
-        }
-        *vc = (*vc & 0xFFFFFFDF) | (cnt << 5);
-        if (type & 0xFFFFFFF8) {
-            OSPanic("GXAttr.c", 0x237, "GX Internal: Register field out of range");
-        }
-        *vc = (*vc & 0xFFFFFE3F) | (type << 6);
-        if (shft & 0xE0) {
-            OSPanic("GXAttr.c", 0x238, "GX Internal: Register field out of range");
-        }
-        *vc = (*vc & 0xFFFFC1FF) | ((shft << 9) & 0x1FE00);
-        return;
-    case 10:
-        if (cnt & 0xFFFFFFFE) {
-            OSPanic("GXAttr.c", 0x23B, "GX Internal: Register field out of range");
-        }
-        *vc = (*vc & 0xFFFFBFFF) | (cnt << 0xE);
-        if (type & 0xFFFFFFF8) {
-            OSPanic("GXAttr.c", 0x23C, "GX Internal: Register field out of range");
-        }
-        *vc = (*vc & 0xFFFC7FFF) | (type << 0xF);
-        if (shft & 0xE0) {
-            OSPanic("GXAttr.c", 0x23D, "GX Internal: Register field out of range");
-        }
-        *vc = (*vc & 0xFF83FFFF) | ((shft << 0x12) & 0x03FC0000);
-        return;
-    case 11:
-        if (cnt & 0xFFFFFFFE) {
-            OSPanic("GXAttr.c", 0x240, "GX Internal: Register field out of range");
-        }
-        *vc = (*vc & 0xFF7FFFFF) | (cnt << 0x17);
-        if (type & 0xFFFFFFF8) {
-            OSPanic("GXAttr.c", 0x241, "GX Internal: Register field out of range");
-        }
-        *vc = (*vc & 0xF8FFFFFF) | (type << 0x18);
-        if (shft & 0xE0) {
-            OSPanic("GXAttr.c", 0x242, "GX Internal: Register field out of range");
-        }
-        *vc = (*vc & 0x07FFFFFF) | ((shft << 0x1B) & ~0x07FFFFFF);
-        /* fallthrough */
-    default:
-        return;
-    }
 }
 
 void GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, GXVtxAttrFmtList *list)
@@ -569,21 +325,10 @@ void __GXSetVAT(void)
     u8 i;
 
     for (i = 0; i < 8; i++) {
-        if (gx->dirtyVAT & (1 << i)) {
-			GX_WRITE_U8(8);
-			GX_WRITE_U8(i | 0x70);
-			GX_WRITE_U32(gx->vatA[i]);
-			{ long regAddr = i - 12; }
-
-			GX_WRITE_U8(8);
-			GX_WRITE_U8(i | 0x80);
-			GX_WRITE_U32(gx->vatB[i]);
-			{ long regAddr = i - 12; }
-
-			GX_WRITE_U8(8);
-			GX_WRITE_U8(i | 0x90);
-			GX_WRITE_U32(gx->vatC[i]);
-			{ long regAddr = i - 12; }
+        if (gx->dirtyVAT & (1 << (u8)i)) {
+			GX_WRITE_SOME_REG4(8, i | 0x70, gx->vatA[i], i - 12);
+			GX_WRITE_SOME_REG4(8, i | 0x80, gx->vatB[i], i - 12);
+			GX_WRITE_SOME_REG4(8, i | 0x90, gx->vatC[i], i - 12);
         }
     }
     gx->dirtyVAT = 0;
@@ -688,7 +433,7 @@ void GXGetVtxAttrFmtv(GXVtxFmt fmt, GXVtxAttrFmtList *vat)
     vat->attr = GX_VA_NULL;
 }
 
-void GXSetArray(s32 attr, void *base_ptr, u8 stride)
+void GXSetArray(GXAttr attr, void *base_ptr, u8 stride)
 {
     GXAttr cpAttr;
     unsigned long phyAddr;
@@ -696,30 +441,14 @@ void GXSetArray(s32 attr, void *base_ptr, u8 stride)
 	attr;  // needed to match
 
     CHECK_GXBEGIN(0x34F, "GXSetArray");
-    if (attr == 0x19) {
-        attr = 0xA;
+    if (attr == GX_VA_NBT) {
+        attr = GX_VA_NRM;
     }
     CHECK_ATTRNAME3(0x352, attr);
-    cpAttr = attr - 9;
+    cpAttr = attr - GX_VA_POS;
     phyAddr = (u32)base_ptr & 0x3FFFFFFF;
-    GX_WRITE_U8(8);
-    GX_WRITE_U8(cpAttr | 0xA0);
-    GX_WRITE_U32(phyAddr);
-    {
-		long regAddr = cpAttr - 12;
-		if ((regAddr >= 0) && (regAddr < 4)) {
-			gx->indexBase[regAddr] = phyAddr;
-		}
-	}
-    GX_WRITE_U8(8);
-    GX_WRITE_U8(cpAttr | 0xB0);
-    GX_WRITE_U32(stride);
-    {
-		long regAddr = cpAttr - 12;
-		if ((regAddr >= 0) && (regAddr < 4)) {
-			gx->indexStride[regAddr] = stride;
-		}
-	}
+    GX_WRITE_SOME_REG2(8, cpAttr | 0xA0, phyAddr, cpAttr - 12);
+    GX_WRITE_SOME_REG3(8, cpAttr | 0xB0, stride, cpAttr - 12);
 }
 
 void GXInvalidateVtxCache(void)
@@ -728,12 +457,12 @@ void GXInvalidateVtxCache(void)
 	GX_WRITE_U8(0x48);
 }
 
-void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, unsigned long mtx, u8 normalize, u32 pt_texmtx)
+void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, u8 normalize, u32 pt_texmtx)
 {
-    unsigned long reg = 0;
-    unsigned long row;
-    unsigned long bumprow;  // unused
-    unsigned long form;
+    u32 reg = 0;
+    u32 row;
+    u32 bumprow;  // unused
+    u32 form;
     GXAttr mtxIdAttr;
 
     CHECK_GXBEGIN(0x392, "GXSetTexCoordGen");
@@ -810,29 +539,11 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
         ASSERTMSGLINE(__FILE__, 0x3E5, 0, "GXSetTexCoordGen:  Invalid function");
 		break;
     }
-    GX_WRITE_U8(16);
-    GX_WRITE_U32(dst_coord + 0x1040);
-    GX_WRITE_U32(reg);
-    {
-		long regAddr = dst_coord + 0x40;
-		if ((regAddr >= 0) && (regAddr < 0x50)) {
-			__gxVerif->xfRegs[regAddr] = reg;
-			__gxVerif->xfRegsDirty[regAddr] = 1;
-		}
-	}
+    GX_WRITE_SOME_REG1(16, dst_coord + 0x1040, reg, dst_coord + 0x40);
     reg = 0;
     SET_REG_FIELD(0x3F8, reg, 6, 0, pt_texmtx - 64);
     SET_REG_FIELD(0x3F9, reg, 1, 8, normalize);
-    GX_WRITE_U8(16);
-    GX_WRITE_U32(dst_coord + 0x1050);
-    GX_WRITE_U32(reg);
-    {
-		long regAddr = dst_coord + 0x50;
-		if ((regAddr >= 0) && (regAddr < 0x50)) {
-			__gxVerif->xfRegs[regAddr] = reg;
-			__gxVerif->xfRegsDirty[regAddr] = 1;
-		}
-	}
+    GX_WRITE_SOME_REG1(16, dst_coord + 0x1050, reg, dst_coord + 0x50);
     switch (dst_coord) {
     case GX_TEXCOORD0: SET_REG_FIELD(0x402, gx->matIdxA, 6, 6, mtx);  break;
     case GX_TEXCOORD1: SET_REG_FIELD(0x403, gx->matIdxA, 6, 12, mtx); break;
@@ -850,17 +561,7 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
 void GXSetNumTexGens(u8 nTexGens)
 {
 	CHECK_GXBEGIN(0x41B, "GXSetNumTexGens");
-
 	SET_REG_FIELD(0x41D, gx->genMode, 4, 0, nTexGens);
-    GX_WRITE_U8(16);
-    GX_WRITE_U32(0x103F);
-    GX_WRITE_U32(nTexGens);
-    {
-		long regAddr = 0x3F;
-		if ((regAddr >= 0) && (regAddr < 0x50)) {
-			__gxVerif->xfRegs[regAddr] = nTexGens;
-			__gxVerif->xfRegsDirty[regAddr] = 1;
-		}
-	}
+	GX_WRITE_SOME_REG1(16, 0x103F, nTexGens, 0x3F);
     gx->dirtyState |= 4;
 }

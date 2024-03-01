@@ -167,7 +167,7 @@ build/debug/src/%.o: src/%.c
 	$(CC) -c -opt level=0 -inline off -schedule off -sym on $(CFLAGS) -I- $(INCLUDES) -DDEBUG $< -o $@
 
 build/release/src/%.o: src/%.c
-	$(CC) -c -O4,p -inline auto $(CFLAGS) -I- $(INCLUDES) -DRELEASE $< -o $@
+	$(CC) -c -O4,p -inline auto -sym on $(CFLAGS) -I- $(INCLUDES) -DRELEASE $< -o $@
 
 ################################ Build AR Files ###############################
 
