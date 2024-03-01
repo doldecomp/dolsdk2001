@@ -457,8 +457,8 @@ void LCAlloc(void * addr, unsigned long nBytes) {
     unsigned long numBlocks = nBytes >> 5;
     unsigned long hid2 = PPCMfhid2();
 
-    ASSERTMSGLINE("OSCache.c", 0x530, !((u32)addr & 31), "LCAlloc(): addr must be 32 byte aligned");
-    ASSERTMSGLINE("OSCache.c", 0x532, !((u32)nBytes & 31), "LCAlloc(): nBytes must be 32 byte aligned");
+    ASSERTMSGLINE(0x530, !((u32)addr & 31), "LCAlloc(): addr must be 32 byte aligned");
+    ASSERTMSGLINE(0x532, !((u32)nBytes & 31), "LCAlloc(): nBytes must be 32 byte aligned");
 
     if ((hid2 & 0x10000000) == 0) {
         LCEnable();
@@ -470,8 +470,8 @@ void LCAllocNoInvalidate(void * addr, unsigned long nBytes) {
     unsigned long numBlocks = nBytes >> 5;
     unsigned long hid2 = PPCMfhid2();
 
-    ASSERTMSGLINE("OSCache.c", 0x55F, !((u32)addr & 31), "LCAllocNoFlush(): addr must be 32 byte aligned");
-    ASSERTMSGLINE("OSCache.c", 0x561, !((u32)nBytes & 31), "LCAllocNoFlush(): nBytes must be 32 byte aligned");
+    ASSERTMSGLINE(0x55F, !((u32)addr & 31), "LCAllocNoFlush(): addr must be 32 byte aligned");
+    ASSERTMSGLINE(0x561, !((u32)nBytes & 31), "LCAllocNoFlush(): nBytes must be 32 byte aligned");
 
     if ((hid2 & 0x10000000) == 0) {
         LCEnable();
@@ -483,8 +483,8 @@ u32 LCLoadData(void* destAddr, void* srcAddr, u32 nBytes) {
   u32 numBlocks = (nBytes + 31) / 32;
   u32 numTransactions = (numBlocks + 128 - 1) / 128;
 
-  ASSERTMSGLINE("OSCache.c", 0x59B, !((u32)srcAddr & 31), "LCLoadData(): srcAddr not 32 byte aligned");
-  ASSERTMSGLINE("OSCache.c", 0x59D, !((u32)destAddr & 31), "LCLoadData(): destAddr not 32 byte aligned");
+  ASSERTMSGLINE(0x59B, !((u32)srcAddr & 31), "LCLoadData(): srcAddr not 32 byte aligned");
+  ASSERTMSGLINE(0x59D, !((u32)destAddr & 31), "LCLoadData(): destAddr not 32 byte aligned");
 
   while (numBlocks > 0) {
     if (numBlocks < 128) {
@@ -505,8 +505,8 @@ u32 LCStoreData(void* destAddr, void* srcAddr, u32 nBytes) {
   u32 numBlocks = (nBytes + 31) / 32;
   u32 numTransactions = (numBlocks + 128 - 1) / 128;
 
-  ASSERTMSGLINE("OSCache.c", 0x5DF, !((u32)srcAddr & 31), "LCStoreData(): srcAddr not 32 byte aligned");
-  ASSERTMSGLINE("OSCache.c", 0x5E1, !((u32)destAddr & 31), "LCStoreData(): destAddr not 32 byte aligned");
+  ASSERTMSGLINE(0x5DF, !((u32)srcAddr & 31), "LCStoreData(): srcAddr not 32 byte aligned");
+  ASSERTMSGLINE(0x5E1, !((u32)destAddr & 31), "LCStoreData(): destAddr not 32 byte aligned");
 
   while (numBlocks > 0) {
     if (numBlocks < 128) {

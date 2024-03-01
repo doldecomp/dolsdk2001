@@ -105,12 +105,12 @@ static int ReadSram(void * buffer) {
 
 static void WriteSramCallback() {
     int unused;
-    ASSERTLINE("OSRtc.c", 0xF0, !Scb.locked);
+    ASSERTLINE(0xF0, !Scb.locked);
     Scb.sync = WriteSram(&Scb.sram[Scb.offset], Scb.offset, 0x40 - Scb.offset);
     if (Scb.sync != 0) {
         Scb.offset = 0x40;
     }
-    ASSERTLINE("OSRtc.c", 0xF6, Scb.sync);
+    ASSERTLINE(0xF6, Scb.sync);
 }
 
 static int WriteSram(void * buffer, unsigned long offset, unsigned long size) {
@@ -138,7 +138,7 @@ static int WriteSram(void * buffer, unsigned long offset, unsigned long size) {
 void __OSInitSram() {
     Scb.locked = Scb.enabled = 0;
     Scb.sync = ReadSram(&Scb);
-    ASSERTLINE("OSRtc.c", 0x12C, Scb.sync);
+    ASSERTLINE(0x12C, Scb.sync);
     Scb.offset = 0x40;
 }
 
@@ -146,7 +146,7 @@ static void * LockSram(unsigned long offset) {
     int enabled;
 
     enabled = OSDisableInterrupts();
-    ASSERTLINE("OSRtc.c", 0x140, !Scb.locked);
+    ASSERTLINE(0x140, !Scb.locked);
     if (Scb.locked) {
         OSRestoreInterrupts(enabled);
         return NULL;
@@ -167,7 +167,7 @@ struct OSSramEx * __OSLockSramEx(void) {
 static int UnlockSram(int commit, unsigned long offset) {
     unsigned short * p;
 
-    ASSERTLINE("OSRtc.c", 0x162, Scb.locked);
+    ASSERTLINE(0x162, Scb.locked);
     if (commit != 0) {
         if (offset == 0) {
             struct OSSram * sram  = (struct OSSram *)&Scb.sram[0];
@@ -209,7 +209,7 @@ int __OSCheckSram() {
     struct OSSram * sram;
     int unused;
 
-    ASSERTLINE("OSRtc.c", 0x1A9, Scb.locked);
+    ASSERTLINE(0x1A9, Scb.locked);
 
     checkSum = checkSumInv = 0;
 
@@ -227,7 +227,7 @@ int __OSReadROM(void * buffer, long length, long offset) {
     int err;
     unsigned long cmd;
 
-    ASSERTLINE("OSRtc.c", 0x1C8, length <= 1024);
+    ASSERTLINE(0x1C8, length <= 1024);
     DCInvalidateRange(buffer, length);
     if (EXILock(0, 1, NULL) == 0) {
         return 0;
@@ -263,8 +263,8 @@ int __OSReadROMAsync(void * buffer, long length, long offset, void (* callback)(
     int err;
     unsigned long cmd;
 
-    ASSERTLINE("OSRtc.c", 0x203, length <= 1024);
-    ASSERTLINE("OSRtc.c", 0x204, callback);
+    ASSERTLINE(0x203, length <= 1024);
+    ASSERTLINE(0x204, callback);
     DCInvalidateRange(buffer, length);
     Scb.callback = callback;
     if (EXILock(0, 1, NULL) == 0) {
@@ -294,7 +294,7 @@ void OSSetSoundMode(unsigned long mode) {
     struct OSSram * sram;
     int unused;
 
-    ASSERTLINE("OSRtc.c", 0x22A, mode == OS_SOUND_MODE_MONO || mode == OS_SOUND_MODE_STEREO);
+    ASSERTLINE(0x22A, mode == OS_SOUND_MODE_MONO || mode == OS_SOUND_MODE_STEREO);
     mode *= 4;
     mode &= 4;
     sram = __OSLockSram();
@@ -319,7 +319,7 @@ void OSSetVideoMode(unsigned long mode) {
     struct OSSram * sram;
     int unused;
 
-    ASSERTLINE("OSRtc.c", 0x249, OS_VIDEO_MODE_NTSC <= mode && mode <= OS_VIDEO_MODE_MPAL);
+    ASSERTLINE(0x249, OS_VIDEO_MODE_NTSC <= mode && mode <= OS_VIDEO_MODE_MPAL);
 
     mode &= 3;
     sram = __OSLockSram();

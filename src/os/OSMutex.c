@@ -68,8 +68,8 @@ void OSLockMutex(struct OSMutex * mutex) {
     int enabled = OSDisableInterrupts();
     struct OSThread * currentThread = OSGetCurrentThread();
 
-    ASSERTMSGLINE("OSMutex.c", 0x8C, currentThread, "OSLockMutex(): current thread does not exist.");
-    ASSERTMSGLINE("OSMutex.c", 0x8E, currentThread->state == 2, "OSLockMutex(): current thread is not running.");
+    ASSERTMSGLINE(0x8C, currentThread, "OSLockMutex(): current thread does not exist.");
+    ASSERTMSGLINE(0x8E, currentThread->state == 2, "OSLockMutex(): current thread is not running.");
     
     while(1) {
         struct OSThread * ownerThread = mutex->thread;
@@ -84,7 +84,7 @@ void OSLockMutex(struct OSMutex * mutex) {
         } else {
             currentThread->mutex = mutex;
             __OSPromoteThread(mutex->thread, currentThread->priority);
-            ASSERTMSG2LINE("OSMutex.c", 0xA4, __OSCheckDeadLock(currentThread) == 0, "OSLockMutex(): detected deadlock: current thread %p, mutex %p.", currentThread, mutex);
+            ASSERTMSG2LINE(0xA4, __OSCheckDeadLock(currentThread) == 0, "OSLockMutex(): detected deadlock: current thread %p, mutex %p.", currentThread, mutex);
             OSSleepThread(&mutex->queue);
             currentThread->mutex = NULL;
         }
@@ -96,9 +96,9 @@ void OSUnlockMutex(struct OSMutex * mutex) {
     int enabled = OSDisableInterrupts();
     struct OSThread * currentThread = OSGetCurrentThread();
 
-    ASSERTMSGLINE("OSMutex.c", 0xBD, currentThread, "OSUnlockMutex(): current thread does not exist.");
-    ASSERTMSGLINE("OSMutex.c", 0xBF, currentThread->state == 2, "OSUnlockMutex(): current thread is not running.");
-    ASSERTMSG2LINE("OSMutex.c", 0xC2, mutex->thread == currentThread, "OSUnlockMutex(): current thread %p is not the owner of mutex %p.", currentThread, mutex);
+    ASSERTMSGLINE(0xBD, currentThread, "OSUnlockMutex(): current thread does not exist.");
+    ASSERTMSGLINE(0xBF, currentThread->state == 2, "OSUnlockMutex(): current thread is not running.");
+    ASSERTMSG2LINE(0xC2, mutex->thread == currentThread, "OSUnlockMutex(): current thread %p is not the owner of mutex %p.", currentThread, mutex);
 
     if (mutex->thread == currentThread) {
         if(!--mutex->count) {
@@ -120,7 +120,7 @@ void __OSUnlockAllMutex(struct OSThread * thread) {
     while(thread->queueMutex.head) {
         mutex = thread->queueMutex.head;
         DEQUEUE_HEAD(mutex, &thread->queueMutex, link);
-        ASSERTLINE("OSMutex.c", 0xE5, mutex->thread == thread);
+        ASSERTLINE(0xE5, mutex->thread == thread);
         mutex->count = 0;
         mutex->thread = 0;
         OSWakeupThread(&mutex->queue);
@@ -132,8 +132,8 @@ int OSTryLockMutex(struct OSMutex * mutex) {
     struct OSThread * currentThread = OSGetCurrentThread();
     int locked;
 
-    ASSERTMSGLINE("OSMutex.c", 0xFF, currentThread, "OSTryLockMutex(): current thread does not exist.");
-    ASSERTMSGLINE("OSMutex.c", 0x101, currentThread->state == 2, "OSTryLockMutex(): current thread is not running.");
+    ASSERTMSGLINE(0xFF, currentThread, "OSTryLockMutex(): current thread does not exist.");
+    ASSERTMSGLINE(0x101, currentThread->state == 2, "OSTryLockMutex(): current thread is not running.");
 
     if (!mutex->thread) {
         mutex->thread = currentThread;
@@ -158,9 +158,9 @@ void OSWaitCond(struct OSCond * cond, struct OSMutex * mutex) {
     int enabled = OSDisableInterrupts();
     struct OSThread * currentThread = OSGetCurrentThread();
 
-    ASSERTMSGLINE("OSMutex.c", 0x139, currentThread, "OSWaitCond(): current thread does not exist.");
-    ASSERTMSGLINE("OSMutex.c", 0x13B, currentThread->state == 2, "OSWaitCond(): current thread is not running.");
-    ASSERTMSG2LINE("OSMutex.c", 0x13E, mutex->thread == currentThread, "OSWaitCond(): current thread %p is not the owner of mutex %p.", currentThread, mutex);
+    ASSERTMSGLINE(0x139, currentThread, "OSWaitCond(): current thread does not exist.");
+    ASSERTMSGLINE(0x13B, currentThread->state == 2, "OSWaitCond(): current thread is not running.");
+    ASSERTMSG2LINE(0x13E, mutex->thread == currentThread, "OSWaitCond(): current thread %p is not the owner of mutex %p.", currentThread, mutex);
 
     if (mutex->thread == currentThread) {
         long count = mutex->count;

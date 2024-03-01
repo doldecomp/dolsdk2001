@@ -16,9 +16,9 @@ s32 CARDRenameAsync(s32 chan, char *old, char *new, CARDCallback callback) {
     int newNo;
     int oldNo;
 
-    ASSERTLINE("CARDRename.c", 0x49, 0 <= chan && chan < 2);
-    ASSERTLINE("CARDRename.c", 0x4A, *old != 0xff && *new != 0xff);
-    ASSERTLINE("CARDRename.c", 0x4B, *old != 0x00 && *new != 0x00);
+    ASSERTLINE(0x49, 0 <= chan && chan < 2);
+    ASSERTLINE(0x4A, *old != 0xff && *new != 0xff);
+    ASSERTLINE(0x4B, *old != 0x00 && *new != 0x00);
 
     if (old[0] == 0xFF || new[0] == 0xFF || old[0] == 0 || new[0] == 0)
         return CARD_RESULT_FATAL_ERROR;
