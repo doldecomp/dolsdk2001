@@ -29,4 +29,8 @@ s32 __CARDUnlock(s32 chan, u8 flashID[12]);
 // CARDRead.c
 s32 __CARDSeek(CARDFileInfo *fileInfo, s32 length, s32 offset, CARDControl **pcard);
 
+// CARDRdwr.c
+long __CARDRead(long chan, unsigned long addr, long length, void * dst, void (* callback)(long, long));
+long __CARDWrite(long chan, unsigned long addr, long length, void * dst, void (* callback)(long, long));
+
 #endif // _DOLPHIN_CARD_INTERNAL_H_
