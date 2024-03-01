@@ -97,6 +97,7 @@ typedef struct CARDID {
     /* 0x1FE */ u16 checkSumInv;
 } CARDID;
 
+#include <dolphin/card/CARDOpen.h>
 #include <dolphin/card/CARDRdwr.h>
 #include <dolphin/card/CARDRead.h>
 #include <dolphin/card/CARDStat.h>
@@ -150,11 +151,10 @@ typedef struct CARDID {
 #define CARD_RESULT_CANCELED     -14
 #define CARD_RESULT_FATAL_ERROR -128
 
+#define CARDIsValidBlockNo(card, blockNo) ((blockNo) >= CARD_NUM_SYSTEM_BLOCK && (blockNo) < (card)->cBlock)
+
 void CARDInit(void);
 s32 CARDUnmount(s32 chan);
-s32 CARDCancel(CARDFileInfo *fileInfo);
-s32 CARDOpen(s32 chan, char *fileName, CARDFileInfo *fileInfo);
-s32 CARDClose(CARDFileInfo *fileInfo);
 s32 CARDProbeEx(s32 chan, s32 *memSize, s32 *sectorSize);
 s32 CARDMountAsync(s32 chan, void *workArea, CARDCallback detachCallback,
     CARDCallback attachCallback);
@@ -163,9 +163,7 @@ s32 CARDCheckAsync(s32 chan, CARDCallback callback);
 s32 CARDFreeBlocks(s32 chan, s32 *byteNotUsed, s32 *filesNotUsed);
 s32 CARDCreateAsync(s32 chan, char *fileName, u32 size, CARDFileInfo *fileInfo, CARDCallback callback);
 s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat *stat, CARDCallback callback);
-s32 CARDReadAsync(CARDFileInfo* fileInfo, void *addr, s32 length, s32 offset, CARDCallback callback);
 s32 CARDGetStatus(s32 chan, s32 fileNo, CARDStat *stat);
-s32 CARDFastOpen(s32 chan, s32 fileNo, CARDFileInfo *fileInfo);
 s32 CARDFastDeleteAsync(s32 chan, s32 fileNo, CARDCallback callback);
 s32 CARDDeleteAsync(s32 chan, char *fileName, CARDCallback callback);
 s32 CARDRenameAsync(s32 chan, char *oldName, char *newName, CARDCallback callback);

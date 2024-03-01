@@ -117,9 +117,11 @@ ASFLAGS = -mgekko -I src -I include
 
 $(foreach dir,$(SRC_DIRS) $(ASM_DIRS) $(DATA_DIRS),$(shell mkdir -p build/release/$(dir) build/debug/$(dir)))
 
-# why. Did some SDK libs prefer char signed over unsigned? TODO: Figure out consistency behind this.
+# why. Did some SDK libs (like CARD) prefer char signed over unsigned? TODO: Figure out consistency behind this.
 build/debug/src/card/CARDRename.o: CHARFLAGS := -char signed
 build/release/src/card/CARDRename.o: CHARFLAGS := -char signed
+build/debug/src/card/CARDOpen.o: CHARFLAGS := -char signed
+build/release/src/card/CARDOpen.o: CHARFLAGS := -char signed
 
 ######################## Build #############################
 
