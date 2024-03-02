@@ -10,4 +10,10 @@ objdiff
 *.exe
 
 # Compiler
-mwcc_compiler/
+mwcc_compiler/*
+
+# Original files
+baserom/*
+
+# Keep .gitkeep
+!**/.gitkeep
