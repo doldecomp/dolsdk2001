@@ -69,8 +69,7 @@ long CARDFastDelete(long chan, long fileNo) {
     return __CARDSync(chan);
 }
 
-s32 CARDDeleteAsync(s32 chan, char *fileName, CARDCallback callback)
-{
+s32 CARDDeleteAsync(s32 chan, char *fileName, CARDCallback callback) {
     CARDControl *card;
     s32 fileNo;
     s32 result;
@@ -98,8 +97,7 @@ s32 CARDDeleteAsync(s32 chan, char *fileName, CARDCallback callback)
     return result;
 }
 
-s32 CARDDelete(s32 chan, char *fileName)
-{
+s32 CARDDelete(s32 chan, char *fileName) {
     s32 result = CARDDeleteAsync(chan, fileName, __CARDSyncCallback);
 
     if (result < 0)
