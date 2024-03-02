@@ -11,6 +11,27 @@
    GXWGFifo.f32 = (f32)(f);
 
 #if DEBUG
+#define SET_XF_REG_VERIF(addr, value) \
+do { \
+    s32 regAddr = (addr); \
+    if (regAddr >= 0 && regAddr < 0x50) { \
+        __gxVerif->xfRegs[regAddr] = (value); \
+        __gxVerif->xfRegsDirty[regAddr] = 1; \
+    } \
+} while (0)
+#else
+#define SET_XF_REG_VERIF(addr, value) ((void)0)
+#endif
+
+#define SET_XF_REG(addr, value) \
+do { \
+    GX_WRITE_U8(0x10); \
+    GX_WRITE_U32(0x1000 + (addr)); \
+    GX_WRITE_U32(value); \
+    SET_XF_REG_VERIF(addr, value); \
+} while (0)
+
+#if DEBUG
 #define GX_WRITE_SOME_REG1(a, b, c, addr) \
 do { \
 	long regAddr; \

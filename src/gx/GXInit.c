@@ -1,3 +1,4 @@
+#include <string.h>
 #include <dolphin/gx.h>
 
 #include "__gx.h"
@@ -16,9 +17,9 @@ u8 __GXinBegin; // size: 0x1, address: 0x0
 
 asm int IsWriteGatherBufferEmpty(void)
 {
-	sync
-	mfspr r3, WPAR
-	andi. r3, r3, 1
+    sync
+    mfspr r3, WPAR
+    andi. r3, r3, 1
 }
 
 void EnableWriteGatherPipe(void)
@@ -32,21 +33,21 @@ void EnableWriteGatherPipe(void)
 
 void DisableWriteGatherPipe(void)
 {
-	u32 hid2 = PPCMfhid2();
+    u32 hid2 = PPCMfhid2();
 
-	hid2 &= ~0x40000000;
+    hid2 &= ~0x40000000;
     PPCMthid2(hid2);
 }
 
 GXTexRegion *__GXDefaultTexRegionCallback(GXTexObj *t_obj, GXTexMapID unused)
 {
-	GXTexFmt fmt = GXGetTexObjFmt(t_obj);
+    GXTexFmt fmt = GXGetTexObjFmt(t_obj);
 
     if (fmt != GX_TF_C4 && fmt != GX_TF_C8 && fmt != GX_TF_C14X2) {
         return &gx->TexRegions[gx->nextTexRgn++ & 7];
     } else {
-		return &gx->TexRegionsCI[gx->nextTexRgnCI++ & 3];
-	}
+        return &gx->TexRegionsCI[gx->nextTexRgnCI++ & 3];
+    }
 }
 
 GXTlutRegion *__GXDefaultTlutRegionCallback(u32 idx)
@@ -84,8 +85,8 @@ GXFifoObj *GXInit(void *base, u32 size)
     unsigned long reg; // r26
     unsigned long freqBase; // r21
     //long regAddr; // r1+0x28
-    unsigned long reg1; // r28
-    unsigned long reg2; // r24
+    //unsigned long reg1; // r28
+    //unsigned long reg2; // r24
     //long regAddr; // r23
     //long regAddr; // r22
     //unsigned long reg; // r27
@@ -119,10 +120,10 @@ GXFifoObj *GXInit(void *base, u32 size)
         gx->teva[i] = 0;
         gx->tref[i / 2] = 0;
         gx->texmapId[i] = GX_TEXMAP_NULL;
-		SET_REG_FIELD(0x2F2, gx->tevc[i], 8, 24, 0xC0 + i * 2);
-		SET_REG_FIELD(0x2F3, gx->teva[i], 8, 24, 0xC1 + i * 2);
-		SET_REG_FIELD(0x2F5, gx->tevKsel[i / 2], 8, 24, 0xF6 + i / 2);
-		SET_REG_FIELD(0x2F7, gx->tref[i / 2], 8, 24, 0x28 + i / 2);
+        SET_REG_FIELD(0x2F2, gx->tevc[i], 8, 24, 0xC0 + i * 2);
+        SET_REG_FIELD(0x2F3, gx->teva[i], 8, 24, 0xC1 + i * 2);
+        SET_REG_FIELD(0x2F5, gx->tevKsel[i / 2], 8, 24, 0xF6 + i / 2);
+        SET_REG_FIELD(0x2F7, gx->tref[i / 2], 8, 24, 0x28 + i / 2);
     }
     gx->iref = 0;
     SET_REG_FIELD(0, gx->iref, 8, 24, 0x27);
@@ -142,12 +143,12 @@ GXFifoObj *GXInit(void *base, u32 size)
     gx->dirtyState = 0;
     gx->dirtyVAT = FALSE;
 #if DEBUG
-	__gxVerif->verifyLevel = GX_WARN_ALL;
+    __gxVerif->verifyLevel = GX_WARN_ALL;
     GXSetVerifyCallback(__GXDefaultVerifyCallback);
     for (i = 0; i < 256; i++) {
-		SET_REG_FIELD(0, __gxVerif->rasRegs[i], 8, 24, 0xFF);
-	}
-	memset(__gxVerif->xfRegsDirty, 0, 0x50);
+        SET_REG_FIELD(0, __gxVerif->rasRegs[i], 8, 24, 0xFF);
+    }
+    memset(__gxVerif->xfRegsDirty, 0, 0x50);
     memset(__gxVerif->xfMtxDirty, 0, 0x100);
     memset(__gxVerif->xfNrmDirty, 0, 0x60);
     memset(__gxVerif->xfLightDirty, 0, 0x80);
@@ -155,83 +156,85 @@ GXFifoObj *GXInit(void *base, u32 size)
     freqBase = __OSBusClock / 0x1F4;  // r21
     __GXFlushTextureState();
     {
-		reg = (freqBase >> 11) | 0x400 | 0x69000000;  // r26
-		GX_WRITE_U8(0x61);
-		GX_WRITE_U32(reg);
+        reg = (freqBase >> 11) | 0x400 | 0x69000000;  // r26
+        GX_WRITE_U8(0x61);
+        GX_WRITE_U32(reg);
 #if DEBUG
-		__gxVerif->rasRegs[(reg & 0xFF000000) >> 24] = reg;
+        __gxVerif->rasRegs[(reg & 0xFF000000) >> 24] = reg;
 #endif
-	}
-	__GXFlushTextureState();
-	{
-		reg = (freqBase / 0x1080) | 0x200 | 0x46000000;  // r26
-		GX_WRITE_U8(0x61);
-		GX_WRITE_U32(reg);
-#if DEBUG
-		__gxVerif->rasRegs[(reg & 0xFF000000) >> 24] = reg;
-#endif
-	}
-	for (i = GX_VTXFMT0; i < GX_MAX_VTXFMT; i++)
+    }
+    __GXFlushTextureState();
     {
-		SET_REG_FIELD(0, gx->vatA[i], 1, 30, 1);
-		SET_REG_FIELD(0, gx->vatB[i], 1, 31, 1);
+        reg = (freqBase / 0x1080) | 0x200 | 0x46000000;  // r26
+        GX_WRITE_U8(0x61);
+        GX_WRITE_U32(reg);
+#if DEBUG
+        __gxVerif->rasRegs[(reg & 0xFF000000) >> 24] = reg;
+#endif
+    }
+    for (i = GX_VTXFMT0; i < GX_MAX_VTXFMT; i++)
+    {
+        SET_REG_FIELD(0, gx->vatA[i], 1, 30, 1);
+        SET_REG_FIELD(0, gx->vatB[i], 1, 31, 1);
 //        gx->vatA[i] = (gx->vatA[i] & ~0x40000000) | 0x40000000;
         //gx->vatB[i] = (gx->vatB[i] & ~0x80000000) | 0x80000000;
         {
-			s32 regAddr;
-			GX_WRITE_U8(8);
-			GX_WRITE_U8(i | 0x80);
-			GX_WRITE_U32(gx->vatB[i]);
-			regAddr = i - 12;  // r1+0x28
-		}
+            s32 regAddr;
+            GX_WRITE_U8(8);
+            GX_WRITE_U8(i | 0x80);
+            GX_WRITE_U32(gx->vatB[i]);
+            regAddr = i - 12;  // r1+0x28
+        }
     }
-    reg1 = 0;  // r28
-    reg2 = 0;  // r24
+    {
+    u32 reg1 = 0;  // r28
+    u32 reg2 = 0;  // r24
     SET_REG_FIELD(0, reg1, 1, 0, 1);
-	SET_REG_FIELD(0, reg1, 1, 1, 1);
-	SET_REG_FIELD(0, reg1, 1, 2, 1);
-	SET_REG_FIELD(0, reg1, 1, 3, 1);
-	SET_REG_FIELD(0, reg1, 1, 4, 1);
-	SET_REG_FIELD(0, reg1, 1, 5, 1);
+    SET_REG_FIELD(0, reg1, 1, 1, 1);
+    SET_REG_FIELD(0, reg1, 1, 2, 1);
+    SET_REG_FIELD(0, reg1, 1, 3, 1);
+    SET_REG_FIELD(0, reg1, 1, 4, 1);
+    SET_REG_FIELD(0, reg1, 1, 5, 1);
     GX_WRITE_U8(0x10);
     GX_WRITE_U32(0x1000);
     GX_WRITE_U32(reg1);
 #if DEBUG
     {
-		s32 regAddr = 0;  // r23
-		if (regAddr >= 0 && regAddr < 0x50) {
-			__gxVerif->xfRegs[regAddr] = regAddr;
-			__gxVerif->xfRegsDirty[regAddr] = 1;
-		}
-	}
+        s32 regAddr = 0;  // r23
+        if (regAddr >= 0 && regAddr < 0x50) {
+            __gxVerif->xfRegs[regAddr] = regAddr;
+            __gxVerif->xfRegsDirty[regAddr] = 1;
+        }
+    }
 #endif
-	SET_REG_FIELD(0, reg2, 1, 0, 1);
-	GX_WRITE_U8(0x10);
-	GX_WRITE_U32(0x1012);
-	GX_WRITE_U32(reg2);
+    SET_REG_FIELD(0, reg2, 1, 0, 1);
+    GX_WRITE_U8(0x10);
+    GX_WRITE_U32(0x1012);
+    GX_WRITE_U32(reg2);
+    }
 #if DEBUG
-	{
-		s32 regAddr = 0x12;  // r22
-		if (regAddr >= 0 && regAddr < 0x50) {
-			__gxVerif->xfRegs[regAddr] = regAddr;
-			__gxVerif->xfRegsDirty[regAddr] = 1;
-		}
-	}
-	__gxVerif->xfRegsDirty[0] = 0;
+    {
+        s32 regAddr = 0x12;  // r22
+        if (regAddr >= 0 && regAddr < 0x50) {
+            __gxVerif->xfRegs[regAddr] = regAddr;
+            __gxVerif->xfRegsDirty[regAddr] = 1;
+        }
+    }
+    __gxVerif->xfRegsDirty[0] = 0;
 #endif
-	{
-		u32 reg = 0;  // r27
-		SET_REG_FIELD(0, reg, 1, 0, 1);
-		SET_REG_FIELD(0, reg, 1, 1, 1);
-		SET_REG_FIELD(0, reg, 1, 2, 1);
-		SET_REG_FIELD(0, reg, 1, 3, 1);
-		SET_REG_FIELD(0, reg, 8, 24, 0x58);
-		GX_WRITE_U8(0x61);
-		GX_WRITE_U32(reg);
+    {
+        u32 reg = 0;  // r27
+        SET_REG_FIELD(0, reg, 1, 0, 1);
+        SET_REG_FIELD(0, reg, 1, 1, 1);
+        SET_REG_FIELD(0, reg, 1, 2, 1);
+        SET_REG_FIELD(0, reg, 1, 3, 1);
+        SET_REG_FIELD(0, reg, 8, 24, 0x58);
+        GX_WRITE_U8(0x61);
+        GX_WRITE_U32(reg);
 #if DEBUG
-		__gxVerif->rasRegs[(reg & 0xFF000000) >> 24] = reg;
+        __gxVerif->rasRegs[(reg & 0xFF000000) >> 24] = reg;
 #endif
-	}
+    }
     switch (VIGetTvFormat()) {
     case VI_NTSC: rmode = &GXNtsc480IntDf; break;
     case VI_PAL:  rmode = &GXPal528IntDf;  break;
@@ -241,7 +244,7 @@ GXFifoObj *GXInit(void *base, u32 size)
         rmode = &GXNtsc480IntDf;
         break;
     }
-	GXSetCopyClear(clear, 0xFFFFFF);
+    GXSetCopyClear(clear, 0xFFFFFF);
     GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3CU);
     GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, 0x3CU);
     GXSetTexCoordGen(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX2, 0x3CU);
