@@ -96,7 +96,17 @@ extern struct __GXVerifyData *__gxVerif;
 
 extern u8 __GXinBegin;
 
-extern struct __GXData_struct {
+extern u32 *__piReg;
+extern u16 *__cpReg; // size: 0x4, address: 0x0
+
+/* GXGeometry.c */
+
+void __GXSendFlushPrim(void);
+void __GXSetGenMode(void);
+
+/* GXInit.c */
+
+struct __GXData_struct {
     // total size: 0x4F4
     unsigned short vNum; // offset 0x0, size 0x2
     unsigned short bpSent; // offset 0x2, size 0x2
@@ -173,11 +183,6 @@ extern struct __GXData_struct {
     unsigned char dlSaveContext; // offset 0x4ED, size 0x1
     unsigned char dirtyVAT; // offset 0x4EE, size 0x1
     unsigned long dirtyState; // offset 0x4F0, size 0x4
-} *gx;  // size = 0x4F4
+}; // size = 0x4F4
 
-extern u32 *__piReg;
-extern u16 *__cpReg; // size: 0x4, address: 0x0
-
-/* GXGeometry.c */
-void __GXSendFlushPrim(void);
-void __GXSetGenMode(void);
+extern struct __GXData_struct *gx;  

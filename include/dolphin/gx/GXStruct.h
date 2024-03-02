@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-typedef struct
+typedef struct _GXRenderModeObj
 {
     /*0x00*/ VITVMode viTVmode;
     /*0x04*/ u16 fbWidth;
@@ -44,7 +44,7 @@ typedef struct
     u32 dummy[16];
 } GXLightObj;
 
-typedef struct
+typedef struct _GXTexRegion
 {
     u32 dummy[4];
 } GXTexRegion;
@@ -54,7 +54,7 @@ typedef struct
     u32 dummy[3];
 } GXTlutObj;
 
-typedef struct
+typedef struct _GXTlutRegion
 {
     u32 dummy[4];
 } GXTlutRegion;

@@ -132,7 +132,7 @@ typedef enum _GXAttrType
 #define _GX_TF_CTF 0x20
 #define _GX_TF_ZTF 0x10
 
-typedef enum
+typedef enum _GXTexFmt
 {
     GX_TF_I4 = 0x0,
     GX_TF_I8 = 0x1,
@@ -166,14 +166,14 @@ typedef enum
     GX_TF_A8 = GX_CTF_A8,
 } GXTexFmt;
 
-typedef enum
+typedef enum _GXCITexFmt
 {
     GX_TF_C4 = 0x8,
     GX_TF_C8 = 0x9,
     GX_TF_C14X2 = 0xA,
 } GXCITexFmt;
 
-typedef enum
+typedef enum _GXTexWrapMode
 {
     GX_CLAMP,
     GX_REPEAT,
@@ -181,7 +181,7 @@ typedef enum
     GX_MAX_TEXWRAPMODE,
 } GXTexWrapMode;
 
-typedef enum
+typedef enum _GXTexFilter
 {
     GX_NEAR,
     GX_LINEAR,
@@ -191,7 +191,7 @@ typedef enum
     GX_LIN_MIP_LIN,
 } GXTexFilter;
 
-typedef enum
+typedef enum _GXAnisotropy
 {
     GX_ANISO_1,
     GX_ANISO_2,

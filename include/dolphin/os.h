@@ -144,9 +144,12 @@ void OSPanic(char *file, int line, char *msg, ...);
 
 #ifdef DEBUG
 void *OSPhysicalToCached(void *offset);
+void *OSPhysicalToUncached(void *offset);
+void *OSCachedToPhysical(void *offset);
 void *OSUncachedToPhysical(void *offset);
 #else
 #define OSPhysicalToCached(offset) ((void*)((u32)(OS_BASE_CACHED + (u32)offset)))
+#define OSPhysicalToUncached(offset) ((void*)((u32)(OS_BASE_UNCACHED + (u32)offset)))
 #define OSCachedToPhysical(offset) ((void*)((u32)((u32)offset - OS_BASE_CACHED)))
 #define OSUncachedToPhysical(offset) ((void*)((u32)((u32)offset - OS_BASE_UNCACHED)))
 #endif
