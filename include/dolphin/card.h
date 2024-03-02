@@ -105,6 +105,7 @@ typedef struct CARDID {
 #include <dolphin/card/CARDOpen.h>
 #include <dolphin/card/CARDRdwr.h>
 #include <dolphin/card/CARDRead.h>
+#include <dolphin/card/CARDRename.h>
 #include <dolphin/card/CARDStat.h>
 #include <dolphin/card/CARDWrite.h>
 
@@ -182,15 +183,8 @@ typedef struct CARDID {
 #define CARDGetDirCheck(dir) ((CARDDirCheck *)&(dir)[CARD_MAX_FILE])
 
 void CARDInit(void);
-s32 CARDUnmount(s32 chan);
-s32 CARDProbeEx(s32 chan, s32 *memSize, s32 *sectorSize);
-s32 CARDMountAsync(s32 chan, void *workArea, CARDCallback detachCallback,
-    CARDCallback attachCallback);
 s32 CARDGetResultCode(s32 chan);
 s32 CARDCheckAsync(s32 chan, CARDCallback callback);
 s32 CARDFreeBlocks(s32 chan, s32 *byteNotUsed, s32 *filesNotUsed);
-s32 CARDRenameAsync(s32 chan, char *oldName, char *newName, CARDCallback callback);
-s32 CARDMount(s32 chan, void *workArea, CARDCallback detachCallback);
-s32 CARDRename(s32 chan, char *oldName, char *newName);
 
 #endif

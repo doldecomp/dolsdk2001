@@ -4,9 +4,6 @@
 
 #include "__card.h"
 
-s32 CARDRenameAsync(s32 chan, char *old, char *new, CARDCallback callback);
-s32 CARDRename(s32 chan, char *oldName, char *newName);
-
 s32 CARDRenameAsync(s32 chan, char *old, char *new, CARDCallback callback) {
     CARDControl* card;
     CARDDir* dir;
