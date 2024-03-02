@@ -55,4 +55,8 @@ s32 CARDFormatAsync(s32 chan, CARDCallback callback);
 CARDDir *__CARDGetDirBlock(CARDControl* card);
 s32 __CARDUpdateDir(s32 chan, CARDCallback callback);
 
+// CARDCheck.c
+void __CARDCheckSum(void *ptr, int length, u16 *checksum, u16 *checksumInv);
+s32 __CARDVerify(CARDControl *card);
+
 #endif // _DOLPHIN_CARD_INTERNAL_H_
