@@ -97,6 +97,7 @@ typedef struct CARDID {
     /* 0x1FE */ u16 checkSumInv;
 } CARDID;
 
+#include <dolphin/card/CARDDelete.h>
 #include <dolphin/card/CARDDir.h>
 #include <dolphin/card/CARDFormat.h>
 #include <dolphin/card/CARDMount.h>
@@ -188,11 +189,8 @@ s32 CARDGetResultCode(s32 chan);
 s32 CARDCheckAsync(s32 chan, CARDCallback callback);
 s32 CARDFreeBlocks(s32 chan, s32 *byteNotUsed, s32 *filesNotUsed);
 s32 CARDCreateAsync(s32 chan, char *fileName, u32 size, CARDFileInfo *fileInfo, CARDCallback callback);
-s32 CARDFastDeleteAsync(s32 chan, s32 fileNo, CARDCallback callback);
-s32 CARDDeleteAsync(s32 chan, char *fileName, CARDCallback callback);
 s32 CARDRenameAsync(s32 chan, char *oldName, char *newName, CARDCallback callback);
 s32 CARDMount(s32 chan, void *workArea, CARDCallback detachCallback);
-s32 CARDDelete(s32 chan, char *fileName);
 s32 CARDRename(s32 chan, char *oldName, char *newName);
 
 #endif
