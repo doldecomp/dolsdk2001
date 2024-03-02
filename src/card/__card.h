@@ -9,7 +9,6 @@ extern DVDDiskID * __CARDDiskID;
 extern DVDDiskID __CARDDiskNone;
 extern struct CARDControl __CARDBlock[2];
 
-extern unsigned short *__CARDGetFatBlock(struct CARDControl *card);
 extern long __CARDEraseSector(long chan, int size, void *callback);
 extern void __CARDDefaultApiCallback();
 extern void __CARDSyncCallback();
@@ -58,5 +57,11 @@ s32 __CARDUpdateDir(s32 chan, CARDCallback callback);
 // CARDCheck.c
 void __CARDCheckSum(void *ptr, int length, u16 *checksum, u16 *checksumInv);
 s32 __CARDVerify(CARDControl *card);
+
+// CARDBlock.c
+void *__CARDGetFatBlock(CARDControl *card);
+s32 __CARDAllocBlock(s32 chan, u32 cBlock, CARDCallback callback);
+s32 __CARDFreeBlock(s32 chan, u16 nBlock, CARDCallback callback);
+s32 __CARDUpdateFatBlock(s32 chan, u16 *fat, CARDCallback callback);
 
 #endif // _DOLPHIN_CARD_INTERNAL_H_
