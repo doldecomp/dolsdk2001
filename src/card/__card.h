@@ -4,20 +4,6 @@
 #include <dolphin/card.h>
 #include <dolphin/exi.h>
 
-// unsorted includes
-extern DVDDiskID * __CARDDiskID;
-extern DVDDiskID __CARDDiskNone;
-extern struct CARDControl __CARDBlock[2];
-
-extern long __CARDEraseSector(long chan, int size, void *callback);
-extern void __CARDDefaultApiCallback();
-extern void __CARDSyncCallback();
-extern void __CARDUnlockedHandler();
-extern void __CARDExtHandler();
-extern void __CARDExiHandler(s32 chan, OSContext *context);
-extern long __CARDGetControlBlock(long chan, struct CARDControl **card);
-extern long __CARDPutControlBlock(struct CARDControl *card, long result);
-
 // CARDStatEx.c
 long __CARDGetStatusEx(long chan, long fileNo, struct CARDDir * dirent);
 long __CARDSetStatusExAsync(long chan, long fileNo, struct CARDDir * dirent, void (* callback)(long, long));
@@ -63,5 +49,31 @@ void *__CARDGetFatBlock(CARDControl *card);
 s32 __CARDAllocBlock(s32 chan, u32 cBlock, CARDCallback callback);
 s32 __CARDFreeBlock(s32 chan, u16 nBlock, CARDCallback callback);
 s32 __CARDUpdateFatBlock(s32 chan, u16 *fat, CARDCallback callback);
+
+// CARDBios.c
+extern struct CARDControl __CARDBlock[2];
+
+extern DVDDiskID * __CARDDiskID;
+extern DVDDiskID __CARDDiskNone;
+
+void __CARDDefaultApiCallback(s32 chan, s32 result);
+void __CARDSyncCallback(s32 chan, s32 result);
+void __CARDExtHandler(s32 chan, OSContext *context);
+void __CARDExiHandler(s32 chan, OSContext *context);
+void __CARDTxHandler(s32 chan, OSContext *context);
+void __CARDUnlockedHandler(s32 chan, OSContext *context);
+int __CARDReadNintendoID(s32 chan, u32 *id);
+s32 __CARDEnableInterrupt(s32 chan, BOOL enable);
+s32 __CARDReadStatus(s32 chan, u8 *status);
+s32 __CARDClearStatus(s32 chan);
+long __CARDSleep(long chan);
+long __CARDWakeup(long chan);
+s32 __CARDReadSegment(s32 chan, CARDCallback callback);
+long __CARDErase(long chan, void (* callback)(long, long));
+s32 __CARDEraseSector(s32 chan, u32 addr, CARDCallback callback);
+void __CARDSetDiskID(DVDDiskID *id);
+s32 __CARDGetControlBlock(s32 chan, CARDControl **pcard);
+s32 __CARDPutControlBlock(CARDControl *card, s32 result);
+s32 __CARDSync(s32 chan);
 
 #endif // _DOLPHIN_CARD_INTERNAL_H_
