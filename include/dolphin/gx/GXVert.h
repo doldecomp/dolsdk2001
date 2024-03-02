@@ -29,6 +29,16 @@ volatile PPCWGPipe GXWGFifo : GXFIFO_ADDR;
 #define GXWGFifo (*(volatile PPCWGPipe *)GXFIFO_ADDR)
 #endif
 
+#if DEBUG
+void GXPosition2f32(const f32 x, const f32 y);
+void GXPosition3s16(const s16 x, const s16 y, const s16 z);
+void GXPosition3f32(const f32 x, const f32 y, const f32 z);
+void GXNormal3f32(const f32 x, const f32 y, const f32 z);
+void GXColor4u8(const u8 r, const u8 g, const u8 b, const u8 a);
+void GXTexCoord2s8(const s8 u, const s8 v);
+void GXTexCoord2s16(const s16 u, const s16 v);
+void GXTexCoord2f32(const f32 u, const f32 v);
+#else
 inline void GXPosition2f32(const f32 x, const f32 y)
 {
     GXWGFifo.f32 = x;
@@ -81,6 +91,7 @@ inline void GXTexCoord2f32(const f32 u, const f32 v)
     GXWGFifo.f32 = u;
     GXWGFifo.f32 = v;
 }
+#endif
 
 #ifdef __cplusplus
 }

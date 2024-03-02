@@ -4,14 +4,14 @@
 
 #include "__gx.h"
 
-#define CHECK_ATTRPTR(line, attrPtr) ASSERTMSGLINE(__FILE__, line, (attrPtr) != NULL, "GXSetVtxDescv: attrPtr is NULL")
-#define CHECK_ATTRNAME(line, attr)   ASSERTMSGLINE(__FILE__, line, (attr) >= GX_VA_PNMTXIDX && (attr) < GX_VA_MAX_ATTR, "GXSetVtxDesc: Invalid vertex attribute name")
-#define CHECK_ATTRNAME2(line, attr)  ASSERTMSGLINE(__FILE__, line, (attr) >= GX_VA_POS && (attr) <= GX_VA_MAX_ATTR, "GXSetVtxAttrFmt: Invalid vertex attribute name")
-#define CHECK_ATTRNAME3(line, attr)  ASSERTMSGLINE(__FILE__, line, (attr) >= GX_VA_POS && (attr) <= GX_LIGHT_ARRAY, "GXSetArray: Invalid vertex attribute name")
-#define CHECK_ATTRTYPE(line, type)   ASSERTMSGLINE(__FILE__, line, (type) >= GX_NONE && (type) <= GX_INDEX16, "GXSetVtxDesc: Invalid vertex attribute type")
-#define CHECK_VTXFMT(line, vtxfmt)   ASSERTMSGLINE(__FILE__, line, (vtxfmt) < GX_MAX_VTXFMT, "GXSetVtxAttrFmt: Format Index is out of range")
-#define CHECK_FRAC(line, frac)       ASSERTMSGLINE(__FILE__, line, (frac) < 32, "GXSetVtxAttrFmt: Frac value is >= 32")
-#define CHECK_LISTPTR(line, list)    ASSERTMSGLINE(__FILE__, line, (list) != NULL, "GXSetVtxAttrFmt: list pointer is NULL")
+#define CHECK_ATTRPTR(line, attrPtr) ASSERTMSGLINE(line, (attrPtr) != NULL, "GXSetVtxDescv: attrPtr is NULL")
+#define CHECK_ATTRNAME(line, attr)   ASSERTMSGLINE(line, (attr) >= GX_VA_PNMTXIDX && (attr) < GX_VA_MAX_ATTR, "GXSetVtxDesc: Invalid vertex attribute name")
+#define CHECK_ATTRNAME2(line, attr)  ASSERTMSGLINE(line, (attr) >= GX_VA_POS && (attr) <= GX_VA_MAX_ATTR, "GXSetVtxAttrFmt: Invalid vertex attribute name")
+#define CHECK_ATTRNAME3(line, attr)  ASSERTMSGLINE(line, (attr) >= GX_VA_POS && (attr) <= GX_LIGHT_ARRAY, "GXSetArray: Invalid vertex attribute name")
+#define CHECK_ATTRTYPE(line, type)   ASSERTMSGLINE(line, (type) >= GX_NONE && (type) <= GX_INDEX16, "GXSetVtxDesc: Invalid vertex attribute type")
+#define CHECK_VTXFMT(line, vtxfmt)   ASSERTMSGLINE(line, (vtxfmt) < GX_MAX_VTXFMT, "GXSetVtxAttrFmt: Format Index is out of range")
+#define CHECK_FRAC(line, frac)       ASSERTMSGLINE(line, (frac) < 32, "GXSetVtxAttrFmt: Frac value is >= 32")
+#define CHECK_LISTPTR(line, list)    ASSERTMSGLINE(line, (list) != NULL, "GXSetVtxAttrFmt: list pointer is NULL")
 
 static void __GXXfVtxSpecs(void)
 {
@@ -33,7 +33,7 @@ static void __GXXfVtxSpecs(void)
     nTex += GET_REG_FIELD(gx->vcdHi, 2, 12) ? 1 : 0;
     nTex += GET_REG_FIELD(gx->vcdHi, 2, 14) ? 1 : 0;
     reg = (nCols) | (nNrm << 2) | (nTex << 4);
-    GX_WRITE_SOME_REG1(0x10, 0x1008, reg, 8);
+    GX_WRITE_XF_REG(8, reg);
     gx->bpSent = 0;
 }
 
@@ -465,7 +465,7 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     GXAttr mtxIdAttr;
 
     CHECK_GXBEGIN(0x392, "GXSetTexCoordGen");
-    ASSERTMSGLINE(__FILE__, 0x393, dst_coord < 8, "GXSetTexCoordGen: Invalid coordinate Id");
+    ASSERTMSGLINE(0x393, dst_coord < 8, "GXSetTexCoordGen: Invalid coordinate Id");
     form = 0;
     row = 5;
     switch (src_param) {
@@ -491,7 +491,7 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     case GX_TG_TEXCOORD5: bumprow; break;
     case GX_TG_TEXCOORD6: bumprow; break;
     default:
-        ASSERTMSGLINE(__FILE__, 0x3AF, 0, "GXSetTexCoordGen: Invalid source parameter");
+        ASSERTMSGLINE(0x3AF, 0, "GXSetTexCoordGen: Invalid source parameter");
         break;
     }
     switch (func)
@@ -516,7 +516,7 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     case 7:
     case 8:
     case 9:
-        ASSERTMSGLINE(__FILE__, 0x3CF, src_param >= 12 && src_param <= 18, "GXSetTexCoordGen:  Bump source texture value is invalid");
+        ASSERTMSGLINE(0x3CF, src_param >= 12 && src_param <= 18, "GXSetTexCoordGen:  Bump source texture value is invalid");
         SET_REG_FIELD(0x3D0, reg, 1, 1, 0);
         SET_REG_FIELD(0x3D1, reg, 1, 2, form);
         SET_REG_FIELD(0x3D2, reg, 3, 4, 1);
@@ -535,14 +535,14 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
         SET_REG_FIELD(0, reg, 5, 7, 2);
         break;
     default:
-        ASSERTMSGLINE(__FILE__, 0x3E5, 0, "GXSetTexCoordGen:  Invalid function");
+        ASSERTMSGLINE(0x3E5, 0, "GXSetTexCoordGen:  Invalid function");
         break;
     }
-    GX_WRITE_SOME_REG1(16, dst_coord + 0x1040, reg, dst_coord + 0x40);
+    GX_WRITE_XF_REG(dst_coord + 0x40, reg);
     reg = 0;
     SET_REG_FIELD(0x3F8, reg, 6, 0, pt_texmtx - 64);
     SET_REG_FIELD(0x3F9, reg, 1, 8, normalize);
-    GX_WRITE_SOME_REG1(16, dst_coord + 0x1050, reg, dst_coord + 0x50);
+    GX_WRITE_XF_REG(dst_coord + 0x50, reg);
     switch (dst_coord) {
     case GX_TEXCOORD0: SET_REG_FIELD(0x402, gx->matIdxA, 6, 6, mtx);  break;
     case GX_TEXCOORD1: SET_REG_FIELD(0x403, gx->matIdxA, 6, 12, mtx); break;
@@ -561,6 +561,6 @@ void GXSetNumTexGens(u8 nTexGens)
 {
     CHECK_GXBEGIN(0x41B, "GXSetNumTexGens");
     SET_REG_FIELD(0x41D, gx->genMode, 4, 0, nTexGens);
-    GX_WRITE_SOME_REG1(16, 0x103F, nTexGens, 0x3F);
+    GX_WRITE_XF_REG(0x3F, nTexGens);
     gx->dirtyState |= 4;
 }

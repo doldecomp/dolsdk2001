@@ -98,10 +98,10 @@ GXFifoObj *GXInit(void *base, u32 size)
 #endif
     gx->tcsManEnab = FALSE;
     gx->vNum = 0;
-    __piReg = OSPhysicalToUncached((void *)0xC003000);
-    __cpReg = OSPhysicalToUncached((void *)0xC000000);
-    __peReg = OSPhysicalToUncached((void *)0xC001000);
-    __memReg = OSPhysicalToUncached((void *)0xC004000);
+    __piReg = OSPhysicalToUncached(0xC003000);
+    __cpReg = OSPhysicalToUncached(0xC000000);
+    __peReg = OSPhysicalToUncached(0xC001000);
+    __memReg = OSPhysicalToUncached(0xC004000);
     __GXFifoInit();
     GXInitFifoBase(&FifoObj, base, size);
     GXSetCPUFifo(&FifoObj);
@@ -155,23 +155,17 @@ GXFifoObj *GXInit(void *base, u32 size)
 #endif
     freqBase = __OSBusClock / 0x1F4;  // r21
     __GXFlushTextureState();
-    {
-        reg = (freqBase >> 11) | 0x400 | 0x69000000;  // r26
-        GX_WRITE_U8(0x61);
-        GX_WRITE_U32(reg);
-#if DEBUG
-        __gxVerif->rasRegs[(reg & 0xFF000000) >> 24] = reg;
-#endif
-    }
+    reg = (freqBase >> 11) | 0x400 | 0x69000000;  // r26
+    GX_WRITE_RAS_REG(reg);
+
     __GXFlushTextureState();
-    {
-        reg = (freqBase / 0x1080) | 0x200 | 0x46000000;  // r26
-        GX_WRITE_U8(0x61);
-        GX_WRITE_U32(reg);
+    reg = (freqBase / 0x1080) | 0x200 | 0x46000000;  // r26
+    //GX_WRITE_RAS_REG(reg);  // causes reg swaps somehow
+    GX_WRITE_U8(0x61);
+    GX_WRITE_U32(reg);
 #if DEBUG
-        __gxVerif->rasRegs[(reg & 0xFF000000) >> 24] = reg;
+    __gxVerif->rasRegs[(reg & 0xFF000000) >> 24] = reg;
 #endif
-    }
     for (i = GX_VTXFMT0; i < GX_MAX_VTXFMT; i++)
     {
         SET_REG_FIELD(0, gx->vatA[i], 1, 30, 1);
@@ -195,33 +189,13 @@ GXFifoObj *GXInit(void *base, u32 size)
     SET_REG_FIELD(0, reg1, 1, 3, 1);
     SET_REG_FIELD(0, reg1, 1, 4, 1);
     SET_REG_FIELD(0, reg1, 1, 5, 1);
-    GX_WRITE_U8(0x10);
-    GX_WRITE_U32(0x1000);
-    GX_WRITE_U32(reg1);
-#if DEBUG
-    {
-        s32 regAddr = 0;  // r23
-        if (regAddr >= 0 && regAddr < 0x50) {
-            __gxVerif->xfRegs[regAddr] = regAddr;
-            __gxVerif->xfRegsDirty[regAddr] = 1;
-        }
-    }
-#endif
+    GX_WRITE_XF_REG(0, reg1);
     SET_REG_FIELD(0, reg2, 1, 0, 1);
-    GX_WRITE_U8(0x10);
-    GX_WRITE_U32(0x1012);
-    GX_WRITE_U32(reg2);
-    }
+    GX_WRITE_XF_REG(0x12, reg2);
 #if DEBUG
-    {
-        s32 regAddr = 0x12;  // r22
-        if (regAddr >= 0 && regAddr < 0x50) {
-            __gxVerif->xfRegs[regAddr] = regAddr;
-            __gxVerif->xfRegsDirty[regAddr] = 1;
-        }
-    }
     __gxVerif->xfRegsDirty[0] = 0;
 #endif
+    }
     {
         u32 reg = 0;  // r27
         SET_REG_FIELD(0, reg, 1, 0, 1);

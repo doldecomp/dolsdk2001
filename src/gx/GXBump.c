@@ -129,7 +129,7 @@ void GXSetIndTexCoordScale(GXIndTexStageID ind_state, GXIndTexScale scale_s, GXI
         GX_WRITE_SOME_REG5(0x61, gx->IndTexScale1);
         break;
     default:
-        ASSERTMSGLINE(__FILE__, 0x102, 0, "GXSetIndTexCoordScale: Invalid Indirect Stage Id");
+        ASSERTMSGLINE(0x102, 0, "GXSetIndTexCoordScale: Invalid Indirect Stage Id");
         break;
     }
     gx->bpSent = 1;
@@ -139,8 +139,8 @@ void GXSetIndTexOrder(GXIndTexStageID ind_stage, GXTexCoordID tex_coord, GXTexMa
 {
     CHECK_GXBEGIN(0x11B, "GXSetIndTexOrder");
 
-    ASSERTMSGLINE(__FILE__, 0x11D, tex_map < 8, "GXSetIndTexOrder: Invalid direct texture Id");
-    ASSERTMSGLINE(__FILE__, 0x11E, tex_coord < 8, "GXSetIndTexOrder: Invalid texture coord");
+    ASSERTMSGLINE(0x11D, tex_map < 8, "GXSetIndTexOrder: Invalid direct texture Id");
+    ASSERTMSGLINE(0x11E, tex_coord < 8, "GXSetIndTexOrder: Invalid texture coord");
 
     switch (ind_stage) {
     case GX_INDTEXSTAGE0:
@@ -160,7 +160,7 @@ void GXSetIndTexOrder(GXIndTexStageID ind_stage, GXTexCoordID tex_coord, GXTexMa
         SET_REG_FIELD(0x12F, gx->iref, 3, 21, tex_coord);
         break;
     default:
-        ASSERTMSGLINE(__FILE__, 0x132, 0, "GXSetIndTexOrder: Invalid Indirect Stage Id");
+        ASSERTMSGLINE(0x132, 0, "GXSetIndTexOrder: Invalid Indirect Stage Id");
         break;
     }
     GX_WRITE_SOME_REG5(0x61, gx->iref);
@@ -171,7 +171,7 @@ void GXSetIndTexOrder(GXIndTexStageID ind_stage, GXTexCoordID tex_coord, GXTexMa
 void GXSetNumIndStages(u8 nIndStages)
 {
     CHECK_GXBEGIN(0x144, "GXSetNumIndStages");
-    ASSERTMSGLINE(__FILE__, 0x146, nIndStages <= 4, "GXSetNumIndStages: Exceeds max. number of indirect texture stages");
+    ASSERTMSGLINE(0x146, nIndStages <= 4, "GXSetNumIndStages: Exceeds max. number of indirect texture stages");
     SET_REG_FIELD(0x147, gx->genMode, 3, 16, nIndStages);
     gx->dirtyState |= 6;
 }
@@ -199,8 +199,8 @@ void GXSetTevIndTile(GXTevStageID tev_stage, GXIndTexStageID ind_stage, u16 tile
     f32 mtx[2][3];
 
     CHECK_GXBEGIN(0x190, "GXSetTevIndTile");
-    ASSERTMSGLINE(__FILE__, 0x191, tev_stage < 16, "GXSetTevIndTile: Invalid tev stage id");
-    ASSERTMSGLINE(__FILE__, 0x192, ind_stage < 4, "GXSetTevIndTile: Invalid indirect stage id");
+    ASSERTMSGLINE(0x191, tev_stage < 16, "GXSetTevIndTile: Invalid tev stage id");
+    ASSERTMSGLINE(0x192, ind_stage < 4, "GXSetTevIndTile: Invalid indirect stage id");
     switch (tilesize_s) {
     case 256:
         wrap_s = GX_ITW_256;
@@ -218,7 +218,7 @@ void GXSetTevIndTile(GXTevStageID tev_stage, GXIndTexStageID ind_stage, u16 tile
         wrap_s = GX_ITW_16;
         break;
     default:
-        ASSERTMSGLINE(__FILE__, 0x19B, 0, "GXSetTevIndTile: Invalid tilesize for S coordinate");
+        ASSERTMSGLINE(0x19B, 0, "GXSetTevIndTile: Invalid tilesize for S coordinate");
         wrap_s = GX_ITW_OFF;
         break;
     }
@@ -239,7 +239,7 @@ void GXSetTevIndTile(GXTevStageID tev_stage, GXIndTexStageID ind_stage, u16 tile
         wrap_t = GX_ITW_16;
         break;
     default:
-        ASSERTMSGLINE(__FILE__, 0x1A7, 0, "GXSetTevIndTile: Invalid tilesize for T coordinate");
+        ASSERTMSGLINE(0x1A7, 0, "GXSetTevIndTile: Invalid tilesize for T coordinate");
         wrap_t = GX_ITW_OFF;
         break;
     }
@@ -271,7 +271,7 @@ void GXSetTevIndBumpST(GXTevStageID tev_stage, GXIndTexStageID ind_stage, GXIndT
         tm = GX_ITM_T2;
         break;
     default:
-        ASSERTMSGLINE(__FILE__, 0x1E0, 0, "GXSetTevIndBumpST: Invalid matrix selection");
+        ASSERTMSGLINE(0x1E0, 0, "GXSetTevIndBumpST: Invalid matrix selection");
         break;
     }
     GXSetTevIndirect(tev_stage, ind_stage, GX_ITF_8, GX_ITB_ST, sm, GX_ITW_0, GX_ITW_0, 0U, 0, 0);
@@ -321,7 +321,7 @@ void __GXUpdateBPMask(void)
             new_dmask |= 1 << tmap;
         }
     }
-    ASSERTMSGLINE(__FILE__, 0x269, !(new_imask & new_dmask), "GXSetTevOrder/GXSetIndTexOrder: Same texture map cannot be specified in both");
+    ASSERTMSGLINE(0x269, !(new_imask & new_dmask), "GXSetTevOrder/GXSetIndTexOrder: Same texture map cannot be specified in both");
 #endif
 
     if ((u8)gx->bpMask != new_imask) {

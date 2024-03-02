@@ -11,7 +11,7 @@
    GXWGFifo.f32 = (f32)(f);
 
 #if DEBUG
-#define SET_XF_REG_VERIF(addr, value) \
+#define VERIF_XF_REG(addr, value) \
 do { \
     s32 regAddr = (addr); \
     if (regAddr >= 0 && regAddr < 0x50) { \
@@ -19,41 +19,26 @@ do { \
         __gxVerif->xfRegsDirty[regAddr] = 1; \
     } \
 } while (0)
+#define VERIF_RAS_REG(value) (__gxVerif->rasRegs[(value) >> 24] = value)
 #else
-#define SET_XF_REG_VERIF(addr, value) ((void)0)
+#define VERIF_XF_REG(addr, value) ((void)0)
+#define VERIF_RAS_REG(value) ((void)0)
 #endif
 
-#define SET_XF_REG(addr, value) \
+#define GX_WRITE_XF_REG(addr, value) \
 do { \
     GX_WRITE_U8(0x10); \
     GX_WRITE_U32(0x1000 + (addr)); \
     GX_WRITE_U32(value); \
-    SET_XF_REG_VERIF(addr, value); \
+    VERIF_XF_REG(addr, value); \
 } while (0)
 
-#if DEBUG
-#define GX_WRITE_SOME_REG1(a, b, c, addr) \
+#define GX_WRITE_RAS_REG(value) \
 do { \
-	long regAddr; \
-	GX_WRITE_U8(a); \
-    GX_WRITE_U32(b); \
-    GX_WRITE_U32(c); \
-    regAddr = addr; \
-    if (regAddr >= 0 && regAddr < 0x50) { \
-		__gxVerif->xfRegs[regAddr] = c; \
-		__gxVerif->xfRegsDirty[regAddr] = TRUE; \
-    } \
+    GX_WRITE_U8(0x61); \
+    GX_WRITE_U32(value); \
+    VERIF_RAS_REG(value); \
 } while (0)
-#else
-#define GX_WRITE_SOME_REG1(a, b, c, addr) \
-do { \
-	long regAddr; \
-	GX_WRITE_U8(a); \
-    GX_WRITE_U32(b); \
-    GX_WRITE_U32(c); \
-    regAddr = addr; \
-} while (0)
-#endif
 
 #define GX_WRITE_SOME_REG2(a, b, c, addr) \
 do { \

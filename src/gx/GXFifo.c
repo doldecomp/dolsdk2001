@@ -256,7 +256,7 @@ void GXSaveCPUFifo(GXFifoObj *fifo)
 do { \
     u32 temp = __cpReg[29] << 16; \
     temp |= __cpReg[28]; \
-    fifo->rdPtr = OSPhysicalToCached((void *)temp); \
+    fifo->rdPtr = OSPhysicalToCached(temp); \
 } while (0)
 
 #define SOME_MACRO2(fifo) \
@@ -271,9 +271,9 @@ void __GXSaveCPUFifoAux(struct __GXFifoObj *realFifo)
     BOOL enabled = OSDisableInterrupts();
 
     GXFlush();
-    realFifo->base = OSPhysicalToCached((void *)__piReg[3]);
-    realFifo->top = OSPhysicalToCached((void *)__piReg[4]);
-    realFifo->wrPtr = OSPhysicalToCached((void *)(__piReg[5] & 0xFBFFFFFF));
+    realFifo->base = OSPhysicalToCached(__piReg[3]);
+    realFifo->top = OSPhysicalToCached(__piReg[4]);
+    realFifo->wrPtr = OSPhysicalToCached(__piReg[5] & 0xFBFFFFFF);
     if (CPGPLinked) {
         SOME_MACRO1(realFifo);
         SOME_MACRO2(realFifo);
@@ -340,7 +340,7 @@ void GXGetFifoPtrs(GXFifoObj *fifo, void **readPtr, void **writePtr)
 
     ASSERTMSGLINE(0x3F2, realFifo == CPUFifo || realFifo == GPFifo, "GXGetFifoPtrs: fifo is not CPU or GP fifo");
     if (realFifo == CPUFifo) {
-        realFifo->wrPtr = OSPhysicalToCached((void *)(__piReg[5] & 0xFBFFFFFF));
+        realFifo->wrPtr = OSPhysicalToCached(__piReg[5] & 0xFBFFFFFF);
     }
     if (realFifo == GPFifo) {
         SOME_MACRO1(realFifo);
@@ -553,7 +553,7 @@ void *GXRedirectWriteGatherPipe(void *ptr)
         __GXFifoLink(0);
         __GXWriteFifoIntEnable(0, 0);
     }
-    CPUFifo->wrPtr = OSPhysicalToCached((void *)(__piReg[5] & 0xFBFFFFFF));
+    CPUFifo->wrPtr = OSPhysicalToCached(__piReg[5] & 0xFBFFFFFF);
     __piReg[3] = 0;
     __piReg[4] = 0x04000000;
     SET_REG_FIELD(0x5C8, reg, 21, 5, ((u32)ptr & 0x3FFFFFFF) >> 5);

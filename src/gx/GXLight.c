@@ -499,7 +499,7 @@ void GXSetChanAmbColor(GXChannelID chan, GXColor amb_color)
         return;
     }
 
-    SET_XF_REG(colIdx + 10, reg);
+    GX_WRITE_XF_REG(colIdx + 10, reg);
     gx->bpSent = 0;
     gx->ambColor[colIdx] = reg;
 }
@@ -558,7 +558,7 @@ void GXSetChanMatColor(GXChannelID chan, GXColor mat_color)
         return;
     }
 
-    SET_XF_REG(colIdx + 12, reg);
+    GX_WRITE_XF_REG(colIdx + 12, reg);
     gx->bpSent = 0;
     gx->matColor[colIdx] = reg;
 }
@@ -569,7 +569,7 @@ void GXSetNumChans(u8 nChans)
     ASSERTMSGLINE(0x2D6, nChans <= 2, "GXSetNumChans: nChans > 2");
 
     SET_REG_FIELD(0x2D8, gx->genMode, 3, 4, nChans);
-    SET_XF_REG(9, nChans);
+    GX_WRITE_XF_REG(9, nChans);
     gx->dirtyState |= 4;
 }
 
@@ -606,11 +606,11 @@ void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src,
     SET_REG_FIELD(0x30F, reg, 1, 9, (attn_fn != 2));
     SET_REG_FIELD(0x310, reg, 1, 10, (attn_fn != 0));
 
-    SET_XF_REG(idx + 14, reg);
+    GX_WRITE_XF_REG(idx + 14, reg);
     gx->bpSent = 0;
     if (chan == GX_COLOR0A0) {
-        SET_XF_REG(16, reg);
+        GX_WRITE_XF_REG(16, reg);
     } else if (chan == GX_COLOR1A1) {
-        SET_XF_REG(17, reg);
+        GX_WRITE_XF_REG(17, reg);
     }
 }
