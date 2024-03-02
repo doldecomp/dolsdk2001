@@ -497,7 +497,7 @@ typedef enum _GXTexOffset
     GX_MAX_TEXOFFSET,
 } GXTexOffset;
 
-typedef enum
+typedef enum _GXSpotFn
 {
     GX_SP_OFF,
     GX_SP_FLAT,
@@ -508,7 +508,7 @@ typedef enum
     GX_SP_RING2,
 } GXSpotFn;
 
-typedef enum
+typedef enum _GXDistAttnFn
 {
     GX_DA_OFF,
     GX_DA_GENTLE,
@@ -516,7 +516,7 @@ typedef enum
     GX_DA_STEEP,
 } GXDistAttnFn;
 
-typedef enum
+typedef enum _GXCullMode
 {
     GX_CULL_NONE,
     GX_CULL_FRONT,
@@ -525,7 +525,7 @@ typedef enum
 
 } GXCullMode;
 
-typedef enum
+typedef enum _GXTevSwapSel
 {
     GX_TEV_SWAP0 = 0,
     GX_TEV_SWAP1,
@@ -534,7 +534,7 @@ typedef enum
     GX_MAX_TEVSWAP
 } GXTevSwapSel;
 
-typedef enum
+typedef enum _GXTevColorChan
 {
     GX_CH_RED = 0,
     GX_CH_GREEN,
@@ -552,7 +552,7 @@ typedef enum _GXFogType
     GX_FOG_REVEXP2 = 7
 } GXFogType;
 
-typedef enum
+typedef enum _GXTevColorArg
 {
     GX_CC_CPREV,
     GX_CC_APREV,
@@ -572,7 +572,7 @@ typedef enum
     GX_CC_ZERO
 } GXTevColorArg;
 
-typedef enum
+typedef enum _GXTevAlphaArg
 {
     GX_CA_APREV,
     GX_CA_A0,
@@ -584,7 +584,7 @@ typedef enum
     GX_CA_ZERO
 } GXTevAlphaArg;
 
-typedef enum
+typedef enum _GXTevOp
 {
     GX_TEV_ADD = 0,
     GX_TEV_SUB = 1,
@@ -600,7 +600,7 @@ typedef enum
     GX_TEV_COMP_A8_EQ = GX_TEV_COMP_RGB8_EQ
 } GXTevOp;
 
-typedef enum
+typedef enum _GXTevBias
 {
     GX_TB_ZERO,
     GX_TB_ADDHALF,
@@ -608,7 +608,7 @@ typedef enum
     GX_MAX_TEVBIAS
 } GXTevBias;
 
-typedef enum
+typedef enum _GXTevScale
 {
     GX_CS_SCALE_1,
     GX_CS_SCALE_2,

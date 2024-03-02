@@ -5,8 +5,6 @@
 
 #include "__gx.h"
 
-extern u16 *__cpReg; // size: 0x4, address: 0x0
-
 struct __GXFifoObj {
     // total size: 0x24
     unsigned char * base; // offset 0x0, size 0x4
@@ -136,7 +134,7 @@ void GXInitFifoPtrs(GXFifoObj *fifo, void *readPtr, void *writePtr)
     ASSERTMSGLINE(0x233, realFifo != GPFifo,          "GXInitFifoPtrs: fifo is attached to GP");
     ASSERTMSGLINE(0x235, ((u32)readPtr & 0x1F) == 0,  "GXInitFifoPtrs: readPtr not 32B aligned");
     ASSERTMSGLINE(0x237, ((u32)writePtr & 0x1F) == 0, "GXInitFifoPtrs: writePtr not 32B aligned");
-    ASSERTMSGLINE(0x23A, realFifo->base <= readPtr && readPtr < realFifo->top, "GXInitFifoPtrs: readPtr not in fifo range");
+    ASSERTMSGLINE(0x23A, realFifo->base <= readPtr && readPtr < realFifo->top,   "GXInitFifoPtrs: readPtr not in fifo range");
     ASSERTMSGLINE(0x23D, realFifo->base <= writePtr && writePtr < realFifo->top, "GXInitFifoPtrs: writePtr not in fifo range");
 
     enabled = OSDisableInterrupts();
@@ -494,7 +492,7 @@ OSThread *GXSetCurrentGXThread(void)
 
     enabled = OSDisableInterrupts();
     prev = __GXCurrentThread;
-    ASSERTMSGLINE(0X532, !GXOverflowSuspendInProgress, "GXSetCurrentGXThread: Two threads cannot generate GX commands at the same time!");
+    ASSERTMSGLINE(0x532, !GXOverflowSuspendInProgress, "GXSetCurrentGXThread: Two threads cannot generate GX commands at the same time!");
     __GXCurrentThread = OSGetCurrentThread();
     OSRestoreInterrupts(enabled);
     return prev;
@@ -558,11 +556,16 @@ void *GXRedirectWriteGatherPipe(void *ptr)
     CPUFifo->wrPtr = OSPhysicalToCached((void *)(__piReg[5] & 0xFBFFFFFF));
     __piReg[3] = 0;
     __piReg[4] = 0x04000000;
-    SET_REG_FIELD(0x5C8, reg, 25, 5, ((u32)ptr & 0x3FFFFFFF) >> 5);
+    SET_REG_FIELD(0x5C8, reg, 21, 5, ((u32)ptr & 0x3FFFFFFF) >> 5);
+    /*if (((u32)ptr >> 5) & 0x1E00000)
+        OSPanic(__FILE__, 0x5FB, "GX Internal: Register field out of range");
+    //SET_REG_FIELD(0x5C8, reg, 25, 5, ((u32)ptr & 0x3FFFFFFF) >> 5);*/
+    //reg = (reg & ~0x3FFFFE0) | ((u32)ptr & 0x3FFFFFE0);
+    reg &= 0xFBFFFFFF;
     __piReg[5] = reg;
     __sync();
     OSRestoreInterrupts(enabled);
-    return &GXWGFifo;
+    return (void *)GXFIFO_ADDR;
 }
 
 void GXRestoreWriteGatherPipe(void)
@@ -585,7 +588,12 @@ void GXRestoreWriteGatherPipe(void)
     PPCMtwpar((u32)OSUncachedToPhysical((void *)GXFIFO_ADDR));
     __piReg[3] = (u32)CPUFifo->base & 0x3FFFFFFF;
     __piReg[4] = (u32)CPUFifo->top & 0x3FFFFFFF;
-    SET_REG_FIELD(0x5FB, reg, 25, 5, ((u32)CPUFifo->wrPtr & 0x3FFFFFFF) >> 5);
+    SET_REG_FIELD(0x5FB, reg, 21, 5, ((u32)CPUFifo->wrPtr & 0x3FFFFFFF) >> 5);
+    /*if ((((u32)CPUFifo->wrPtr & 0x3FFFFFFF) >> 5) & 0x7E00000)
+        OSPanic(__FILE__, 0x5FB, "GX Internal: Register field out of range");
+    reg = (reg & ~0x3FFFFE0) | (((u32)CPUFifo->wrPtr & 0x3FFFFFFF) & ~0x1F);*/
+    //SET_REG_FIELD(0x5FB, reg, 25, 5, ((u32)CPUFifo->wrPtr & 0x3FFFFFFF) >> 5);
+    reg &= 0xFBFFFFFF;
     __piReg[5] = reg;
     if (CPGPLinked) {
         __GXWriteFifoIntReset(1, 1);
