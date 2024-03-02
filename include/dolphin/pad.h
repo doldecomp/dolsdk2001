@@ -61,4 +61,7 @@ void PADControlAllMotors(const u32 *commandArray);
 void PADControlMotor(s32 chan, u32 command);
 void PADSetSpec(u32 spec);
 
+// Padclamp.c
+void PADClamp(PADStatus * status);
+
 #endif

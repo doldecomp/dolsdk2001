@@ -36,7 +36,7 @@ Currently this repository supports building the following libraries:
 | odemustubs   | :heavy_check_mark: |
 | odenotstub   | :heavy_check_mark: |
 | os           | :heavy_check_mark: |
-| pad          | :x: |
+| pad          | :warning: |
 | perf         | :x: |
 | seq          | :x: |
 | support      | :x: |

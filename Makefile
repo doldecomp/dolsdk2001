@@ -132,7 +132,7 @@ TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a
+all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a
 
 extract: $(DTK)
 	$(info Extracting files...)
@@ -196,6 +196,10 @@ osD.a : $(addprefix $(BUILD_DIR)/debug/,$(os_c_files:.c=.o))
 card_c_files := $(wildcard src/card/*.c)
 card.a  : $(addprefix $(BUILD_DIR)/release/,$(card_c_files:.c=.o))
 cardD.a : $(addprefix $(BUILD_DIR)/debug/,$(card_c_files:.c=.o))
+
+pad_c_files := $(wildcard src/pad/*.c)
+pad.a  : $(addprefix $(BUILD_DIR)/release/,$(pad_c_files:.c=.o))
+padD.a : $(addprefix $(BUILD_DIR)/debug/,$(pad_c_files:.c=.o))
 
 %.a:
 	@ test ! -z '$?' || { echo 'no object files for $@'; return 1; }
