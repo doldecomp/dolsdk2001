@@ -21,6 +21,7 @@ else
 endif
 
 BUILD_DIR := build
+TOOLS_DIR := $(BUILD_DIR)/tools
 BASEROM_DIR := baserom
 TARGET_LIBS := G2D              \
                ai               \
@@ -100,7 +101,8 @@ ifeq ($(HOST_OS),macos)
 else
   CPP := cpp
 endif
-DTK     := tools/dtk
+DTK     := $(TOOLS_DIR)/dtk
+DTK_VERSION := 0.7.4
 
 CC        = $(MWCC)
 
@@ -154,16 +156,25 @@ extract: $(DTK)
 distclean:
 	rm -rf $(BASEROM_DIR)/release
 	rm -rf $(BASEROM_DIR)/debug
-	rm -rf tools/dtk
 	make clean
 
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf *.a
 
-$(DTK): tools/dtk_version
-	@echo "Downloading $@"
-	$(QUIET) $(PYTHON) tools/download_dtk.py $< $@
+$(TOOLS_DIR):
+	$(QUIET) mkdir -p $(TOOLS_DIR)
+
+.PHONY: check-dtk
+
+CURRENT_DTK_VERSION := "$((shell $(DTK) --version | awk '{print $$2}') || echo '')" 
+
+check-dtk: $(TOOLS_DIR)
+	@if [ "$(DTK_VERSION) " != "$(CURRENT_DTK_VERSION)" ]; then \
+		$(PYTHON) tools/download_dtk.py dtk $(DTK) --tag "v$(DTK_VERSION)"; \
+	fi
+
+$(DTK): check-dtk
 
 build/debug/src/%.o: src/%.c
 	$(CC) -c -opt level=0 -inline off -schedule off -sym on $(CFLAGS) -I- $(INCLUDES) -DDEBUG $< -o $@
