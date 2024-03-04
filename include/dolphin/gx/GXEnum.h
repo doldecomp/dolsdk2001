@@ -774,7 +774,7 @@ typedef enum _GXIndTexScale
     GX_MAX_ITSCALE,
 } GXIndTexScale;
 
-typedef enum
+typedef enum _GXPerf0
 {
     GX_PERF0_VERTICES,
     GX_PERF0_CLIP_VTX,
@@ -817,7 +817,7 @@ typedef enum
     GX_PERF0_NONE,
 } GXPerf0;
 
-typedef enum
+typedef enum _GXPerf1
 {
     GX_PERF1_TEXELS,
     GX_PERF1_TX_IDLE,
@@ -846,6 +846,23 @@ typedef enum
     GX_PERF1_CLOCKS,
     GX_PERF1_NONE,
 } GXPerf1;
+
+typedef enum _GXVCachePerf
+{
+    GX_VC_POS = 0,
+    GX_VC_NRM = 1,
+    GX_VC_CLR0 = 2,
+    GX_VC_CLR1 = 3,
+    GX_VC_TEX0 = 4,
+    GX_VC_TEX1 = 5,
+    GX_VC_TEX2 = 6,
+    GX_VC_TEX3 = 7,
+    GX_VC_TEX4 = 8,
+    GX_VC_TEX5 = 9,
+    GX_VC_TEX6 = 10,
+    GX_VC_TEX7 = 11,
+    GX_VC_ALL = 15,
+} GXVCachePerf;
 
 typedef enum
 {

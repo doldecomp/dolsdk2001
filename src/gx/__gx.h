@@ -187,7 +187,7 @@ struct __GXData_struct {
 }; // size = 0x4F4
 
 extern struct __GXData_struct *gx;  
-extern void *__memReg;
+extern u16 *__memReg;
 extern u16 *__peReg;
 extern u16 *__cpReg;
 extern u32 *__piReg;
