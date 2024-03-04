@@ -7,8 +7,9 @@
 
 static struct __GXData_struct gxData; // size: 0x4F4, address: 0x0
 struct __GXData_struct *gx = &gxData; // size: 0x4, address: 0x0
+// DWARF info lists all of these as "void *", but these types make more sense.
 void *__memReg; // size: 0x4, address: 0x10
-void *__peReg; // size: 0x4, address: 0xC
+u16 *__peReg; // size: 0x4, address: 0xC
 u16 *__cpReg; // size: 0x4, address: 0x8
 u32 *__piReg; // size: 0x4, address: 0x4
 #if DEBUG

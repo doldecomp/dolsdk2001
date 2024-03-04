@@ -100,11 +100,6 @@ struct __GXVerifyData {
 
 extern struct __GXVerifyData *__gxVerif;
 
-extern u8 __GXinBegin;
-
-extern u32 *__piReg;
-extern u16 *__cpReg; // size: 0x4, address: 0x0
-
 /* GXGeometry.c */
 
 void __GXSendFlushPrim(void);
@@ -192,3 +187,10 @@ struct __GXData_struct {
 }; // size = 0x4F4
 
 extern struct __GXData_struct *gx;  
+extern void *__memReg;
+extern u16 *__peReg;
+extern u16 *__cpReg;
+extern u32 *__piReg;
+#if DEBUG
+extern u8 __GXinBegin;
+#endif

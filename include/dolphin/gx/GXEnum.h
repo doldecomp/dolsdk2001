@@ -929,4 +929,10 @@ typedef enum
     GX_TLUT_16K = 1024,
 } GXTlutSize;
 
+typedef enum _GXMiscToken {
+    GX_MT_XF_FLUSH = 1,
+    GX_MT_DL_SAVE_CONTEXT = 2,
+    GX_MT_NULL = 0,
+} GXMiscToken;
+
 #endif
