@@ -66,4 +66,21 @@ FUNC_1PARAM(GXColor, u16)
 FUNC_INDEX16(GXColor)
 FUNC_INDEX8(GXColor)
 
+// GXTexCoord
+FUNC_2PARAM(GXTexCoord, f32)
+FUNC_2PARAM(GXTexCoord, s16)
+FUNC_2PARAM(GXTexCoord, u16)
+FUNC_2PARAM(GXTexCoord, s8)
+FUNC_2PARAM(GXTexCoord, u8)
+FUNC_1PARAM(GXTexCoord, f32)
+FUNC_1PARAM(GXTexCoord, s16)
+FUNC_1PARAM(GXTexCoord, u16)
+FUNC_1PARAM(GXTexCoord, s8)
+FUNC_1PARAM(GXTexCoord, u8)
+FUNC_INDEX16(GXTexCoord)
+FUNC_INDEX8(GXTexCoord)
+
+// GXMatrixIndex
+FUNC_1PARAM(GXMatrixIndex, u8)
+
 #endif  // DEBUG
