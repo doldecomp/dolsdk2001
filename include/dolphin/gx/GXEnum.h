@@ -11,13 +11,13 @@ typedef u8 GXBool;
 #define GX_ENABLE ((GXBool)1)
 #define GX_DISABLE ((GXBool)0)
 
-typedef enum
+typedef enum _GXProjectionType
 {
     GX_PERSPECTIVE,
     GX_ORTHOGRAPHIC,
 } GXProjectionType;
 
-typedef enum
+typedef enum _GXCompare
 {
     GX_NEVER,
     GX_LESS,
@@ -29,7 +29,7 @@ typedef enum
     GX_ALWAYS,
 } GXCompare;
 
-typedef enum
+typedef enum _GXAlphaOp
 {
     GX_AOP_AND,
     GX_AOP_OR,
@@ -38,7 +38,7 @@ typedef enum
     GX_MAX_ALPHAOP,
 } GXAlphaOp;
 
-typedef enum
+typedef enum _GXZFmt16
 {
     GX_ZC_LINEAR,
     GX_ZC_NEAR,

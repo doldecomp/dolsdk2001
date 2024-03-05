@@ -26,7 +26,7 @@ typedef struct _GXRenderModeObj
     u8 vfilter[7];
 } GXRenderModeObj;
 
-typedef struct
+typedef struct _GXColor
 {
     u8 r;
     u8 g; 
@@ -34,12 +34,12 @@ typedef struct
     u8 a;
 } GXColor;
 
-typedef struct
+typedef struct _GXTexObj
 {
     u32 dummy[8];
 } GXTexObj;
 
-typedef struct
+typedef struct _GXLightObj
 {
     u32 dummy[16];
 } GXLightObj;
@@ -49,7 +49,7 @@ typedef struct _GXTexRegion
     u32 dummy[4];
 } GXTexRegion;
 
-typedef struct
+typedef struct _GXTlutObj
 {
     u32 dummy[3];
 } GXTlutObj;
@@ -59,7 +59,7 @@ typedef struct _GXTlutRegion
     u32 dummy[4];
 } GXTlutRegion;
 
-typedef struct
+typedef struct _GXFogAdjTable
 {
     u16 r[10];
 } GXFogAdjTable;
