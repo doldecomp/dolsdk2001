@@ -76,7 +76,14 @@ static inline void GXTexCoord2f32(const f32 u, const f32 v)
     GXWGFifo.f32 = v;
 }
 
-static inline void GXEnd (void) {}
+extern u8 __GXinBegin;
+
+static inline void GXEnd (void) {
+    if (__GXinBegin == 0) {
+        OSPanic("GXGeometry.h", 0x6D, "GXEnd: called without a GXBegin");
+    }
+    __GXinBegin = 0;
+}
 
 #ifdef __cplusplus
 }
