@@ -20,6 +20,32 @@ do { \
     } \
 } while (0)
 #define VERIF_RAS_REG(value) (__gxVerif->rasRegs[(value) >> 24] = value)
+#define VERIF_MTXLIGHT(addr, data) \
+do { \
+    s32 xfAddr; \
+    if (addr < 0x400U) { \
+        __gxVerif->xfMtx[addr] = data; \
+        __gxVerif->xfMtxDirty[addr] = 1; \
+    } else if (addr < 0x500U) { \
+        xfAddr = addr - 0x400; \
+        __gxVerif->xfNrm[xfAddr] = data; \
+        __gxVerif->xfNrmDirty[xfAddr] = 1; \
+    } else if (addr < 0x600U) { \
+        xfAddr = addr - 0x500; \
+        __gxVerif->xfDMtx[xfAddr] = data; \
+        __gxVerif->xfDMtxDirty[xfAddr] = 1; \
+    } else if (addr < 0x680U) { \
+        xfAddr = addr - 0x600; \
+        __gxVerif->xfLight[xfAddr] = data; \
+        __gxVerif->xfLightDirty[xfAddr] = 1; \
+    } else { \
+        xfAddr = addr - 0x1000; \
+        if ((xfAddr >= 0) && (xfAddr < 0x50)) { \
+            __gxVerif->xfRegs[xfAddr] = data; \
+            __gxVerif->xfRegsDirty[xfAddr] = 1; \
+        } \
+    } \
+} while (0)
 #else
 #define VERIF_XF_REG(addr, value) ((void)0)
 #define VERIF_RAS_REG(value) ((void)0)
@@ -107,6 +133,8 @@ void __GXSetGenMode(void);
 
 /* GXInit.c */
 
+typedef enum { GX_WARN_NONE, GX_WARN_SEVERE, GX_WARN_MEDIUM, GX_WARN_ALL } GXWarnLevel;
+
 struct __GXData_struct {
     // total size: 0x4F4
     unsigned short vNum; // offset 0x0, size 0x2
@@ -186,7 +214,7 @@ struct __GXData_struct {
     unsigned long dirtyState; // offset 0x4F0, size 0x4
 }; // size = 0x4F4
 
-extern struct __GXData_struct *gx;  
+extern struct __GXData_struct *gx;
 extern u16 *__memReg;
 extern u16 *__peReg;
 extern u16 *__cpReg;

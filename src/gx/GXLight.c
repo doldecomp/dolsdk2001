@@ -301,59 +301,15 @@ void GXGetLightColor(GXLightObj *lt_obj, GXColor *color)
 #define WRITE_SOME_LIGHT_REG1(val, addr) \
 do {  \
     u32 xfData = val; \
-    s32 xfAddr; \
     GX_WRITE_U32(val); \
-    if (addr < 0x400U) { \
-        __gxVerif->xfMtx[addr] = xfData; \
-        __gxVerif->xfMtxDirty[addr] = 1; \
-    } else if (addr < 0x500U) { \
-        xfAddr = addr - 0x400; \
-        __gxVerif->xfNrm[xfAddr] = xfData; \
-        __gxVerif->xfNrmDirty[xfAddr] = 1; \
-    } else if (addr < 0x600U) { \
-        xfAddr = addr - 0x500; \
-        __gxVerif->xfDMtx[xfAddr] = xfData; \
-        __gxVerif->xfDMtxDirty[xfAddr] = 1; \
-    } else if (addr < 0x680U) { \
-        xfAddr = addr - 0x600; \
-        __gxVerif->xfLight[xfAddr] = xfData; \
-        __gxVerif->xfLightDirty[xfAddr] = 1; \
-    } else { \
-        xfAddr = addr - 0x1000; \
-        if ((xfAddr >= 0) && (xfAddr < 0x50)) { \
-            __gxVerif->xfRegs[xfAddr] = xfData; \
-            __gxVerif->xfRegsDirty[xfAddr] = 1; \
-        } \
-    } \
+    VERIF_MTXLIGHT(addr, xfData); \
 } while (0)
 
 #define WRITE_SOME_LIGHT_REG2(val, addr) \
 do {  \
     f32 xfData = val; \
-    s32 xfAddr; \
     GX_WRITE_F32(val); \
-    if (addr < 0x400U) { \
-        __gxVerif->xfMtx[addr] = *(u32 *)&xfData; \
-        __gxVerif->xfMtxDirty[addr] = 1; \
-    } else if (addr < 0x500U) { \
-        xfAddr = addr - 0x400; \
-        __gxVerif->xfNrm[xfAddr] = *(u32 *)&xfData; \
-        __gxVerif->xfNrmDirty[xfAddr] = 1; \
-    } else if (addr < 0x600U) { \
-        xfAddr = addr - 0x500; \
-        __gxVerif->xfDMtx[xfAddr] = *(u32 *)&xfData; \
-        __gxVerif->xfDMtxDirty[xfAddr] = 1; \
-    } else if (addr < 0x680U) { \
-        xfAddr = addr - 0x600; \
-        __gxVerif->xfLight[xfAddr] = *(u32 *)&xfData; \
-        __gxVerif->xfLightDirty[xfAddr] = 1; \
-    } else { \
-        xfAddr = addr - 0x1000; \
-        if ((xfAddr >= 0) && (xfAddr < 0x50)) { \
-            __gxVerif->xfRegs[xfAddr] = *(u32 *)&xfData; \
-            __gxVerif->xfRegsDirty[xfAddr] = 1; \
-        } \
-    } \
+    VERIF_MTXLIGHT(addr, *(u32 *)&xfData); \
 } while (0)
 #else
 #define WRITE_SOME_LIGHT_REG1(val, addr) GX_WRITE_U32(val)

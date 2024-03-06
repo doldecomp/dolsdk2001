@@ -50,7 +50,7 @@ extern inline float sqrtf(float x)
 }
 
 // TODO: this isn't correct! It's just to generate sdata2 in GXDraw.o
-extern inline float sqrt(double x)
+extern inline float sqrt(float x)
 {
     static const double _half = .5;
     static const double _three = 3.0;

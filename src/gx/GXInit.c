@@ -60,8 +60,6 @@ GXTlutRegion *__GXDefaultTlutRegionCallback(u32 idx)
 }
 
 #if DEBUG
-typedef enum { GX_WARN_NONE, GX_WARN_SEVERE, GX_WARN_MEDIUM, GX_WARN_ALL } GXWarnLevel;
-// TODO: enum
 static void __GXDefaultVerifyCallback(GXWarnLevel level, u32 id, char *msg)
 {
     OSReport("Level %1d, Warning %3d: %s", level, id, msg);
@@ -69,9 +67,6 @@ static void __GXDefaultVerifyCallback(GXWarnLevel level, u32 id, char *msg)
 #endif
 
 GXFifoObj FifoObj;
-#if DEBUG
-struct __GXVerifyData * __gxVerif;
-#endif
 
 void __GXPEInit(void);
 
