@@ -15,11 +15,15 @@
 #define ASSERTMSG2LINE(line, cond, msg, arg1, arg2) \
     ((cond) || (OSPanic(__FILE__, line, msg, arg1, arg2), 0))
 
+#define ASSERTMSGLINEV(line, cond, ...) \
+    ((cond) || (OSPanic(__FILE__, line, __VA_ARGS__), 0))
+
 #else
 #define ASSERTLINE(line, cond) (void)0
 #define ASSERTMSGLINE(line, cond, msg) (void)0
 #define ASSERTMSG1LINE(line, cond, msg, arg1) (void)0
 #define ASSERTMSG2LINE(line, cond, msg, arg1, arg2) (void)0
+#define ASSERTMSGLINEV(line, cond, ...) (void)0
 #endif
     
 #define ASSERT(cond) ASSERTLINE(__LINE__, cond)

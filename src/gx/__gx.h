@@ -20,6 +20,7 @@ do { \
     } \
 } while (0)
 #define VERIF_RAS_REG(value) (__gxVerif->rasRegs[(value) >> 24] = value)
+#define VERIF_RAS_REG_alt(value) (__gxVerif->rasRegs[((value) & 0xFF000000) >> 24] = value)
 #define VERIF_MTXLIGHT(addr, data) \
 do { \
     s32 xfAddr; \
@@ -49,6 +50,7 @@ do { \
 #else
 #define VERIF_XF_REG(addr, value) ((void)0)
 #define VERIF_RAS_REG(value) ((void)0)
+#define VERIF_RAS_REG_alt(value) ((void)0)
 #endif
 
 #define GX_WRITE_XF_REG(addr, value) \
@@ -64,6 +66,13 @@ do { \
     GX_WRITE_U8(0x61); \
     GX_WRITE_U32(value); \
     VERIF_RAS_REG(value); \
+} while (0)
+
+#define GX_WRITE_RAS_REG_alt(value) \
+do { \
+    GX_WRITE_U8(0x61); \
+    GX_WRITE_U32(value); \
+    VERIF_RAS_REG_alt(value); \
 } while (0)
 
 #define GX_WRITE_SOME_REG2(a, b, c, addr) \
@@ -101,7 +110,7 @@ do { \
 
 #define SET_REG_FIELD(line, reg, size, shift, val) \
 do { \
-    ASSERTMSGLINE(line, ((val) & ~((1 << (size)) - 1)) == 0, "GX Internal: Register field out of range"); \
+    ASSERTMSGLINE(line, ((u32)(val) & ~((1 << (size)) - 1)) == 0, "GX Internal: Register field out of range"); \
     (reg) = ((u32)(reg) & ~(((1 << (size)) - 1) << (shift))) | ((u32)(val) << (shift)); \
 } while (0)
 

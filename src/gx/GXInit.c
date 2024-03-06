@@ -3,15 +3,13 @@
 
 #include "__gx.h"
 
-
-
-static struct __GXData_struct gxData; // size: 0x4F4, address: 0x0
-struct __GXData_struct *gx = &gxData; // size: 0x4, address: 0x0
+static struct __GXData_struct gxData;
+struct __GXData_struct *gx = &gxData;
 // DWARF info lists all of these as "void *", but these types make more sense.
-u16 *__memReg; // size: 0x4, address: 0x10
-u16 *__peReg; // size: 0x4, address: 0xC
-u16 *__cpReg; // size: 0x4, address: 0x8
-u32 *__piReg; // size: 0x4, address: 0x4
+u16 *__memReg;
+u16 *__peReg;
+u16 *__cpReg;
+u32 *__piReg;
 #if DEBUG
 u8 __GXinBegin; // size: 0x1, address: 0x0
 #endif
@@ -156,18 +154,12 @@ GXFifoObj *GXInit(void *base, u32 size)
 
     __GXFlushTextureState();
     reg = (freqBase / 0x1080) | 0x200 | 0x46000000;  // r26
-    //GX_WRITE_RAS_REG(reg);  // causes reg swaps somehow
-    GX_WRITE_U8(0x61);
-    GX_WRITE_U32(reg);
-#if DEBUG
-    __gxVerif->rasRegs[(reg & 0xFF000000) >> 24] = reg;
-#endif
+    GX_WRITE_RAS_REG_alt(reg);  // causes reg swaps somehow
+
     for (i = GX_VTXFMT0; i < GX_MAX_VTXFMT; i++)
     {
         SET_REG_FIELD(0, gx->vatA[i], 1, 30, 1);
         SET_REG_FIELD(0, gx->vatB[i], 1, 31, 1);
-//        gx->vatA[i] = (gx->vatA[i] & ~0x40000000) | 0x40000000;
-        //gx->vatB[i] = (gx->vatB[i] & ~0x80000000) | 0x80000000;
         {
             s32 regAddr;
             GX_WRITE_U8(8);
@@ -199,11 +191,7 @@ GXFifoObj *GXInit(void *base, u32 size)
         SET_REG_FIELD(0, reg, 1, 2, 1);
         SET_REG_FIELD(0, reg, 1, 3, 1);
         SET_REG_FIELD(0, reg, 8, 24, 0x58);
-        GX_WRITE_U8(0x61);
-        GX_WRITE_U32(reg);
-#if DEBUG
-        __gxVerif->rasRegs[(reg & 0xFF000000) >> 24] = reg;
-#endif
+        GX_WRITE_RAS_REG_alt(reg);
     }
     switch (VIGetTvFormat()) {
     case VI_NTSC: rmode = &GXNtsc480IntDf; break;
