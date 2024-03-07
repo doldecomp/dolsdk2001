@@ -167,10 +167,9 @@ $(TOOLS_DIR):
 
 .PHONY: check-dtk
 
-CURRENT_DTK_VERSION := "$((shell $(DTK) --version | awk '{print $$2}') || echo '')" 
-
 check-dtk: $(TOOLS_DIR)
-	@if [ "$(DTK_VERSION) " != "$(CURRENT_DTK_VERSION)" ]; then \
+	@version=$$($(DTK) --version | awk '{print $$2}'); \
+	if [ "$(DTK_VERSION)" != "$$version" ]; then \
 		$(PYTHON) tools/download_dtk.py dtk $(DTK) --tag "v$(DTK_VERSION)"; \
 	fi
 
