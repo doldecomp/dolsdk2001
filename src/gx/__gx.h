@@ -149,33 +149,12 @@ do { \
 
 #define CHECK_GXBEGIN(line, name) ASSERTMSGLINE(line, !__GXinBegin, "'" name "' is not allowed between GXBegin/GXEnd")
 
-struct __GXVerifyData {
-    // total size: 0x13F8
-    void (* cb)(GXAttr, unsigned long, char *); // offset 0x0, size 0x4
-    GXAttr verifyLevel; // offset 0x4, size 0x4
-    unsigned long xfRegs[80]; // offset 0x8, size 0x140
-    unsigned long xfMtx[256]; // offset 0x148, size 0x400
-    unsigned long xfNrm[96]; // offset 0x548, size 0x180
-    unsigned long xfDMtx[256]; // offset 0x6C8, size 0x400
-    unsigned long xfLight[128]; // offset 0xAC8, size 0x200
-    unsigned long rasRegs[256]; // offset 0xCC8, size 0x400
-    unsigned char xfRegsDirty[80]; // offset 0x10C8, size 0x50
-    unsigned char xfMtxDirty[256]; // offset 0x1118, size 0x100
-    unsigned char xfNrmDirty[96]; // offset 0x1218, size 0x60
-    unsigned char xfDMtxDirty[256]; // offset 0x1278, size 0x100
-    unsigned char xfLightDirty[128]; // offset 0x1378, size 0x80
-};
-
-extern struct __GXVerifyData *__gxVerif;
-
 /* GXGeometry.c */
 
 void __GXSendFlushPrim(void);
 void __GXSetGenMode(void);
 
 /* GXInit.c */
-
-typedef enum { GX_WARN_NONE, GX_WARN_SEVERE, GX_WARN_MEDIUM, GX_WARN_ALL } GXWarnLevel;
 
 struct __GXData_struct {
     // total size: 0x4F4
@@ -264,3 +243,28 @@ extern u32 *__piReg;
 #if DEBUG
 extern u8 __GXinBegin;
 #endif
+
+/* GXVerif.c */
+
+struct __GXVerifyData {
+    // total size: 0x13F8
+    GXVerifyCallback cb; // offset 0x0, size 0x4
+    GXWarningLevel verifyLevel; // offset 0x4, size 0x4
+    unsigned long xfRegs[80]; // offset 0x8, size 0x140
+    unsigned long xfMtx[256]; // offset 0x148, size 0x400
+    unsigned long xfNrm[96]; // offset 0x548, size 0x180
+    unsigned long xfDMtx[256]; // offset 0x6C8, size 0x400
+    unsigned long xfLight[128]; // offset 0xAC8, size 0x200
+    unsigned long rasRegs[256]; // offset 0xCC8, size 0x400
+    unsigned char xfRegsDirty[80]; // offset 0x10C8, size 0x50
+    unsigned char xfMtxDirty[256]; // offset 0x1118, size 0x100
+    unsigned char xfNrmDirty[96]; // offset 0x1218, size 0x60
+    unsigned char xfDMtxDirty[256]; // offset 0x1278, size 0x100
+    unsigned char xfLightDirty[128]; // offset 0x1378, size 0x80
+};
+
+extern struct __GXVerifyData *__gxVerif;
+
+void __GXVerifyGlobal(void);
+void __GXVerifyCP(GXVtxFmt fmt);
+void __GXVerifyState(GXVtxFmt vtxfmt);

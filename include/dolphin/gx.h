@@ -21,5 +21,6 @@
 #include <dolphin/gx/GXDraw.h>
 #include <dolphin/gx/GXPerf.h>
 #include <dolphin/gx/GXCpu2Efb.h>
+#include <dolphin/gx/GXVerify.h>
 
 #endif

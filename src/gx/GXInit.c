@@ -58,7 +58,7 @@ GXTlutRegion *__GXDefaultTlutRegionCallback(u32 idx)
 }
 
 #if DEBUG
-static void __GXDefaultVerifyCallback(GXWarnLevel level, u32 id, char *msg)
+static void __GXDefaultVerifyCallback(GXWarningLevel level, u32 id, char *msg)
 {
     OSReport("Level %1d, Warning %3d: %s", level, id, msg);
 }
