@@ -1,6 +1,10 @@
 #ifndef _DOLPHIN_OS_H_
 #define _DOLPHIN_OS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <dolphin/os/OSAlloc.h>
 #include <dolphin/os/OSCache.h>
 #include <dolphin/os/OSContext.h>
@@ -152,6 +156,10 @@ u32 OSUncachedToPhysical(void *offset);
 #define OSPhysicalToUncached(offset) ((void*)((u32)(OS_BASE_UNCACHED + (u32)(offset))))
 #define OSCachedToPhysical(offset) ((u32)((u32)(offset) - OS_BASE_CACHED))
 #define OSUncachedToPhysical(offset) ((u32)((u32)(offset) - OS_BASE_UNCACHED))
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

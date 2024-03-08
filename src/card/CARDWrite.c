@@ -20,7 +20,7 @@ static void WriteCallback(long chan, long result) {
     if (result >= 0) {
         fileInfo = card->fileInfo;
         if (fileInfo->length < 0) {
-            result = -0xE;
+            result = CARD_RESULT_CANCELED;
             goto after;
         }
         fileInfo->length -= card->sectorSize;
@@ -37,7 +37,7 @@ static void WriteCallback(long chan, long result) {
             fileInfo->offset += card->sectorSize;
             fileInfo->iBlock = fat[fileInfo->iBlock];
             if ((fileInfo->iBlock < 5) || (fileInfo->iBlock >= card->cBlock)) {
-                result = -6;
+                result = CARD_RESULT_BROKEN;
                 goto after;
             }
             result = __CARDEraseSector(chan, card->sectorSize * fileInfo->iBlock, EraseCallback);
@@ -95,7 +95,7 @@ long CARDWriteAsync(struct CARDFileInfo * fileInfo, void * buf, long length, lon
     ASSERTLINE(0xD1, OFFSET(length, card->sectorSize) == 0);
 
     if (OFFSET(offset, card->sectorSize) != 0 || OFFSET(length, card->sectorSize) != 0)
-        return __CARDPutControlBlock(card, -0x80);
+        return __CARDPutControlBlock(card, CARD_RESULT_FATAL_ERROR);
 
     dir = __CARDGetDirBlock(card);
     ent = &dir[fileInfo->fileNo];

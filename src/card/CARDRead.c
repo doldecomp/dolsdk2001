@@ -6,8 +6,6 @@
 
 #define TRUNC(n, a) (((u32)(n)) & ~((a)-1))
 
-#define CARDIsValidBlockNo(card, blockNo) ((blockNo) >= CARD_NUM_SYSTEM_BLOCK && (blockNo) < (card)->cBlock)
-
 // functions
 static void ReadCallback(s32 chan, s32 result);
 

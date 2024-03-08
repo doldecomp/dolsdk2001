@@ -36,5 +36,6 @@ typedef int BOOL;
 #endif
 
 #include "libc/stdarg.h"
+#include "libc/string.h"
 
 #endif

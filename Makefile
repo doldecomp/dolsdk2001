@@ -21,6 +21,7 @@ else
 endif
 
 BUILD_DIR := build
+TOOLS_DIR := $(BUILD_DIR)/tools
 BASEROM_DIR := baserom
 TARGET_LIBS := G2D              \
                ai               \
@@ -100,7 +101,8 @@ ifeq ($(HOST_OS),macos)
 else
   CPP := cpp
 endif
-DTK     := tools/dtk
+DTK     := $(TOOLS_DIR)/dtk
+DTK_VERSION := 0.7.4
 
 CC        = $(MWCC)
 
@@ -117,9 +119,15 @@ ASFLAGS = -mgekko -I src -I include
 
 $(foreach dir,$(SRC_DIRS) $(ASM_DIRS) $(DATA_DIRS),$(shell mkdir -p build/release/$(dir) build/debug/$(dir)))
 
-# why. Did some SDK libs prefer char signed over unsigned? TODO: Figure out consistency behind this.
+# why. Did some SDK libs (like CARD) prefer char signed over unsigned? TODO: Figure out consistency behind this.
 build/debug/src/card/CARDRename.o: CHARFLAGS := -char signed
 build/release/src/card/CARDRename.o: CHARFLAGS := -char signed
+build/debug/src/card/CARDOpen.o: CHARFLAGS := -char signed
+build/release/src/card/CARDOpen.o: CHARFLAGS := -char signed
+
+# this lib is compiled as C++
+build/debug/src/perf/%.o: CFLAGS += -lang=c++
+build/release/src/perf/%.o: CFLAGS += -lang=c++
 
 ######################## Build #############################
 
@@ -130,7 +138,7 @@ TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a gx.a gxD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a
+all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a gx.a gxD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a perf.a perfD.a
 
 extract: $(DTK)
 	$(info Extracting files...)
@@ -152,16 +160,24 @@ extract: $(DTK)
 distclean:
 	rm -rf $(BASEROM_DIR)/release
 	rm -rf $(BASEROM_DIR)/debug
-	rm -rf tools/dtk
 	make clean
 
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf *.a
 
-$(DTK): tools/dtk_version
-	@echo "Downloading $@"
-	$(QUIET) $(PYTHON) tools/download_dtk.py $< $@
+$(TOOLS_DIR):
+	$(QUIET) mkdir -p $(TOOLS_DIR)
+
+.PHONY: check-dtk
+
+check-dtk: $(TOOLS_DIR)
+	@version=$$($(DTK) --version | awk '{print $$2}'); \
+	if [ "$(DTK_VERSION)" != "$$version" ]; then \
+		$(PYTHON) tools/download_dtk.py dtk $(DTK) --tag "v$(DTK_VERSION)"; \
+	fi
+
+$(DTK): check-dtk
 
 build/debug/src/%.o: src/%.c
 	$(CC) -c -opt level=0 -inline off -schedule off -sym on $(CFLAGS) -I- $(INCLUDES) -DDEBUG $< -o $@
@@ -198,6 +214,14 @@ osD.a : $(addprefix $(BUILD_DIR)/debug/,$(os_c_files:.c=.o))
 card_c_files := $(wildcard src/card/*.c)
 card.a  : $(addprefix $(BUILD_DIR)/release/,$(card_c_files:.c=.o))
 cardD.a : $(addprefix $(BUILD_DIR)/debug/,$(card_c_files:.c=.o))
+
+pad_c_files := $(wildcard src/pad/*.c)
+pad.a  : $(addprefix $(BUILD_DIR)/release/,$(pad_c_files:.c=.o))
+padD.a : $(addprefix $(BUILD_DIR)/debug/,$(pad_c_files:.c=.o))
+
+perf_c_files := $(wildcard src/perf/*.c)
+perf.a  : $(addprefix $(BUILD_DIR)/release/,$(perf_c_files:.c=.o))
+perfD.a : $(addprefix $(BUILD_DIR)/debug/,$(perf_c_files:.c=.o))
 
 %.a:
 	@ test ! -z '$?' || { echo 'no object files for $@'; return 1; }
