@@ -1,93 +1,13 @@
 // probably from tgmath.h
 #include <dolphin.h>
-
-#pragma cplusplus on
-
-extern inline float sqrtf(float x)
-{
-static const double _half=.5;
-static const double _three=3.0;
-volatile float y;
- if(x > 0.0f)
- {
-
-
-   double guess = __frsqrte((double)x);   // returns an approximation to   
-   guess = _half*guess*(_three - guess*guess*x);  // now have 12 sig bits
-   guess = _half*guess*(_three - guess*guess*x);  // now have 24 sig bits
-   guess = _half*guess*(_three - guess*guess*x);  // now have 32 sig bits
-   y=(float)(x*guess);
-   return y ;
- }
-  return x ;
-}   
-
-extern inline float sqrt(float x)
-{
-static const double _half=.5;
-static const double _three=3.0;
-volatile float y;
- if(x > 0.0f)
- {
-
-
-   double guess = __frsqrte((double)x);   // returns an approximation to   
-   guess = _half*guess*(_three - guess*guess*x);  // now have 12 sig bits
-   guess = _half*guess*(_three - guess*guess*x);  // now have 24 sig bits
-   guess = _half*guess*(_three - guess*guess*x);  // now have 32 sig bits
-   guess = _half*guess*(_three - guess*guess*x);  // now have 32 sig bits
-
-   y=(float)(x*guess);
-   return y ;
- }
-  return x ;
-}
-
-extern inline float fabs(float x)
-            {
-#if __MIPS__
-			 return fabsf(x);
-#else
-             (*(int*)&x)&=0x7fffffff;
-             return  x;
-#endif
-            }
-
-#pragma cplusplus reset
+#include <dolphin/perf.h>
+#include "fake_tgmath.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern inline float fabs(float x);
-
-// definitions
-typedef struct PerfSample {
-    /* 0x00 */ u8 id;
-    /* 0x04 */ u32 cpuTimeStampStart;
-    /* 0x08 */ u32 cpuTimeStampEnd;
-    /* 0x0C */ u32 gpTimeStampStart;
-    /* 0x10 */ u32 gpTimeStampEnd;
-    /* 0x14 */ int interrupted;
-    /* 0x18 */ u32 origcpuStart;
-    /* 0x1C */ u32 origgpStart;
-    /* 0x20 */ u32 cacheMisses[4];
-    /* 0x30 */ u32 instructions[4];
-    /* 0x40 */ u32 cpReq[2];
-    /* 0x48 */ u32 tcReq[2];
-    /* 0x50 */ u32 cpuRdReq[2];
-    /* 0x58 */ u32 cpuWrReq[2];
-    /* 0x60 */ u32 dspReq[2];
-    /* 0x68 */ u32 ioReq[2];
-    /* 0x70 */ u32 viReq[2];
-    /* 0x78 */ u32 peReq[2];
-    /* 0x80 */ u32 rfReq[2];
-    /* 0x88 */ u32 fiReq[2];
-    /* 0x90 */ u32 xfWaitIn[2];
-    /* 0x98 */ u32 xfWaitOut[2];
-    /* 0xA0 */ u32 rasBusy[2];
-    /* 0xA8 */ u32 rasClocks[2];
-} PerfSample;
+extern Mtx mID;
 
 // internal macro for Perfdraw.
 #define DRAW_RECT(x1, x2, y1, y2, color)       \
@@ -101,8 +21,9 @@ typedef struct PerfSample {
         GXEnd();                               \
     } while(0)
 
-// externs
-extern unsigned long PERFNumEvents; // size: 0x4, address: 0x0;
+static unsigned long DrawFrameMax; // size: 0x4, address: 0x0
+static float DrawFrameH; // size: 0x4, address: 0x4
+static unsigned long MaxBusTransactions; // size: 0x4, address: 0x8
 
 // .sdata
 static unsigned long DrawNumFrames = 3; // size: 0x4, address: 0x0
@@ -137,12 +58,8 @@ static int bDrawXFBars = 1; // size: 0x4, address: 0x70
 static int bDrawRASBar = 1; // size: 0x4, address: 0x74
 
 // .sbss
-static unsigned long DrawFrameMax; // size: 0x4, address: 0x0
-static float DrawFrameH; // size: 0x4, address: 0x4
-static unsigned long MaxBusTransactions; // size: 0x4, address: 0x8
 static int bDrawBWBarKey; // size: 0x4, address: 0xC
 static float lastx; // size: 0x4, address: 0x10
-void (* GameDrawInit)(); // size: 0x4, address: 0x14
 
 // .data
 static float FramePts[28] = {
@@ -190,29 +107,11 @@ static float GPPts[4] = {
     0.0f,
 };
 
-// functions
-void __PERFDrawInit(void (* id)());
-void PERFPreDraw();
-static void DrawBWBar(struct PerfSample * s);
-__declspec(weak) float HEIGHT(unsigned long a, float f);
-__declspec(weak) float COORD(unsigned long a /* r3 */);
-static void DrawKey();
-void PERFDumpScreen();
-void PERFPostDraw();
-void PERFSetDrawBWBarKey(int tf);
-void PERFSetDrawBWBar(int tf);
-void PERFSetDrawCPUBar(int tf);
-void PERFSetDrawXFBars(int tf);
-void PERFSetDrawRASBar(int tf);
-void PERFToggleDrawBWBarKey();
-void PERFToggleDrawBWBar();
-void PERFToggleDrawCPUBar();
-void PERFToggleDrawXFBars();
-void PERFToggleDrawRASBar();
+Mtx mID; // size: 0x30, address: 0x0
+void (* GameDrawInit)(); // size: 0x4, address: 0x14
 
-float mID[3][4]; // size: 0x30, address: 0x0
-static float mProj[4][4]; // size: 0x40, address: 0x30
-float pSave[7]; // size: 0x1C, address: 0x70
+// externs
+extern unsigned long PERFNumEvents; // size: 0x4, address: 0x0;
 
 void __PERFDrawInit(void (* id)()) {
     C_MTXIdentity(mID);
@@ -225,6 +124,9 @@ void __PERFDrawInit(void (* id)()) {
     FramePts[33] = (PERFNumEvents + 2) * 19;
     FramePts[35] = FramePts[33];
 }
+
+static Mtx44 mProj; // size: 0x40, address: 0x30
+float pSave[7]; // size: 0x1C, address: 0x70
 
 void PERFPreDraw() {
     unsigned long i;
@@ -355,7 +257,7 @@ static void DrawBWBar(struct PerfSample * s) {
         ipcscale = ipc / 2.0f;
         misses = s->cacheMisses[1] - s->cacheMisses[0];
         lastY = 7.0f + (140.0f + (7.0f + DrawFrameH));
-        height = ipcscale * 0.5f;
+        height = ipcscale * 50.0f;
         if (height > 1.0f) {
             DRAW_RECT(x1, x2, lastY, lastY + height, DrawIPCColor);
         }
@@ -384,7 +286,7 @@ static void DrawBWBar(struct PerfSample * s) {
         }
     }
 }
-
+            
 __declspec(weak) float HEIGHT(unsigned long a, float f) {
     return 140.0f * ((f32) a / ((f32) MaxBusTransactions * f));
 }
@@ -479,25 +381,6 @@ static void DrawKey() {
         lastY += height;
     }
 }
-
-struct Frame {
-    // total size: 0x10
-    struct PerfSample * samples; // offset 0x0, size 0x4
-    long lastSample; // offset 0x4, size 0x4
-    unsigned long end; // offset 0x8, size 0x4
-    unsigned long cachemisscycles; // offset 0xC, size 0x4
-};
-extern struct Frame * PERFFrames; // size: 0x4, address: 0x0
-extern unsigned long PERFCurrFrame; // size: 0x4, address: 0x0
-
-struct PerfEvent {
-    // total size: 0x10
-    char * name; // offset 0x0, size 0x4
-    PerfType type; // offset 0x4, size 0x4
-    long currSample; // offset 0x8, size 0x4
-    struct _GXColor color; // offset 0xC, size 0x4
-};
-extern struct PerfEvent * PERFEvents; // size: 0x4, address: 0x0
 
 void PERFDumpScreen() {
     struct PerfSample * samples; // r30

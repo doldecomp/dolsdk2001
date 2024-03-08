@@ -3,6 +3,10 @@
 
 #include <dolphin/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
 	f32 x, y, z;
@@ -35,5 +39,9 @@ void PSMTXIdentity(Mtx m);
 #define MTXPerspective C_MTXPerspective 
 #define MTXScale       C_MTXScale
 #define MTXLookAt      C_MTXLookAt
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
