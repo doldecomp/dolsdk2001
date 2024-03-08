@@ -107,14 +107,29 @@ static float GPPts[4] = {
     0.0f,
 };
 
-Mtx mID; // size: 0x30, address: 0x0
 void (* GameDrawInit)(); // size: 0x4, address: 0x14
 
 // externs
 extern unsigned long PERFNumEvents; // size: 0x4, address: 0x0;
 
+Mtx mID; // size: 0x30, address: 0x0
+
+#ifndef DEBUG
+inline float HEIGHT(unsigned long a, float f) {
+    return 140.0f * ((f32) a / ((f32) MaxBusTransactions * f));
+}
+
+inline float COORD(unsigned long a) {
+    return 616.0f * ((f32) a / (f32) DrawFrameMax);
+}
+#endif
+
 void __PERFDrawInit(void (* id)()) {
+#ifdef DEBUG
     C_MTXIdentity(mID);
+#else 
+    PSMTXIdentity(mID);
+#endif
     GameDrawInit = id;
     DrawFrameMax = (OS_CORE_CLOCK/60U) * 3;
     DrawFrameH = (PERFNumEvents + 1) * 7;
@@ -135,7 +150,7 @@ void PERFPreDraw() {
     GXGetProjectionv(pSave);
     for(i = 0; i < 4; i++) {
         for(j = 0; j < 4; j++) {
-            mID[i][j] = 0.0f;
+            mProj[i][j] = 0.0f;
         }
     }
     mProj[0][0] = 0.003125f;
@@ -286,7 +301,8 @@ static void DrawBWBar(struct PerfSample * s) {
         }
     }
 }
-            
+
+#if DEBUG
 __declspec(weak) float HEIGHT(unsigned long a, float f) {
     return 140.0f * ((f32) a / ((f32) MaxBusTransactions * f));
 }
@@ -294,6 +310,7 @@ __declspec(weak) float HEIGHT(unsigned long a, float f) {
 __declspec(weak) float COORD(unsigned long a) {
     return 616.0f * ((f32) a / (f32) DrawFrameMax);
 }
+#endif
 
 static void DrawKey() {
     unsigned long delta;
@@ -549,6 +566,7 @@ void PERFDumpScreen() {
                         GXSetChanMatColor(GX_COLOR0A0, PERFEvents[id].color);
                         GXSetLineWidth(0x20U, GX_TO_ZERO);
                         GXBegin(GX_LINES, GX_VTXFMT0, 2U);
+                        !samples[s].cpuTimeStampStart; // needed to match
                         GXPosition3f32(COORD(samples[s].cpuTimeStampStart), (f32) ((id + 1) * 7), -1.0f);
                         GXPosition3f32(COORD(samples[s].cpuTimeStampEnd), (f32) ((id + 1) * 7), -1.0f);
                         GXEnd();

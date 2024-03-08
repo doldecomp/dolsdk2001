@@ -125,6 +125,10 @@ build/release/src/card/CARDRename.o: CHARFLAGS := -char signed
 build/debug/src/card/CARDOpen.o: CHARFLAGS := -char signed
 build/release/src/card/CARDOpen.o: CHARFLAGS := -char signed
 
+# this lib is compiled as C++
+build/debug/src/perf/%.o: CFLAGS += -lang=c++
+build/release/src/perf/%.o: CFLAGS += -lang=c++
+
 ######################## Build #############################
 
 A_FILES := $(foreach dir,$(BASEROM_DIR),$(wildcard $(dir)/*.a)) 
