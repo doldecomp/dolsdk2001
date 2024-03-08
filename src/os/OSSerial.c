@@ -196,9 +196,9 @@ unsigned long SISetXY(unsigned long x, unsigned long y) {
     unsigned long poll;
     int enabled;
 
-    ASSERTMSGLINE(0x1CA, x >= 8, "SISetXY(): x is out of range (8 <= x <= 255)");
-    ASSERTMSGLINE(0x1CB, x <= 255, "SISetXY(): x is out of range (8 <= x <= 255)");
-    ASSERTMSGLINE(0x1CC, y <= 255, "SISetXY(): y is out of range (0 <= y <= 255)");
+    ASSERTMSGLINE(0x1CA, x >= 8, "SISetXY(): x is out of range (8 <= x <= 255).");
+    ASSERTMSGLINE(0x1CB, x <= 255, "SISetXY(): x is out of range (8 <= x <= 255).");
+    ASSERTMSGLINE(0x1CC, y <= 255, "SISetXY(): y is out of range (0 <= y <= 255).");
 
     poll = x << 0x10;
     poll |= y << 8;

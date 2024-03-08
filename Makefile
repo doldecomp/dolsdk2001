@@ -140,6 +140,9 @@ default: all
 
 all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a perf.a perfD.a
 
+verify: test-release.bin test-debug.bin verify.sha1
+	@sha1sum -c verify.sha1
+
 extract: $(DTK)
 	$(info Extracting files...)
 	@$(DTK) ar extract $(TARGET_LIBS) --out baserom/release/src
@@ -203,15 +206,63 @@ odenotstub_c_files := $(wildcard src/odenotstub/*.c)
 odenotstub.a  : $(addprefix $(BUILD_DIR)/release/,$(odenotstub_c_files:.c=.o))
 odenotstubD.a : $(addprefix $(BUILD_DIR)/debug/,$(odenotstub_c_files:.c=.o))
 
-os_c_files := $(wildcard src/os/OS*.c) src/os/time.dolphin.c src/os/__start.c src/os/__ppc_eabi_init.c
+#os_c_files := $(wildcard src/os/OS*.c) src/os/time.dolphin.c src/os/__start.c src/os/__ppc_eabi_init.c
+os_c_files := \
+	src/os/OS.c \
+	src/os/OSAddress.c \
+	src/os/OSAlarm.c \
+	src/os/OSAlloc.c \
+	src/os/OSArena.c \
+	src/os/OSAudioSystem.c \
+	src/os/OSCache.c \
+	src/os/OSContext.c \
+	src/os/OSError.c \
+	src/os/OSExi.c \
+	src/os/OSExiAd16.c \
+	src/os/OSFont.c \
+	src/os/OSInterrupt.c \
+	src/os/OSLink.c \
+	src/os/OSMessage.c \
+	src/os/OSMemory.c \
+	src/os/OSMutex.c \
+	src/os/OSReset.c \
+	src/os/OSResetSW.c \
+	src/os/OSRtc.c \
+	src/os/OSSerial.c \
+	src/os/OSStopwatch.c \
+	src/os/OSSync.c \
+	src/os/OSThread.c \
+	src/os/OSTime.c \
+	src/os/OSTimer.c \
+	src/os/OSUartExi.c \
+	src/os/time.dolphin.c \
+	src/os/__start.c \
+	src/os/__ppc_eabi_init.c
 os.a  : $(addprefix $(BUILD_DIR)/release/,$(os_c_files:.c=.o))
 osD.a : $(addprefix $(BUILD_DIR)/debug/,$(os_c_files:.c=.o))
 
-card_c_files := $(wildcard src/card/*.c)
+card_c_files := \
+	src/card/CARDBios.c \
+	src/card/CARDUnlock.c \
+	src/card/CARDRdwr.c \
+	src/card/CARDBlock.c \
+	src/card/CARDDir.c \
+	src/card/CARDCheck.c \
+	src/card/CARDMount.c \
+	src/card/CARDFormat.c \
+	src/card/CARDOpen.c \
+	src/card/CARDCreate.c \
+	src/card/CARDRead.c \
+	src/card/CARDWrite.c \
+	src/card/CARDDelete.c \
+	src/card/CARDStat.c \
+	src/card/CARDRename.c \
+	src/card/CARDStatEx.c \
+	src/card/CARDRaw.c
 card.a  : $(addprefix $(BUILD_DIR)/release/,$(card_c_files:.c=.o))
 cardD.a : $(addprefix $(BUILD_DIR)/debug/,$(card_c_files:.c=.o))
 
-pad_c_files := $(wildcard src/pad/*.c)
+pad_c_files := src/pad/Padclamp.c src/pad/Pad.c
 pad.a  : $(addprefix $(BUILD_DIR)/release/,$(pad_c_files:.c=.o))
 padD.a : $(addprefix $(BUILD_DIR)/debug/,$(pad_c_files:.c=.o))
 
@@ -219,9 +270,28 @@ perf_c_files := $(wildcard src/perf/*.c)
 perf.a  : $(addprefix $(BUILD_DIR)/release/,$(perf_c_files:.c=.o))
 perfD.a : $(addprefix $(BUILD_DIR)/debug/,$(perf_c_files:.c=.o))
 
+# either the stub or non-stub version of some libraries can be linked, but not both
+TEST_LIBS := amcnotstub odenotstub card os pad
+
+baserom-release.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
+test-release.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)
+baserom-debug.elf:   build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l)D.a)
+test-debug.elf:      build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l)D.a)
+
+%.bin: %.elf
+	$(OBJCOPY) -O binary $< $@
+
+%.elf:
+	@echo Linking $@
+	$(LD) -T gcn.ld --whole-archive $(filter %.o,$^) $(filter %.a,$^) -o $@ -Map $(@:.elf=.map)
+
 %.a:
 	@ test ! -z '$?' || { echo 'no object files for $@'; return 1; }
 	$(AR) -v -r $@ $(filter %.o,$?)
+
+# generate baserom hashes
+verify.sha1: baserom-release.bin baserom-debug.bin
+	sha1sum $^ | sed 's/baserom/test/' > $@
 
 # ------------------------------------------------------------------------------
 
