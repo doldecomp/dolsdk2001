@@ -1,6 +1,10 @@
 #ifndef _DOLPHIN_OS_H_
 #define _DOLPHIN_OS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <dolphin/os/OSAlloc.h>
 #include <dolphin/os/OSCache.h>
 #include <dolphin/os/OSContext.h>
@@ -145,6 +149,10 @@ void OSPanic(char *file, int line, char *msg, ...);
 #ifndef DEBUG
 #define OSPhysicalToCached(offset) ((void*)((u32)(OS_BASE_CACHED + (u32)offset)))
 #define OSCachedToPhysical(offset) ((void*)((u32)((u32)offset - OS_BASE_CACHED)))
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

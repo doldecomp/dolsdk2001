@@ -125,6 +125,10 @@ build/release/src/card/CARDRename.o: CHARFLAGS := -char signed
 build/debug/src/card/CARDOpen.o: CHARFLAGS := -char signed
 build/release/src/card/CARDOpen.o: CHARFLAGS := -char signed
 
+# this lib is compiled as C++
+build/debug/src/perf/%.o: CFLAGS += -lang=c++
+build/release/src/perf/%.o: CFLAGS += -lang=c++
+
 ######################## Build #############################
 
 A_FILES := $(foreach dir,$(BASEROM_DIR),$(wildcard $(dir)/*.a)) 
@@ -134,7 +138,7 @@ TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a
+all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a perf.a perfD.a
 
 extract: $(DTK)
 	$(info Extracting files...)
@@ -210,6 +214,10 @@ cardD.a : $(addprefix $(BUILD_DIR)/debug/,$(card_c_files:.c=.o))
 pad_c_files := $(wildcard src/pad/*.c)
 pad.a  : $(addprefix $(BUILD_DIR)/release/,$(pad_c_files:.c=.o))
 padD.a : $(addprefix $(BUILD_DIR)/debug/,$(pad_c_files:.c=.o))
+
+perf_c_files := $(wildcard src/perf/*.c)
+perf.a  : $(addprefix $(BUILD_DIR)/release/,$(perf_c_files:.c=.o))
+perfD.a : $(addprefix $(BUILD_DIR)/debug/,$(perf_c_files:.c=.o))
 
 %.a:
 	@ test ! -z '$?' || { echo 'no object files for $@'; return 1; }

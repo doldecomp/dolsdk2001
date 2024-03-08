@@ -42,12 +42,16 @@ static inline void GXPosition3s16(const s16 x, const s16 y, const s16 z)
     GXWGFifo.s16 = z;
 }
 
+#ifndef DEBUG
 static inline void GXPosition3f32(const f32 x, const f32 y, const f32 z)
 {
     GXWGFifo.f32 = x;
     GXWGFifo.f32 = y;
     GXWGFifo.f32 = z;
 }
+#else
+static inline void GXPosition3f32(const f32 x, const f32 y, const f32 z);
+#endif
 
 static inline void GXNormal3f32(const f32 x, const f32 y, const f32 z)
 {
@@ -76,7 +80,16 @@ static inline void GXTexCoord2f32(const f32 u, const f32 v)
     GXWGFifo.f32 = v;
 }
 
-static inline void GXEnd (void) {}
+extern u8 __GXinBegin;
+
+static inline void GXEnd (void) {
+#if DEBUG
+    if (__GXinBegin == 0) {
+        OSPanic("GXGeometry.h", 0x6D, "GXEnd: called without a GXBegin");
+    }
+    __GXinBegin = 0;
+#endif
+}
 
 #ifdef __cplusplus
 }
