@@ -7,7 +7,6 @@
 static struct __GXVerifyData __gxVerifData;
 struct __GXVerifyData * __gxVerif = &__gxVerifData;
 
-// only the first one of these is actually used!
 char *__gxvWarnings[113] = {
     "Invalid Vertex Format. Normal count must be set to GX_NRM_NBT",
     "Texture size %ld not initialized.",
@@ -124,7 +123,7 @@ char *__gxvWarnings[113] = {
     "Register (0x%04x) (%s) is not initialized"
 };
 
-char __gxvDummyStr[256];  // unused
+char __gxvDummyStr[256];
 
 void __GXVerifyGlobal(void)
 {

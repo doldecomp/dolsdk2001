@@ -244,6 +244,14 @@ extern u32 *__piReg;
 extern u8 __GXinBegin;
 #endif
 
+/* GXVerifRAS.c */
+
+void __GXVerifySU(void);
+void __GXVerifyBUMP(void);
+void __GXVerifyTEX(void);
+void __GXVerifyTEV(void);
+void __GXVerifyPE(void);
+
 /* GXVerif.c */
 
 struct __GXVerifyData {
@@ -264,6 +272,8 @@ struct __GXVerifyData {
 };
 
 extern struct __GXVerifyData *__gxVerif;
+extern char *__gxvWarnings[113];
+extern char __gxvDummyStr[256];
 
 void __GXVerifyGlobal(void);
 void __GXVerifyCP(GXVtxFmt fmt);
