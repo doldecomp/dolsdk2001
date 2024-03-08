@@ -382,6 +382,13 @@ do { \
     __gxVerif->cb(GX_WARN_SEVERE, (id), __gxvDummyStr); \
 } while (0)
 
+#define __GX_WARN2(level, id) (__gxVerif->cb(level, (id), __gxvWarnings[(id)]))
+#define __GX_WARN2F(level, id, ...) \
+do { \
+    sprintf(__gxvDummyStr, __gxvWarnings[(id)], __VA_ARGS__); \
+    __gxVerif->cb(level, (id), __gxvDummyStr); \
+} while (0)
+
 struct __GXVerifyData {
     // total size: 0x13F8
     GXVerifyCallback cb; // offset 0x0, size 0x4
