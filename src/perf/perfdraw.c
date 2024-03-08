@@ -1,5 +1,7 @@
 // probably from tgmath.h
-#pragma cplusplus on 
+#include <dolphin.h>
+
+#pragma cplusplus on
 
 extern inline float sqrtf(float x)
 {
@@ -39,16 +41,25 @@ volatile float y;
    return y ;
  }
   return x ;
-}   
-
-extern inline float fabs(float x) {
-    (*(signed int*)&x)&=0x7fffffff;
-    return  x;
 }
+
+extern inline float fabs(float x)
+            {
+#if __MIPS__
+			 return fabsf(x);
+#else
+             (*(int*)&x)&=0x7fffffff;
+             return  x;
+#endif
+            }
 
 #pragma cplusplus reset
 
-#include <dolphin.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern inline float fabs(float x);
 
 // definitions
 typedef struct PerfSample {
@@ -183,8 +194,8 @@ static float GPPts[4] = {
 void __PERFDrawInit(void (* id)());
 void PERFPreDraw();
 static void DrawBWBar(struct PerfSample * s);
-float HEIGHT(unsigned long a, float f);
-float COORD(unsigned long a /* r3 */);
+__declspec(weak) float HEIGHT(unsigned long a, float f);
+__declspec(weak) float COORD(unsigned long a /* r3 */);
 static void DrawKey();
 void PERFDumpScreen();
 void PERFPostDraw();
@@ -199,8 +210,9 @@ void PERFToggleDrawCPUBar();
 void PERFToggleDrawXFBars();
 void PERFToggleDrawRASBar();
 
-// .bss
 float mID[3][4]; // size: 0x30, address: 0x0
+static float mProj[4][4]; // size: 0x40, address: 0x30
+float pSave[7]; // size: 0x1C, address: 0x70
 
 void __PERFDrawInit(void (* id)()) {
     C_MTXIdentity(mID);
@@ -213,9 +225,6 @@ void __PERFDrawInit(void (* id)()) {
     FramePts[33] = (PERFNumEvents + 2) * 19;
     FramePts[35] = FramePts[33];
 }
-
-static float mProj[4][4]; // size: 0x40, address: 0x30
-float pSave[7]; // size: 0x1C, address: 0x70
 
 void PERFPreDraw() {
     unsigned long i;
@@ -376,11 +385,11 @@ static void DrawBWBar(struct PerfSample * s) {
     }
 }
 
-float HEIGHT(unsigned long a, float f) {
+__declspec(weak) float HEIGHT(unsigned long a, float f) {
     return 140.0f * ((f32) a / ((f32) MaxBusTransactions * f));
 }
 
-float COORD(unsigned long a) {
+__declspec(weak) float COORD(unsigned long a) {
     return 616.0f * ((f32) a / (f32) DrawFrameMax);
 }
 
@@ -396,7 +405,7 @@ static void DrawKey() {
     x1 = 595.4667f;
     x2 = 616.0f;
     lastY = 7.0f + DrawFrameH;
-    bwscale = -1.0f;
+    bwscale = 1.0f;
     foo[0] = 0;
     foo[1] = MaxBusTransactions / 10;
 
@@ -759,3 +768,7 @@ void PERFToggleDrawXFBars() {
 void PERFToggleDrawRASBar() {
     bDrawRASBar = (bDrawRASBar) ? 0 : 1; 
 }
+
+#ifdef __cplusplus
+}
+#endif
