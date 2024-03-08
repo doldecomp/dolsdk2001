@@ -244,6 +244,10 @@ extern u32 *__piReg;
 extern u8 __GXinBegin;
 #endif
 
+/* GXTexture.c */
+
+void __GetImageTileCount(GXTexFmt fmt, u16 wd, u16 ht, u32 *rowTiles, u32 *colTiles, u32 *cmpTiles);
+
 /* GXVerifRAS.c */
 
 void __GXVerifySU(void);

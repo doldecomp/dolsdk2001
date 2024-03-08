@@ -159,10 +159,10 @@ void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, u8 mipmap)
         SET_REG_FIELD(0, gx->cpTex, 2, 15, 2);
         break;
     }
-    //gx->cpTexZ = GET_REG_FIELD(fmt, 1, 4);
+
     gx->cpTexZ = (fmt & _GX_TF_ZTF) == _GX_TF_ZTF;
-    //peTexFmtH = GET_REG_FIELD(peTexFmt, 1, 3);
     peTexFmtH = (peTexFmt >> 3) & 1;
+    !peTexFmt;
     SET_REG_FIELD(0x44B, gx->cpTex, 1, 3, peTexFmtH);
     peTexFmt = peTexFmt & 7;
     __GetImageTileCount(fmt, wd, ht, &rowTiles, &colTiles, &cmpTiles);
