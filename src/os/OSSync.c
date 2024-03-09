@@ -4,7 +4,7 @@
 #include "__os.h"
 
 static asm void SystemCallVector(void) {
-__OSSystemCallVectorStart:
+entry __OSSystemCallVectorStart
     nofralloc
     mfspr r9, HID0
     ori r10, r9, 0x8
@@ -13,7 +13,7 @@ __OSSystemCallVectorStart:
     sync
     mtspr HID0, r9
     rfi
-__OSSystemCallVectorEnd:
+entry __OSSystemCallVectorEnd
     nop
 }
 
