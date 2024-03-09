@@ -250,6 +250,17 @@ void GXSetCopyClear(GXColor clear_clr, u32 clear_z)
     gx->bpSent = 1;
 }
 
+#if DEBUG  // currently doesn't match
+static char str_GXSetCopyFilter_gxbegin[] = "'GXSetCopyFilter' is not allowed between GXBegin/GXEnd";
+#define ___data_0 GXNtsc240Ds
+asm void GXSetCopyFilter(u8 aa, u8 (*sample_pattern)[2], u8 vf, u8 *vfilter)
+{
+    nofralloc
+#include "../../nonmatchings/GXSetCopyFilter.s"
+}
+#undef ___data_0
+#pragma peephole on
+#else
 void GXSetCopyFilter(u8 aa, u8 (*sample_pattern)[2], u8 vf, u8 *vfilter)
 {
     u32 msLoc[4];
@@ -330,6 +341,7 @@ void GXSetCopyFilter(u8 aa, u8 (*sample_pattern)[2], u8 vf, u8 *vfilter)
     GX_WRITE_RAS_REG(coeff1);
     gx->bpSent = 1;
 }
+#endif
 
 void GXSetDispCopyGamma(GXGamma gamma)
 {

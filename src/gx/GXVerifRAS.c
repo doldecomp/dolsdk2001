@@ -338,7 +338,21 @@ void __GXVerifyTEX(void)
     }
 }
 
-// nonmatching: https://decomp.me/scratch/rXQyF
+#if DEBUG
+// debug nonmatching: https://decomp.me/scratch/rXQyF
+static char _383[] = "A";
+static char _384[] = "B";
+static char _385[] = "C";
+static char _386[] = "D";
+static char _387[] = "alpha";
+static char _388[] = "color";
+asm void __GXVerifyTEV(void)
+{
+    nofralloc
+#include "../../nonmatchings/__GXVerifyTEV.s"
+}
+#pragma peephole on
+#else
 void __GXVerifyTEV(void)
 {
     unsigned long i; // r31
@@ -529,6 +543,7 @@ nCol;
         __gxVerif->cb(2, 0x2EU, __gxvWarnings[0x2E]);
     }
 }
+#endif
 
 void __GXVerifyPE(void)
 {

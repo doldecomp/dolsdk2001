@@ -149,6 +149,14 @@ do { \
 
 #define CHECK_GXBEGIN(line, name) ASSERTMSGLINE(line, !__GXinBegin, "'" name "' is not allowed between GXBegin/GXEnd")
 
+/* GXBump.c */
+
+void __GXFlushTextureState(void);
+
+/* GXFifo.c */
+
+void __GXFifoInit(void);
+
 /* GXGeometry.c */
 
 void __GXSendFlushPrim(void);

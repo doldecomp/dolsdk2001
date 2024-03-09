@@ -1,5 +1,7 @@
 #include <string.h>
+
 #include <dolphin/gx.h>
+#include <dolphin/vi.h>
 
 #include "__gx.h"
 
@@ -21,7 +23,7 @@ asm int IsWriteGatherBufferEmpty(void)
     andi. r3, r3, 1
 }
 
-void EnableWriteGatherPipe(void)
+static void EnableWriteGatherPipe(void)
 {
     u32 hid2 = PPCMfhid2();
 
@@ -30,7 +32,7 @@ void EnableWriteGatherPipe(void)
     PPCMthid2(hid2);
 }
 
-void DisableWriteGatherPipe(void)
+static void DisableWriteGatherPipe(void)
 {
     u32 hid2 = PPCMfhid2();
 
@@ -38,7 +40,7 @@ void DisableWriteGatherPipe(void)
     PPCMthid2(hid2);
 }
 
-GXTexRegion *__GXDefaultTexRegionCallback(GXTexObj *t_obj, GXTexMapID unused)
+static GXTexRegion *__GXDefaultTexRegionCallback(GXTexObj *t_obj, GXTexMapID unused)
 {
     GXTexFmt fmt = GXGetTexObjFmt(t_obj);
 
@@ -49,7 +51,7 @@ GXTexRegion *__GXDefaultTexRegionCallback(GXTexObj *t_obj, GXTexMapID unused)
     }
 }
 
-GXTlutRegion *__GXDefaultTlutRegionCallback(u32 idx)
+static GXTlutRegion *__GXDefaultTlutRegionCallback(u32 idx)
 {
     if (idx >= 0x14U) {
         return NULL;
@@ -60,7 +62,7 @@ GXTlutRegion *__GXDefaultTlutRegionCallback(u32 idx)
 #if DEBUG
 static void __GXDefaultVerifyCallback(GXWarningLevel level, u32 id, char *msg)
 {
-    OSReport("Level %1d, Warning %3d: %s", level, id, msg);
+    OSReport("Level %1d, Warning %3d: %s\n", level, id, msg);
 }
 #endif
 
@@ -70,20 +72,14 @@ void __GXPEInit(void);
 
 GXFifoObj *GXInit(void *base, u32 size)
 {
-    struct _GXRenderModeObj * rmode; // r30
-    float identity_mtx[3][4]; // r1+0x38
+    GXRenderModeObj *rmode;
+    f32 identity_mtx[3][4];
     GXColor clear = {64, 64, 64, 255};
     GXColor black = {0, 0, 0, 0};
     GXColor white = {255, 255, 255, 255};
-    unsigned long i; // r31
-    unsigned long reg; // r26
-    unsigned long freqBase; // r21
-    //long regAddr; // r1+0x28
-    //unsigned long reg1; // r28
-    //unsigned long reg2; // r24
-    //long regAddr; // r23
-    //long regAddr; // r22
-    //unsigned long reg; // r27
+    u32 i;
+    u32 reg;
+    u32 freqBase;
 
     gx->inDispList = FALSE;
     gx->dlSaveContext = TRUE;
@@ -147,14 +143,14 @@ GXFifoObj *GXInit(void *base, u32 size)
     memset(__gxVerif->xfNrmDirty, 0, 0x60);
     memset(__gxVerif->xfLightDirty, 0, 0x80);
 #endif
-    freqBase = __OSBusClock / 0x1F4;  // r21
+    freqBase = __OSBusClock / 0x1F4;
     __GXFlushTextureState();
-    reg = (freqBase >> 11) | 0x400 | 0x69000000;  // r26
-    GX_WRITE_RAS_REG(reg);
+    reg = (freqBase >> 11) | 0x400 | 0x69000000;
+    GX_WRITE_RAS_REG_alt(reg);
 
     __GXFlushTextureState();
-    reg = (freqBase / 0x1080) | 0x200 | 0x46000000;  // r26
-    GX_WRITE_RAS_REG_alt(reg);  // causes reg swaps somehow
+    reg = (freqBase / 0x1080) | 0x200 | 0x46000000;
+    GX_WRITE_RAS_REG_alt(reg);
 
     for (i = GX_VTXFMT0; i < GX_MAX_VTXFMT; i++)
     {
@@ -165,27 +161,27 @@ GXFifoObj *GXInit(void *base, u32 size)
             GX_WRITE_U8(8);
             GX_WRITE_U8(i | 0x80);
             GX_WRITE_U32(gx->vatB[i]);
-            regAddr = i - 12;  // r1+0x28
+            regAddr = i - 12;
         }
     }
     {
-    u32 reg1 = 0;  // r28
-    u32 reg2 = 0;  // r24
-    SET_REG_FIELD(0, reg1, 1, 0, 1);
-    SET_REG_FIELD(0, reg1, 1, 1, 1);
-    SET_REG_FIELD(0, reg1, 1, 2, 1);
-    SET_REG_FIELD(0, reg1, 1, 3, 1);
-    SET_REG_FIELD(0, reg1, 1, 4, 1);
-    SET_REG_FIELD(0, reg1, 1, 5, 1);
-    GX_WRITE_XF_REG(0, reg1);
-    SET_REG_FIELD(0, reg2, 1, 0, 1);
-    GX_WRITE_XF_REG(0x12, reg2);
-#if DEBUG
-    __gxVerif->xfRegsDirty[0] = 0;
-#endif
+        u32 reg1 = 0;
+        u32 reg2 = 0;
+        SET_REG_FIELD(0, reg1, 1, 0, 1);
+        SET_REG_FIELD(0, reg1, 1, 1, 1);
+        SET_REG_FIELD(0, reg1, 1, 2, 1);
+        SET_REG_FIELD(0, reg1, 1, 3, 1);
+        SET_REG_FIELD(0, reg1, 1, 4, 1);
+        SET_REG_FIELD(0, reg1, 1, 5, 1);
+        GX_WRITE_XF_REG(0, reg1);
+        SET_REG_FIELD(0, reg2, 1, 0, 1);
+        GX_WRITE_XF_REG(0x12, reg2);
+    #if DEBUG
+        __gxVerif->xfRegsDirty[0] = 0;
+    #endif
     }
     {
-        u32 reg = 0;  // r27
+        u32 reg = 0;
         SET_REG_FIELD(0, reg, 1, 0, 1);
         SET_REG_FIELD(0, reg, 1, 1, 1);
         SET_REG_FIELD(0, reg, 1, 2, 1);

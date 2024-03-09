@@ -41,6 +41,12 @@ static void __SaveCPRegs(u8 reg, u8 vatIdx, u32 data)
 
     DPF("\tCP Stream Reg[0x%x] = 0x%x\n", reg, data);
     switch (reg) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        break;
     case 5:
         gx->vcdLo = data;
         break;
@@ -69,7 +75,6 @@ static void __SaveCPRegs(u8 reg, u8 vatIdx, u32 data)
         }
         break;
     default:
-    case 0:
         OSReport("GX DisplayList: Invalid CP Stream Register Address 0x%x\n", reg);
         break;
     }
@@ -323,6 +328,9 @@ void __GXShadowDispList(void *list, u32 nbytes)
         cmdOp = (u32)GET_REG_FIELD((u32)cmd, 5, 3);
         vatIdx = cmd & 7;
         switch (cmdOp) {
+        case 0:
+        case 9:
+            break;
         case 16:
         case 18:
         case 19:

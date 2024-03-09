@@ -125,11 +125,11 @@ char *__gxvWarnings[113] = {
 
 char __gxvDummyStr[256];
 
-void __GXVerifyGlobal(void)
+static void __GXVerifyGlobal(void)
 {
 }
 
-void __GXVerifyCP(GXVtxFmt fmt)
+static void __GXVerifyCP(GXVtxFmt fmt)
 {
     u32 nrmCnt = GET_REG_FIELD(gx->vatA[fmt], 1, 9);
     
