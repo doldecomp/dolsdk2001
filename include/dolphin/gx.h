@@ -22,4 +22,21 @@
 #include <dolphin/gx/GXPerf.h>
 #include <dolphin/gx/GXCpu2Efb.h>
 
+// unsorted GX externs
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// GXInit
+extern void *__memReg;
+
+// GXMisc
+void (* GXSetDrawSyncCallback(void (* cb)(unsigned short)))(unsigned short);
+void GXSetDrawSync(unsigned short token);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
