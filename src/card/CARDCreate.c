@@ -100,7 +100,7 @@ s32 CARDCreateAsync(s32 chan, const char* fileName, u32 size, CARDFileInfo* file
     card->freeNo = freeNo;
     ent = &dir[freeNo];
     ent->length = (u16)(size / card->sectorSize);
-    strncpy(ent->fileName, fileName, CARD_FILENAME_MAX);
+    strncpy((char *)ent->fileName, fileName, CARD_FILENAME_MAX);
 
     card->fileInfo = fileInfo;
     fileInfo->chan = chan;

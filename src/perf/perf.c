@@ -4,6 +4,7 @@
 #include "fake_tgmath.h"
 
 #include "__perf.h"
+#include "../gx/__gx.h"
 
 #ifdef __cplusplus
 extern "C" {
