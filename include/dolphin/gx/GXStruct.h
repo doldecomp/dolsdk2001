@@ -3,12 +3,13 @@
 
 #include <dolphin/types.h>
 #include <dolphin/vitypes.h>
+#include <dolphin/gx/GXEnum.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct
+typedef struct _GXRenderModeObj
 {
     /*0x00*/ VITVMode viTVmode;
     /*0x04*/ u16 fbWidth;
@@ -20,48 +21,62 @@ typedef struct
     /*0x10*/ u16 viHeight;
     /*0x14*/ VIXFBMode xFBmode;
     /*0x18*/ u8 field_rendering;
-    u8 aa;
-    u8 sample_pattern[12][2];
-    u8 vfilter[7];
+    /*0x19*/ u8 aa;
+    /*0x20*/ u8 sample_pattern[12][2];
+    /*0x38*/ u8 vfilter[7];
 } GXRenderModeObj;
 
-typedef struct
+typedef struct _GXColor
 {
-    u8 r;
-    u8 g; 
-    u8 b; 
-    u8 a;
+    u8 r, g, b, a;
 } GXColor;
 
-typedef struct
+typedef struct _GXColorS10
+{
+    s16 r, g, b, a;
+} GXColorS10;
+
+typedef struct _GXTexObj
 {
     u32 dummy[8];
 } GXTexObj;
 
-typedef struct
+typedef struct _GXLightObj
 {
     u32 dummy[16];
 } GXLightObj;
 
-typedef struct
+typedef struct _GXTexRegion
 {
     u32 dummy[4];
 } GXTexRegion;
 
-typedef struct
+typedef struct _GXTlutObj
 {
     u32 dummy[3];
 } GXTlutObj;
 
-typedef struct
+typedef struct _GXTlutRegion
 {
     u32 dummy[4];
 } GXTlutRegion;
 
-typedef struct
+typedef struct _GXFogAdjTable
 {
     u16 r[10];
 } GXFogAdjTable;
+
+typedef struct _GXVtxDescList {
+    GXAttr attr;
+    GXAttrType type;
+} GXVtxDescList;
+
+typedef struct _GXVtxAttrFmtList {
+    GXAttr attr;
+    GXCompCnt cnt;
+    GXCompType type;
+    u8 frac;
+} GXVtxAttrFmtList;
 
 #ifdef __cplusplus
 }

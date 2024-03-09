@@ -19,13 +19,13 @@ Currently this repository supports building the following libraries:
 | ax           | :x: |
 | axfx         | :x: |
 | base         | :x: |
-| card         | :warning: |
+| card         | :heavy_check_mark: |
 | db           | :x: |
 | demo         | :x: |
 | dolformat    | :x: |
 | dsp          | :x: |
 | dtk          | :x: |
-| dvd          | :x: |
+| dvd          | :warning: |
 | fileCache    | :x: |
 | G2D          | :x: |
 | gx           | :x: |
@@ -36,8 +36,8 @@ Currently this repository supports building the following libraries:
 | odemustubs   | :heavy_check_mark: |
 | odenotstub   | :heavy_check_mark: |
 | os           | :heavy_check_mark: |
-| pad          | :x: |
-| perf         | :x: |
+| pad          | :heavy_check_mark: |
+| perf         | :heavy_check_mark: |
 | seq          | :x: |
 | support      | :x: |
 | syn          | :x: |

@@ -98,7 +98,7 @@ static void CompleteTransfer(long chan) {
     int len;
 
     exi = &Ecb[chan];
-    ASSERTLINE("OSExi.c", 0x115, 0 <= chan && chan < MAX_CHAN);
+    ASSERTLINE(0x115, 0 <= chan && chan < MAX_CHAN);
 
     if (exi->state & 3) {
         if (exi->state & 2) {
@@ -121,10 +121,10 @@ int EXIImm(long chan, void * buf, long len, unsigned long type, EXICallback call
     int i;
 
     exi = &Ecb[chan];
-    ASSERTLINE("OSExi.c", 0x13B, exi->state & STATE_SELECTED);
-    ASSERTLINE("OSExi.c", 0x13C, 0 <= chan && chan < MAX_CHAN);
-    ASSERTLINE("OSExi.c", 0x13D, 0 < len && len <= MAX_IMM);
-    ASSERTLINE("OSExi.c", 0x13E, type < MAX_TYPE);
+    ASSERTLINE(0x13B, exi->state & STATE_SELECTED);
+    ASSERTLINE(0x13C, 0 <= chan && chan < MAX_CHAN);
+    ASSERTLINE(0x13D, 0 < len && len <= MAX_IMM);
+    ASSERTLINE(0x13E, type < MAX_TYPE);
     enabled = OSDisableInterrupts();
     if ((exi->state & 3) || !(exi->state & 4)) {
         OSRestoreInterrupts(enabled);
@@ -173,11 +173,11 @@ int EXIDma(long chan, void * buf, long len, unsigned long type, EXICallback call
 
     exi = &Ecb[chan];
 
-    ASSERTLINE("OSExi.c", 0x1A4, exi->state & STATE_SELECTED);
-    ASSERTLINE("OSExi.c", 0x1A5, OFFSET(buf, 32) == 0);
-    ASSERTLINE("OSExi.c", 0x1A6, 0 < len && OFFSET(len, 32) == 0);
-    ASSERTLINE("OSExi.c", 0x1A8, ((u32) len & ~EXI_0LENGTH_EXILENGTH_MASK) == 0);
-    ASSERTLINE("OSExi.c", 0x1AA, type == EXI_READ || type == EXI_WRITE);
+    ASSERTLINE(0x1A4, exi->state & STATE_SELECTED);
+    ASSERTLINE(0x1A5, OFFSET(buf, 32) == 0);
+    ASSERTLINE(0x1A6, 0 < len && OFFSET(len, 32) == 0);
+    ASSERTLINE(0x1A8, ((u32) len & ~EXI_0LENGTH_EXILENGTH_MASK) == 0);
+    ASSERTLINE(0x1AA, type == EXI_READ || type == EXI_WRITE);
 
     enabled = OSDisableInterrupts();
     if ((exi->state & 3) || !(exi->state & 4)) {
@@ -204,7 +204,7 @@ int EXISync(long chan) {
 
     exi = &Ecb[chan];
     rc = 0;
-    ASSERTLINE("OSExi.c", 0x1D7, 0 <= chan && chan < MAX_CHAN);
+    ASSERTLINE(0x1D7, 0 <= chan && chan < MAX_CHAN);
     while ((exi->state & 4)) {
         if (!(__EXIRegs[(chan * 5) + 3] & 1)) {
             enabled = OSDisableInterrupts();
@@ -222,7 +222,7 @@ int EXISync(long chan) {
             break;
         }
     }
-    ASSERTLINE("OSExi.c", 0x1E9, !(exi->state & STATE_BUSY));
+    ASSERTLINE(0x1E9, !(exi->state & STATE_BUSY));
     return rc;
 }
 
@@ -230,7 +230,7 @@ unsigned long EXIClearInterrupts(long chan, int exi, int tc, int ext) {
     unsigned long cpr;
     unsigned long prev;
 
-    ASSERTLINE("OSExi.c", 0x1FE, 0 <= chan && chan < MAX_CHAN);
+    ASSERTLINE(0x1FE, 0 <= chan && chan < MAX_CHAN);
     cpr = prev = __EXIRegs[(chan * 5)];
     prev &= 0x7F5;
     if (exi != 0) {
@@ -252,7 +252,7 @@ EXICallback EXISetExiCallback(long chan, EXICallback exiCallback) {
     int enabled;
 
     exi = &Ecb[chan];
-    ASSERTLINE("OSExi.c", 0x220, 0 <= chan && chan < MAX_CHAN);
+    ASSERTLINE(0x220, 0 <= chan && chan < MAX_CHAN);
     enabled = OSDisableInterrupts();
     prev = exi->exiCallback;
     exi->exiCallback = exiCallback;
@@ -279,7 +279,7 @@ int EXIProbe(long chan) {
     long t;
 
     exi = &Ecb[chan];
-    ASSERTLINE("OSExi.c", 0x256, 0 <= chan && chan < MAX_CHAN);
+    ASSERTLINE(0x256, 0 <= chan && chan < MAX_CHAN);
     if (chan == 2) {
         return 1;
     }
@@ -327,7 +327,7 @@ int EXIAttach(long chan, EXICallback extCallback) {
     int enabled;
 
     exi = &Ecb[chan];
-    ASSERTLINE("OSExi.c", 0x2AE, 0 <= chan && chan < 2);
+    ASSERTLINE(0x2AE, 0 <= chan && chan < 2);
     enabled = OSDisableInterrupts();
     if (exi->state & 8) {
         OSRestoreInterrupts(enabled);
@@ -350,7 +350,7 @@ int EXIDetach(long chan) {
     int enabled;
 
     exi = &Ecb[chan];
-    ASSERTLINE("OSExi.c", 0x2D7, 0 <= chan && chan < 2);
+    ASSERTLINE(0x2D7, 0 <= chan && chan < 2);
     enabled = OSDisableInterrupts();
     if (!(exi->state & 8)) {
         OSRestoreInterrupts(enabled);
@@ -373,10 +373,10 @@ int EXISelect(long chan, unsigned long dev, unsigned long freq) {
 
     exi = &Ecb[chan];
 
-    ASSERTLINE("OSExi.c", 0x2FF, 0 <= chan && chan < MAX_CHAN);
-    ASSERTLINE("OSExi.c", 0x300, chan == 0 && dev < MAX_DEV || dev == 0);
-    ASSERTLINE("OSExi.c", 0x301, freq < MAX_FREQ);
-    ASSERTLINE("OSExi.c", 0x302, !(exi->state & STATE_SELECTED));
+    ASSERTLINE(0x2FF, 0 <= chan && chan < MAX_CHAN);
+    ASSERTLINE(0x300, chan == 0 && dev < MAX_DEV || dev == 0);
+    ASSERTLINE(0x301, freq < MAX_FREQ);
+    ASSERTLINE(0x302, !(exi->state & STATE_SELECTED));
 
     enabled = OSDisableInterrupts();
     if ((exi->state & 4) || ((chan != 2) && (((dev == 0) && !(exi->state & 8) && (EXIProbe(chan) == 0)) || !(exi->state & 0x10) || (exi->dev != dev)))) {
@@ -408,7 +408,7 @@ int EXIDeselect(long chan) {
     int enabled;
 
     exi = &Ecb[chan];
-    ASSERTLINE("OSExi.c", 0x335, 0 <= chan && chan < MAX_CHAN);
+    ASSERTLINE(0x335, 0 <= chan && chan < MAX_CHAN);
     enabled = OSDisableInterrupts();
     if (!(exi->state & 4)) {
         OSRestoreInterrupts(enabled);
@@ -448,7 +448,7 @@ static void EXIIntrruptHandler(signed short interrupt, struct OSContext * contex
 
     chan = (interrupt-9)/3;
 
-    ASSERTLINE("OSExi.c", 0x368, 0 <= chan && chan < MAX_CHAN);
+    ASSERTLINE(0x368, 0 <= chan && chan < MAX_CHAN);
     exi = &Ecb[chan];
     EXIClearInterrupts(chan, 1, 0, 0);
     callback = exi->exiCallback;
@@ -464,7 +464,7 @@ static void TCIntrruptHandler(signed short interrupt, struct OSContext * context
 
     chan = (interrupt-10)/3;
 
-    ASSERTLINE("OSExi.c", 0x383, 0 <= chan && chan < MAX_CHAN);
+    ASSERTLINE(0x383, 0 <= chan && chan < MAX_CHAN);
     exi = &Ecb[chan];
     __OSMaskInterrupts(0x80000000U >> interrupt);
     EXIClearInterrupts(chan, 0, 1, 0);
@@ -483,7 +483,7 @@ static void EXTIntrruptHandler(signed short interrupt, struct OSContext * contex
 
     chan = (interrupt-11)/3;
 
-    ASSERTLINE("OSExi.c", 0x3A2, 0 <= chan && chan < 2);
+    ASSERTLINE(0x3A2, 0 <= chan && chan < 2);
     __OSMaskInterrupts(0x700000U >> (chan * 3));
     __EXIRegs[(chan * 5)] = 0;
     exi = &Ecb[chan];
@@ -520,13 +520,13 @@ int EXILock(long chan, unsigned long dev, void (* unlockedCallback)(long, struct
     int i;
 
     exi = &Ecb[chan];
-    ASSERTLINE("OSExi.c", 0x3F2, 0 <= chan && chan < MAX_CHAN);
-    ASSERTLINE("OSExi.c", 0x3F3, chan == 0 && dev < MAX_DEV || dev == 0);
+    ASSERTLINE(0x3F2, 0 <= chan && chan < MAX_CHAN);
+    ASSERTLINE(0x3F3, chan == 0 && dev < MAX_DEV || dev == 0);
     enabled = OSDisableInterrupts();
 
     if (exi->state & 0x10) {
         if (unlockedCallback) {
-            ASSERTLINE("OSExi.c", 0x3F9, chan == 0 && exi->items < (MAX_DEV - 1)|| exi->items == 0);
+            ASSERTLINE(0x3F9, chan == 0 && exi->items < (MAX_DEV - 1)|| exi->items == 0);
             for(i = 0; i < exi->items; i++) {
                 if (exi->queue[i].dev == dev) {
                     OSRestoreInterrupts(enabled);
@@ -540,7 +540,7 @@ int EXILock(long chan, unsigned long dev, void (* unlockedCallback)(long, struct
         OSRestoreInterrupts(enabled);
         return 0;
     }
-    ASSERTLINE("OSExi.c", 0x409, exi->items == 0);
+    ASSERTLINE(0x409, exi->items == 0);
     exi->state |= 0x10;
     exi->dev = dev;
     SetExiInterruptMask(chan, exi);
@@ -554,7 +554,7 @@ int EXIUnlock(long chan) {
     EXICallback unlockedCallback;
 
     exi = &Ecb[chan];
-    ASSERTLINE("OSExi.c", 0x421, 0 <= chan && chan < MAX_CHAN);
+    ASSERTLINE(0x421, 0 <= chan && chan < MAX_CHAN);
     enabled = OSDisableInterrupts();
     if (!(exi->state & 0x10)) {
         OSRestoreInterrupts(enabled);
@@ -577,7 +577,7 @@ unsigned long EXIGetState(long chan) {
     struct EXIControl * exi;
 
     exi = &Ecb[chan];
-    ASSERTLINE("OSExi.c", 0x446, 0 <= chan && chan < MAX_CHAN);
+    ASSERTLINE(0x446, 0 <= chan && chan < MAX_CHAN);
     return exi->state;
 }
 
@@ -585,7 +585,7 @@ int EXIGetID(long chan, unsigned long dev, unsigned long * id) {
     int err;
     unsigned long cmd;
 
-    ASSERTLINE("OSExi.c", 0x45A, 0 <= chan && chan < MAX_CHAN);
+    ASSERTLINE(0x45A, 0 <= chan && chan < MAX_CHAN);
     if ((chan != 2) && (dev == 0) && (EXIAttach(chan, 0) == 0)) {
         return 0;
     }

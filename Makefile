@@ -23,6 +23,7 @@ endif
 DOLPHIN_REVISION ?= 36
 
 BUILD_DIR := build
+TOOLS_DIR := $(BUILD_DIR)/tools
 BASEROM_DIR := baserom
 TARGET_LIBS := G2D              \
                ai               \
@@ -102,7 +103,8 @@ ifeq ($(HOST_OS),macos)
 else
   CPP := cpp
 endif
-DTK     := tools/dtk
+DTK     := $(TOOLS_DIR)/dtk
+DTK_VERSION := 0.7.4
 
 CC        = $(MWCC)
 
@@ -111,7 +113,7 @@ CC        = $(MWCC)
 CHARFLAGS := -char unsigned
 
 CFLAGS = $(CHARFLAGS) -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn pragmas -pragma 'cats off' -DDOLPHIN_REVISION=$(DOLPHIN_REVISION)
-INCLUDES := -Iinclude -ir src
+INCLUDES := -Iinclude -Iinclude/libc -ir src
 
 ASFLAGS = -mgekko -I src -I include
 
@@ -119,9 +121,18 @@ ASFLAGS = -mgekko -I src -I include
 
 $(foreach dir,$(SRC_DIRS) $(ASM_DIRS) $(DATA_DIRS),$(shell mkdir -p build/release/$(dir) build/debug/$(dir)))
 
-# why. Did some SDK libs prefer char signed over unsigned? TODO: Figure out consistency behind this.
+# why. Did some SDK libs (like CARD) prefer char signed over unsigned? TODO: Figure out consistency behind this.
 build/debug/src/card/CARDRename.o: CHARFLAGS := -char signed
 build/release/src/card/CARDRename.o: CHARFLAGS := -char signed
+build/debug/src/card/CARDOpen.o: CHARFLAGS := -char signed
+build/release/src/card/CARDOpen.o: CHARFLAGS := -char signed
+
+# this lib is compiled as C++
+build/debug/src/perf/%.o: CFLAGS += -lang=c++
+build/release/src/perf/%.o: CFLAGS += -lang=c++
+
+build/debug/src/dvd/%.o: CFLAGS += -char signed
+build/release/src/dvd/%.o: CFLAGS += -char signed
 
 ######################## Build #############################
 
@@ -132,7 +143,10 @@ TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a
+all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a gx.a gxD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a
+
+verify: test-release.bin test-debug.bin verify.sha1
+	@sha1sum -c verify.sha1
 
 extract: $(DTK)
 	$(info Extracting files...)
@@ -154,22 +168,30 @@ extract: $(DTK)
 distclean:
 	rm -rf $(BASEROM_DIR)/release
 	rm -rf $(BASEROM_DIR)/debug
-	rm -rf tools/dtk
 	make clean
 
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf *.a
 
-$(DTK): tools/dtk_version
-	@echo "Downloading $@"
-	$(QUIET) $(PYTHON) tools/download_dtk.py $< $@
+$(TOOLS_DIR):
+	$(QUIET) mkdir -p $(TOOLS_DIR)
+
+.PHONY: check-dtk
+
+check-dtk: $(TOOLS_DIR)
+	@version=$$($(DTK) --version | awk '{print $$2}'); \
+	if [ "$(DTK_VERSION)" != "$$version" ]; then \
+		$(PYTHON) tools/download_dtk.py dtk $(DTK) --tag "v$(DTK_VERSION)"; \
+	fi
+
+$(DTK): check-dtk
 
 build/debug/src/%.o: src/%.c
 	$(CC) -c -opt level=0 -inline off -schedule off -sym on $(CFLAGS) -I- $(INCLUDES) -DDEBUG $< -o $@
 
 build/release/src/%.o: src/%.c
-	$(CC) -c -O4,p -inline auto $(CFLAGS) -I- $(INCLUDES) -DRELEASE $< -o $@
+	$(CC) -c -O4,p -inline auto -sym on $(CFLAGS) -I- $(INCLUDES) -DRELEASE $< -o $@
 
 ################################ Build AR Files ###############################
 
@@ -181,6 +203,31 @@ amcstubs_c_files := $(wildcard src/amcstubs/*.c)
 amcstubs.a  : $(addprefix $(BUILD_DIR)/release/,$(amcstubs_c_files:.c=.o))
 amcstubsD.a : $(addprefix $(BUILD_DIR)/debug/,$(amcstubs_c_files:.c=.o))
 
+gx_c_files := \
+	src/gx/GXInit.c \
+	src/gx/GXFifo.c \
+	src/gx/GXAttr.c \
+	src/gx/GXMisc.c \
+	src/gx/GXGeometry.c \
+	src/gx/GXFrameBuf.c \
+	src/gx/GXLight.c \
+	src/gx/GXTexture.c \
+	src/gx/GXBump.c \
+	src/gx/GXTev.c \
+	src/gx/GXPixel.c \
+	src/gx/GXDraw.c \
+	src/gx/GXStubs.c \
+	src/gx/GXDisplayList.c \
+	src/gx/GXVert.c \
+	src/gx/GXTransform.c \
+	src/gx/GXVerify.c \
+	src/gx/GXVerifXF.c \
+	src/gx/GXVerifRAS.c \
+	src/gx/GXSave.c \
+	src/gx/GXPerf.c
+gx.a  : $(addprefix $(BUILD_DIR)/release/,$(gx_c_files:.c=.o))
+gxD.a : $(addprefix $(BUILD_DIR)/debug/,$(gx_c_files:.c=.o))
+
 odemustubs_c_files := $(wildcard src/odemustubs/*.c)
 odemustubs.a  : $(addprefix $(BUILD_DIR)/release/,$(odemustubs_c_files:.c=.o))
 odemustubsD.a : $(addprefix $(BUILD_DIR)/debug/,$(odemustubs_c_files:.c=.o))
@@ -189,17 +236,96 @@ odenotstub_c_files := $(wildcard src/odenotstub/*.c)
 odenotstub.a  : $(addprefix $(BUILD_DIR)/release/,$(odenotstub_c_files:.c=.o))
 odenotstubD.a : $(addprefix $(BUILD_DIR)/debug/,$(odenotstub_c_files:.c=.o))
 
-os_c_files := $(wildcard src/os/OS*.c) src/os/time.dolphin.c src/os/__start.c src/os/__ppc_eabi_init.c
+#os_c_files := $(wildcard src/os/OS*.c) src/os/time.dolphin.c src/os/__start.c src/os/__ppc_eabi_init.c
+os_c_files := \
+	src/os/OS.c \
+	src/os/OSAddress.c \
+	src/os/OSAlarm.c \
+	src/os/OSAlloc.c \
+	src/os/OSArena.c \
+	src/os/OSAudioSystem.c \
+	src/os/OSCache.c \
+	src/os/OSContext.c \
+	src/os/OSError.c \
+	src/os/OSExi.c \
+	src/os/OSExiAd16.c \
+	src/os/OSFont.c \
+	src/os/OSInterrupt.c \
+	src/os/OSLink.c \
+	src/os/OSMessage.c \
+	src/os/OSMemory.c \
+	src/os/OSMutex.c \
+	src/os/OSReset.c \
+	src/os/OSResetSW.c \
+	src/os/OSRtc.c \
+	src/os/OSSerial.c \
+	src/os/OSStopwatch.c \
+	src/os/OSSync.c \
+	src/os/OSThread.c \
+	src/os/OSTime.c \
+	src/os/OSTimer.c \
+	src/os/OSUartExi.c \
+	src/os/time.dolphin.c \
+	src/os/__start.c \
+	src/os/__ppc_eabi_init.c
 os.a  : $(addprefix $(BUILD_DIR)/release/,$(os_c_files:.c=.o))
 osD.a : $(addprefix $(BUILD_DIR)/debug/,$(os_c_files:.c=.o))
 
-card_c_files := $(wildcard src/card/*.c)
+card_c_files := \
+	src/card/CARDBios.c \
+	src/card/CARDUnlock.c \
+	src/card/CARDRdwr.c \
+	src/card/CARDBlock.c \
+	src/card/CARDDir.c \
+	src/card/CARDCheck.c \
+	src/card/CARDMount.c \
+	src/card/CARDFormat.c \
+	src/card/CARDOpen.c \
+	src/card/CARDCreate.c \
+	src/card/CARDRead.c \
+	src/card/CARDWrite.c \
+	src/card/CARDDelete.c \
+	src/card/CARDStat.c \
+	src/card/CARDRename.c \
+	src/card/CARDStatEx.c \
+	src/card/CARDRaw.c
 card.a  : $(addprefix $(BUILD_DIR)/release/,$(card_c_files:.c=.o))
 cardD.a : $(addprefix $(BUILD_DIR)/debug/,$(card_c_files:.c=.o))
+
+pad_c_files := src/pad/Padclamp.c src/pad/Pad.c
+pad.a  : $(addprefix $(BUILD_DIR)/release/,$(pad_c_files:.c=.o))
+padD.a : $(addprefix $(BUILD_DIR)/debug/,$(pad_c_files:.c=.o))
+
+perf_c_files := $(wildcard src/perf/*.c)
+perf.a  : $(addprefix $(BUILD_DIR)/release/,$(perf_c_files:.c=.o))
+perfD.a : $(addprefix $(BUILD_DIR)/debug/,$(perf_c_files:.c=.o))
+
+dvd_c_files := $(wildcard src/dvd/*.c)
+dvd.a  : $(addprefix $(BUILD_DIR)/release/,$(dvd_c_files:.c=.o))
+dvdD.a : $(addprefix $(BUILD_DIR)/debug/,$(dvd_c_files:.c=.o))
+
+# either the stub or non-stub version of some libraries can be linked, but not both
+TEST_LIBS := amcnotstub odenotstub card gx os pad perf
+
+baserom-release.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
+test-release.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)
+baserom-debug.elf:   build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l)D.a)
+test-debug.elf:      build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l)D.a)
+
+%.bin: %.elf
+	$(OBJCOPY) -O binary $< $@
+
+%.elf:
+	@echo Linking $@
+	$(LD) -T gcn.ld --whole-archive $(filter %.o,$^) $(filter %.a,$^) -o $@ -Map $(@:.elf=.map)
 
 %.a:
 	@ test ! -z '$?' || { echo 'no object files for $@'; return 1; }
 	$(AR) -v -r $@ $(filter %.o,$?)
+
+# generate baserom hashes
+verify.sha1: baserom-release.bin baserom-debug.bin
+	sha1sum $^ | sed 's/baserom/test/' > $@
 
 # ------------------------------------------------------------------------------
 

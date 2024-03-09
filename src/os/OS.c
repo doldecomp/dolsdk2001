@@ -140,12 +140,7 @@ void OSInit() {
             __DVDLongFileNameFlag = ((u32*)bi2StartAddr)[8];
             __PADSpec = ((u32*)bi2StartAddr)[9];
         }
-#if DOLPHIN_REVISION >= 37
         OSSetArenaLo((!BootInfo->arenaLo) ? &__ArenaLo : BootInfo->arenaLo);
-#else
-        // huh?
-        OSSetArenaHi((!BootInfo->arenaLo) ? &__ArenaLo : BootInfo->arenaLo);
-#endif
         if ((!BootInfo->arenaLo) && (BI2DebugFlag) && (*(u32*)BI2DebugFlag < 2)) {
             OSSetArenaLo((void*)(((u32)(char*)&_stack_addr + 0x1F) & 0xFFFFFFE0));
         }
@@ -162,7 +157,7 @@ void OSInit() {
         __OSInitSram();
         __OSThreadInit();
         __OSInitAudioSystem();
-        ASSERTLINE("OS.c", 0x252, BootInfo); // oh sure, assert NOW, you've already dereferenced it a bunch of times.
+        ASSERTLINE(0x252, BootInfo); // oh sure, assert NOW, you've already dereferenced it a bunch of times.
         if ((BootInfo->consoleType & OS_CONSOLE_DEVELOPMENT) != 0) {
             BootInfo->consoleType = OS_CONSOLE_DEVHW1;
         } else {
@@ -248,7 +243,7 @@ static void OSExceptionInit(void) {
     u8* handlerStart;
     u32 handlerSize;
     
-    ASSERTMSGLINE("OS.c", 0x2F1, ((u32)&__OSEVEnd - (u32)&__OSEVStart) <= 0x100, "OSExceptionInit(): too big exception vector code.");
+    ASSERTMSGLINE(0x2F1, ((u32)&__OSEVEnd - (u32)&__OSEVStart) <= 0x100, "OSExceptionInit(): too big exception vector code.");
       
     // Install the first level exception vector.
     opCodeAddr = (u32*)__OSEVSetNumber;
@@ -346,7 +341,7 @@ entry __OSDBJUMPEND
 __OSExceptionHandler __OSSetExceptionHandler(__OSException exception, __OSExceptionHandler handler) {
     __OSExceptionHandler oldHandler;
     
-    ASSERTMSGLINE("OS.c", 0x37F, exception < __OS_EXCEPTION_MAX, "__OSSetExceptionHandler(): unknown exception."); 
+    ASSERTMSGLINE(0x37F, exception < __OS_EXCEPTION_MAX, "__OSSetExceptionHandler(): unknown exception."); 
     
     oldHandler = OSExceptionTable[exception];
     OSExceptionTable[exception] = handler;
@@ -354,7 +349,7 @@ __OSExceptionHandler __OSSetExceptionHandler(__OSException exception, __OSExcept
 }
 
 __OSExceptionHandler __OSGetExceptionHandler(__OSException exception) {
-    ASSERTMSGLINE("OS.c", 0x396, exception < __OS_EXCEPTION_MAX, "__OSGetExceptionHandler(): unknown exception.");
+    ASSERTMSGLINE(0x396, exception < __OS_EXCEPTION_MAX, "__OSGetExceptionHandler(): unknown exception.");
     return OSExceptionTable[exception];
 }
 

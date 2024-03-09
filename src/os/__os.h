@@ -73,8 +73,8 @@ unsigned char __OSGetBootMode(void);
 void __OSSetBootMode(unsigned char ntd);
 
 // OSSync.c
-extern u32 __OSSystemCallVectorStart[];
-extern u32 __OSSystemCallVectorEnd[];
+extern void __OSSystemCallVectorStart();
+extern void __OSSystemCallVectorEnd();
 
 void __OSInitSystemCall(void);
 
