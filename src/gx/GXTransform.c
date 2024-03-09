@@ -124,20 +124,6 @@ static asm void WriteMTXPS4x3(register f32 mtx[3][4], register volatile f32 *des
     psq_st f5, 0(dest), 0, qr0
 }
 
-static asm void WriteMTXPS3x3(register f32 mtx[3][3], register volatile f32 *dest)
-{
-    psq_l f0, 0x00(mtx), 0, qr0
-    psq_l f1, 0x08(mtx), 0, qr0
-    psq_l f2, 0x10(mtx), 0, qr0
-    psq_l f3, 0x18(mtx), 0, qr0
-    lfs   f4, 0x20(mtx)
-    psq_st f0, 0(dest), 0, qr0
-    psq_st f1, 0(dest), 0, qr0
-    psq_st f2, 0(dest), 0, qr0
-    psq_st f3, 0(dest), 0, qr0
-    stfs   f4, 0(dest)
-}
-
 static asm void WriteMTXPS3x3from3x4(register f32 mtx[3][4], register volatile f32 *dest)
 {
     psq_l f0, 0x00(mtx), 0, qr0
@@ -152,6 +138,20 @@ static asm void WriteMTXPS3x3from3x4(register f32 mtx[3][4], register volatile f
     stfs   f3, 0(dest)
     psq_st f4, 0(dest), 0, qr0
     stfs   f5, 0(dest)
+}
+
+static asm void WriteMTXPS3x3(register f32 mtx[3][3], register volatile f32 *dest)
+{
+    psq_l f0, 0x00(mtx), 0, qr0
+    psq_l f1, 0x08(mtx), 0, qr0
+    psq_l f2, 0x10(mtx), 0, qr0
+    psq_l f3, 0x18(mtx), 0, qr0
+    lfs   f4, 0x20(mtx)
+    psq_st f0, 0(dest), 0, qr0
+    psq_st f1, 0(dest), 0, qr0
+    psq_st f2, 0(dest), 0, qr0
+    psq_st f3, 0(dest), 0, qr0
+    stfs   f4, 0(dest)
 }
 
 static asm void WriteMTXPS4x2(register f32 mtx[2][4], register volatile f32 *dest)

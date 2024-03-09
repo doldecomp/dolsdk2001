@@ -201,7 +201,28 @@ amcstubs_c_files := $(wildcard src/amcstubs/*.c)
 amcstubs.a  : $(addprefix $(BUILD_DIR)/release/,$(amcstubs_c_files:.c=.o))
 amcstubsD.a : $(addprefix $(BUILD_DIR)/debug/,$(amcstubs_c_files:.c=.o))
 
-gx_c_files := $(wildcard src/gx/*.c)
+gx_c_files := \
+	src/gx/GXInit.c \
+	src/gx/GXFifo.c \
+	src/gx/GXAttr.c \
+	src/gx/GXMisc.c \
+	src/gx/GXGeometry.c \
+	src/gx/GXFrameBuf.c \
+	src/gx/GXLight.c \
+	src/gx/GXTexture.c \
+	src/gx/GXBump.c \
+	src/gx/GXTev.c \
+	src/gx/GXPixel.c \
+	src/gx/GXDraw.c \
+	src/gx/GXStubs.c \
+	src/gx/GXDisplayList.c \
+	src/gx/GXVert.c \
+	src/gx/GXTransform.c \
+	src/gx/GXVerify.c \
+	src/gx/GXVerifXF.c \
+	src/gx/GXVerifRAS.c \
+	src/gx/GXSave.c \
+	src/gx/GXPerf.c
 gx.a  : $(addprefix $(BUILD_DIR)/release/,$(gx_c_files:.c=.o))
 gxD.a : $(addprefix $(BUILD_DIR)/debug/,$(gx_c_files:.c=.o))
 
@@ -282,7 +303,7 @@ dvd.a  : $(addprefix $(BUILD_DIR)/release/,$(dvd_c_files:.c=.o))
 dvdD.a : $(addprefix $(BUILD_DIR)/debug/,$(dvd_c_files:.c=.o))
 
 # either the stub or non-stub version of some libraries can be linked, but not both
-TEST_LIBS := amcnotstub odenotstub card os pad perf
+TEST_LIBS := amcnotstub odenotstub card gx os pad perf
 
 baserom-release.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
 test-release.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)
