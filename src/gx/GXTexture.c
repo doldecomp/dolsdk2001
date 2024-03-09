@@ -16,6 +16,16 @@ typedef struct __GXTexObjInt_struct {
     u8 flags; // offset 0x1F, size 0x1
 } __GXTexObjInt;
 
+typedef struct __GXTexRegionInt_struct {
+    // total size: 0x10
+    unsigned long image1; // offset 0x0, size 0x4
+    unsigned long image2; // offset 0x4, size 0x4
+    unsigned short sizeEven; // offset 0x8, size 0x2
+    unsigned short sizeOdd; // offset 0xA, size 0x2
+    unsigned char is32bMipmap; // offset 0xC, size 0x1
+    unsigned char isCached; // offset 0xD, size 0x1
+} __GXTexRegionInt;
+
 u8 GXTexMode0Ids[8] = { 0x80, 0x81, 0x82, 0x83, 0xA0, 0xA1, 0xA2, 0xA3 }; // size: 0x8, address: 0x0
 u8 GXTexMode1Ids[8] = { 0x84, 0x85, 0x86, 0x87, 0xA4, 0xA5, 0xA6, 0xA7 }; // size: 0x8, address: 0x8
 u8 GXTexImage0Ids[8] = { 0x88, 0x89, 0x8A, 0x8B, 0xA8, 0xA9, 0xAA, 0xAB }; // size: 0x8, address: 0x10
@@ -257,7 +267,7 @@ void GXInitTexObjLOD(GXTexObj *obj, GXTexFilter min_filt, GXTexFilter mag_filt, 
     lbias = 32.0f * lod_bias;
     SET_REG_FIELD(0x2CE, t->mode0, 8, 9, lbias);
     SET_REG_FIELD(0x2CF, t->mode0, 1, 4, (mag_filt == GX_LINEAR) ? 1 : 0);
-    ASSERTMSGLINE(0x2D1, (u32)min_filt <= 5, "GXInitTexObjLOD: invalid min filt value");
+    ASSERTMSGLINE(0x2D1, (u32)min_filt <= 5, "GXInitTexObjLOD: invalid min_filt value");
     SET_REG_FIELD(0x2D2, t->mode0, 3, 5, GX2HWFiltConv[min_filt]);
     SET_REG_FIELD(0x2D3, t->mode0, 1, 8, do_edge_lod ? 0 : 1);
     t->mode0 &= 0xFFFDFFFF;
@@ -404,7 +414,6 @@ void GXGetTexObjLODAll(GXTexObj *tex_obj, GXTexFilter *min_filt, GXTexFilter *ma
     __GXTexObjInt *t = (__GXTexObjInt *)tex_obj;
 
     ASSERTMSGLINE(0x3A0, tex_obj, "Texture Object Pointer is null");
-
     *min_filt = HW2GXFiltConv[GET_REG_FIELD(t->mode0, 3, 5)];
     *mag_filt = GET_REG_FIELD(t->mode0, 1, 4);
     *min_lod = (u8)t->mode1 / 16.0f;
@@ -494,4 +503,136 @@ u32 GXGetTexObjTlut(GXTexObj *tex_obj)
 
     ASSERTMSGLINE(0x3E7, tex_obj, "Texture Object Pointer is null");
     return t->tlutName;
+}
+
+typedef struct __GXTlutObjInt_struct {
+    // total size: 0xC
+    u32 tlut; // offset 0x0, size 0x4
+    u32 loadTlut0; // offset 0x4, size 0x4
+    u16 numEntries; // offset 0x8, size 0x2
+} __GXTlutObjInt;
+typedef struct __GXTlutRegionInt_struct {
+    // total size: 0x10
+    u32 loadTlut1; // offset 0x0, size 0x4
+    __GXTlutObjInt tlutObj; // offset 0x4, size 0xC
+} __GXTlutRegionInt;
+
+void GXLoadTexObjPreLoaded(GXTexObj *obj, GXTexRegion *region, GXTexMapID id)
+{
+    __GXTlutRegionInt *tlr;
+    __GXTexObjInt *t = (__GXTexObjInt *)obj;
+    __GXTexRegionInt *r = (__GXTexRegionInt *)region;
+
+    ASSERTMSGLINE(0x3FE, obj, "Texture Object Pointer is null");
+    ASSERTMSGLINE(0x3FE, region, "TexRegion Object Pointer is null");
+    CHECK_GXBEGIN(0x400, "GXLoadTexObjPreLoaded");
+    ASSERTMSGLINEV(0x401, id < 8, "%s: invalid texture map ID", "GXLoadTexObj");
+
+    SET_REG_FIELD(0x403, t->mode0, 8, 24, GXTexMode0Ids[id]);
+    SET_REG_FIELD(0x404, t->mode1, 8, 24, GXTexMode1Ids[id]);
+    SET_REG_FIELD(0x405, t->image0, 8, 24, GXTexImage0Ids[id]);
+    SET_REG_FIELD(0x406, r->image1, 8, 24, GXTexImage1Ids[id]);
+    SET_REG_FIELD(0x407, r->image2, 8, 24, GXTexImage2Ids[id]);
+    SET_REG_FIELD(0x408, t->image3, 8, 24, GXTexImage3Ids[id]);
+
+    GX_WRITE_RAS_REG(t->mode0);
+    GX_WRITE_RAS_REG(t->mode1);
+    GX_WRITE_RAS_REG(t->image0);
+    GX_WRITE_RAS_REG(r->image1);
+    GX_WRITE_RAS_REG(r->image2);
+    GX_WRITE_RAS_REG(t->image3);
+
+    if (!(t->flags & 2)) {
+        ASSERTMSGLINEV(0x413, gx->tlutRegionCallback, "%s: Tex/Tlut Region Callback not set", "GXLoadTexObj/Preloaded");
+        tlr = (__GXTlutRegionInt *)gx->tlutRegionCallback(t->tlutName);
+        ASSERTMSGLINEV(0x415, tlr, "%s: Tex/Tlut Region Callback returns NULL", "GXLoadTexObj/Preloaded");
+
+        SET_REG_FIELD(0x417, tlr->tlutObj.tlut, 8, 24, GXTexTlutIds[id]);
+        GX_WRITE_RAS_REG(tlr->tlutObj.tlut);
+    }
+    gx->tImage0[id] = t->image0;
+    gx->tMode0[id] = t->mode0;
+    gx->dirtyState |= 1;
+    gx->bpSent = 1;
+}
+
+void GXLoadTexObj(GXTexObj *obj, GXTexMapID id)
+{
+    GXTexRegion *r;
+
+    CHECK_GXBEGIN(0x432, "GXLoadTexObj");
+    ASSERTMSGLINEV(0x433, id < 8, "%s: invalid texture map ID", "GXLoadTexObj");
+    ASSERTMSGLINEV(0x438, gx->texRegionCallback, "%s: Tex/Tlut Region Callback not set", "GXLoadTexObj");
+    r = gx->texRegionCallback(obj, id);
+    ASSERTMSGLINEV(0x43A, r, "%s: Tex/Tlut Region Callback returns NULL", "GXLoadTexObj");
+    GXLoadTexObjPreLoaded(obj, r, id);
+}
+
+void GXInitTlutObj(GXTlutObj *tlut_obj, void *lut, GXTlutFmt fmt, u16 n_entries)
+{
+    __GXTlutObjInt *t = (__GXTlutObjInt *)tlut_obj;
+
+    ASSERTMSGLINE(0x452, tlut_obj, "Tlut Object Pointer is null");
+    CHECK_GXBEGIN(0x453, "GXInitTlutObj");
+    ASSERTMSGLINEV(0x456, n_entries <= 0x4000, "%s: number of entries exceeds maximum", "GXInitTlutObj");
+    ASSERTMSGLINEV(0x458, ((u32)lut & 0x1F) == 0, "%s: %s pointer not aligned to 32B", "GXInitTlutObj", "Tlut");
+    t->tlut = 0;
+    SET_REG_FIELD(0x45B, t->tlut, 2, 10, fmt);
+    SET_REG_FIELD(0x45C, t->loadTlut0, 21, 0, ((u32)lut & 0x3FFFFFFF) >> 5);
+    SET_REG_FIELD(0x45D, t->loadTlut0, 8, 24, 0x64);
+    t->numEntries = n_entries;
+}
+
+void GXGetTlutObjAll(GXTlutObj *tlut_obj, void **data, GXTlutFmt *format, u16 *numEntries)
+{
+    __GXTlutObjInt *t = (__GXTlutObjInt *)tlut_obj;
+
+    ASSERTMSGLINE(0x472, tlut_obj, "Tlut Object Pointer is null");
+    *data = (void *)(GET_REG_FIELD(t->loadTlut0, 21, 0) << 5);
+    *format = GET_REG_FIELD(t->tlut, 2, 10);
+    *numEntries = t->numEntries;
+}
+
+void *GXGetTlutObjData(GXTlutObj *tlut_obj)
+{
+    __GXTlutObjInt *t = (__GXTlutObjInt *)tlut_obj;
+
+    ASSERTMSGLINE(0x47B, tlut_obj, "Tlut Object Pointer is null");
+    return (void *)(GET_REG_FIELD(t->loadTlut0, 21, 0) << 5);
+}
+
+GXTlutFmt GXGetTlutObjFmt(GXTlutObj *tlut_obj)
+{
+    __GXTlutObjInt *t = (__GXTlutObjInt *)tlut_obj;
+
+    ASSERTMSGLINE(0x482, tlut_obj, "Tlut Object Pointer is null");
+    return GET_REG_FIELD(t->tlut, 2, 10);
+}
+
+u16 GXGetTlutObjNumEntries(GXTlutObj *tlut_obj)
+{
+    __GXTlutObjInt *t = (__GXTlutObjInt *)tlut_obj;
+
+    ASSERTMSGLINE(0x489, tlut_obj, "Tlut Object Pointer is null");
+    return t->numEntries;
+}
+
+void GXLoadTlut(GXTlutObj *tlut_obj, u32 tlut_name)
+{
+    __GXTlutRegionInt *r;
+    u32 tlut_offset;
+    __GXTlutObjInt *t = (__GXTlutObjInt *)tlut_obj;
+
+    ASSERTMSGLINE(0x4A4, tlut_obj, "Tlut Object Pointer is null");
+    CHECK_GXBEGIN(0x4A6, "GXLoadTlut");
+    ASSERTMSGLINEV(0x4A7, gx->tlutRegionCallback, "%s: Tex/Tlut Region Callback not set", "GXLoadTlut");
+    r = (__GXTlutRegionInt *)gx->tlutRegionCallback(tlut_name);
+    ASSERTMSGLINEV(0x4A9, r, "%s: Tex/Tlut Region Callback returns NULL", "GXLoadTlut");
+    __GXFlushTextureState();
+    GX_WRITE_RAS_REG(t->loadTlut0);
+    GX_WRITE_RAS_REG(r->loadTlut1);
+    __GXFlushTextureState();
+    tlut_offset = r->loadTlut1 & 0x3FF;
+    SET_REG_FIELD(0x4B9, t->tlut, 10, 0, tlut_offset);
+    r->tlutObj = *t;
 }

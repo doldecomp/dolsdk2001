@@ -923,7 +923,7 @@ typedef enum
     GX_BIGTLUT3,
 } GXTlut;
 
-typedef enum
+typedef enum _GXTlutFmt
 {
     GX_TL_IA8,
     GX_TL_RGB565,
