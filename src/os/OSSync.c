@@ -3,6 +3,9 @@
 
 #include "__os.h"
 
+void __OSSystemCallVectorStart();
+void __OSSystemCallVectorEnd();
+
 static asm void SystemCallVector(void) {
 entry __OSSystemCallVectorStart
     nofralloc
@@ -20,7 +23,7 @@ entry __OSSystemCallVectorEnd
 void __OSInitSystemCall(void) {
     void *addr = (void*)OSPhysicalToCached(0xC00);
 
-    memcpy(addr, (void*)&__OSSystemCallVectorStart, ((char*)&__OSSystemCallVectorEnd - (char*)&__OSSystemCallVectorStart));
+    memcpy(addr, __OSSystemCallVectorStart, (u32)&__OSSystemCallVectorEnd - (u32)&__OSSystemCallVectorStart);
     DCFlushRangeNoSync(addr, 0x100);
     __sync();
     ICInvalidateRange(addr, 0x100);

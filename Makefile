@@ -111,7 +111,7 @@ CC        = $(MWCC)
 CHARFLAGS := -char unsigned
 
 CFLAGS = $(CHARFLAGS) -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn pragmas -pragma 'cats off'
-INCLUDES := -Iinclude -ir src
+INCLUDES := -Iinclude -Iinclude/libc -ir src
 
 ASFLAGS = -mgekko -I src -I include
 
@@ -141,7 +141,7 @@ TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a
+all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a gx.a gxD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a
 
 verify: test-release.bin test-debug.bin verify.sha1
 	@sha1sum -c verify.sha1
@@ -189,7 +189,7 @@ build/debug/src/%.o: src/%.c
 	$(CC) -c -opt level=0 -inline off -schedule off -sym on $(CFLAGS) -I- $(INCLUDES) -DDEBUG $< -o $@
 
 build/release/src/%.o: src/%.c
-	$(CC) -c -O4,p -inline auto $(CFLAGS) -I- $(INCLUDES) -DRELEASE $< -o $@
+	$(CC) -c -O4,p -inline auto -sym on $(CFLAGS) -I- $(INCLUDES) -DRELEASE $< -o $@
 
 ################################ Build AR Files ###############################
 
@@ -200,6 +200,31 @@ amcnotstubD.a : $(addprefix $(BUILD_DIR)/debug/,$(amcnotstub_c_files:.c=.o))
 amcstubs_c_files := $(wildcard src/amcstubs/*.c)
 amcstubs.a  : $(addprefix $(BUILD_DIR)/release/,$(amcstubs_c_files:.c=.o))
 amcstubsD.a : $(addprefix $(BUILD_DIR)/debug/,$(amcstubs_c_files:.c=.o))
+
+gx_c_files := \
+	src/gx/GXInit.c \
+	src/gx/GXFifo.c \
+	src/gx/GXAttr.c \
+	src/gx/GXMisc.c \
+	src/gx/GXGeometry.c \
+	src/gx/GXFrameBuf.c \
+	src/gx/GXLight.c \
+	src/gx/GXTexture.c \
+	src/gx/GXBump.c \
+	src/gx/GXTev.c \
+	src/gx/GXPixel.c \
+	src/gx/GXDraw.c \
+	src/gx/GXStubs.c \
+	src/gx/GXDisplayList.c \
+	src/gx/GXVert.c \
+	src/gx/GXTransform.c \
+	src/gx/GXVerify.c \
+	src/gx/GXVerifXF.c \
+	src/gx/GXVerifRAS.c \
+	src/gx/GXSave.c \
+	src/gx/GXPerf.c
+gx.a  : $(addprefix $(BUILD_DIR)/release/,$(gx_c_files:.c=.o))
+gxD.a : $(addprefix $(BUILD_DIR)/debug/,$(gx_c_files:.c=.o))
 
 odemustubs_c_files := $(wildcard src/odemustubs/*.c)
 odemustubs.a  : $(addprefix $(BUILD_DIR)/release/,$(odemustubs_c_files:.c=.o))
@@ -278,7 +303,7 @@ dvd.a  : $(addprefix $(BUILD_DIR)/release/,$(dvd_c_files:.c=.o))
 dvdD.a : $(addprefix $(BUILD_DIR)/debug/,$(dvd_c_files:.c=.o))
 
 # either the stub or non-stub version of some libraries can be linked, but not both
-TEST_LIBS := amcnotstub odenotstub card os pad perf
+TEST_LIBS := amcnotstub odenotstub card gx os pad perf
 
 baserom-release.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
 test-release.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)

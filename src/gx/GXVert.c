@@ -1,68 +1,25 @@
-#ifndef _DOLPHIN_GX_GXVERT_H_
-#define _DOLPHIN_GX_GXVERT_H_
-
-#include <dolphin/types.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define GXFIFO_ADDR 0xCC008000
-
-typedef union
-{
-    u8  u8;
-    u16 u16;
-    u32 u32;
-    u64 u64;
-    s8  s8;
-    s16 s16;
-    s32 s32;
-    s64 s64;
-    f32 f32;
-    f64 f64;
-} PPCWGPipe;
-
-#ifdef __MWERKS__
-volatile PPCWGPipe GXWGFifo : GXFIFO_ADDR;
-#else
-#define GXWGFifo (*(volatile PPCWGPipe *)GXFIFO_ADDR)
-#endif
-
 #if DEBUG
+#include <dolphin/gx.h>
 
-// external functions
-
-#define FUNC_1PARAM(name, T) void name##1##T(T x);
-#define FUNC_2PARAM(name, T) void name##2##T(T x, T y);
-#define FUNC_3PARAM(name, T) void name##3##T(T x, T y, T z);
-#define FUNC_4PARAM(name, T) void name##4##T(T x, T y, T z, T w);
-#define FUNC_INDEX8(name)    void name##1x8(u8 x);
-#define FUNC_INDEX16(name)   void name##1x16(u16 x);
-
-#else
-
-// inline functions
+#include "__gx.h"
 
 #define FUNC_1PARAM(name, T) \
-static inline void name##1##T(T x) { GXWGFifo.T = x; }
+void name##1##T(T x) { GXWGFifo.T = x; }
 
 #define FUNC_2PARAM(name, T) \
-static inline void name##2##T(T x, T y) { GXWGFifo.T = x; GXWGFifo.T = y; }
+void name##2##T(T x, T y) { GXWGFifo.T = x; GXWGFifo.T = y; }
 
 #define FUNC_3PARAM(name, T) \
-static inline void name##3##T(T x, T y, T z) { GXWGFifo.T = x; GXWGFifo.T = y; GXWGFifo.T = z; }
+void name##3##T(T x, T y, T z) { GXWGFifo.T = x; GXWGFifo.T = y; GXWGFifo.T = z; }
 
 #define FUNC_4PARAM(name, T) \
-static inline void name##4##T(T x, T y, T z, T w) { GXWGFifo.T = x; GXWGFifo.T = y; GXWGFifo.T = z; GXWGFifo.T = w; }
+void name##4##T(T x, T y, T z, T w) { GXWGFifo.T = x; GXWGFifo.T = y; GXWGFifo.T = z; GXWGFifo.T = w; }
 
 #define FUNC_INDEX8(name) \
-static inline void name##1x8(u8 x) { GXWGFifo.u8 = x; }
+void name##1x8(u8 x) { GXWGFifo.u8 = x; }
 
 #define FUNC_INDEX16(name) \
-static inline void name##1x16(u16 x) { GXWGFifo.u16 = x; }
-
-#endif
+void name##1x16(u16 x) { GXWGFifo.u16 = x; }
 
 // GXCmd
 FUNC_1PARAM(GXCmd, u8)
@@ -126,15 +83,4 @@ FUNC_INDEX8(GXTexCoord)
 // GXMatrixIndex
 FUNC_1PARAM(GXMatrixIndex, u8)
 
-#undef FUNC_1PARAM
-#undef FUNC_2PARAM
-#undef FUNC_3PARAM
-#undef FUNC_4PARAM
-#undef FUNC_INDEX8
-#undef FUNC_INDEX16
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+#endif  // DEBUG

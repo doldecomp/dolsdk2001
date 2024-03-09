@@ -146,9 +146,16 @@ void OSPanic(char *file, int line, char *msg, ...);
 #define OSRoundUp32B(x)   (((u32)(x) + 32 - 1) & ~(32 - 1))
 #define OSRoundDown32B(x) (((u32)(x)) & ~(32 - 1))
 
-#ifndef DEBUG
-#define OSPhysicalToCached(offset) ((void*)((u32)(OS_BASE_CACHED + (u32)offset)))
-#define OSCachedToPhysical(offset) ((void*)((u32)((u32)offset - OS_BASE_CACHED)))
+#ifdef DEBUG
+void *OSPhysicalToCached(u32 offset);
+void *OSPhysicalToUncached(u32 offset);
+u32 OSCachedToPhysical(void *offset);
+u32 OSUncachedToPhysical(void *offset);
+#else
+#define OSPhysicalToCached(offset) ((void*)((u32)(OS_BASE_CACHED + (u32)(offset))))
+#define OSPhysicalToUncached(offset) ((void*)((u32)(OS_BASE_UNCACHED + (u32)(offset))))
+#define OSCachedToPhysical(offset) ((u32)((u32)(offset) - OS_BASE_CACHED))
+#define OSUncachedToPhysical(offset) ((u32)((u32)(offset) - OS_BASE_UNCACHED))
 #endif
 
 #ifdef __cplusplus
