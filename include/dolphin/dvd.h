@@ -80,6 +80,7 @@ s32 DVDGetDriveStatus(void);
 BOOL DVDOpenDir(char *dirName, DVDDir *dir);
 BOOL DVDCloseDir(DVDDir *dir);
 BOOL DVDReadDir(DVDDir *dir, DVDDirEntry *dirent);
+void DVDDumpWaitingQueue(void);
 
 #define DVDReadAsync(fileInfo, addr, length, offset, callback) \
     DVDReadAsyncPrio((fileInfo), (addr), (length), (offset), (callback), 2)
