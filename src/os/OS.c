@@ -122,7 +122,7 @@ void OSInit() {
             __DVDLongFileNameFlag = ((u32*)bi2StartAddr)[8];
             __PADSpec = ((u32*)bi2StartAddr)[9];
         }
-        OSSetArenaHi((!BootInfo->arenaLo) ? &__ArenaLo : BootInfo->arenaLo);
+        OSSetArenaLo((!BootInfo->arenaLo) ? &__ArenaLo : BootInfo->arenaLo);
         if ((!BootInfo->arenaLo) && (BI2DebugFlag) && (*(u32*)BI2DebugFlag < 2)) {
             OSSetArenaLo((void*)(((u32)(char*)&_stack_addr + 0x1F) & 0xFFFFFFE0));
         }

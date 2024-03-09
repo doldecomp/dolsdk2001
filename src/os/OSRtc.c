@@ -4,7 +4,7 @@
 // internal include
 #include "__os.h"
 
-static struct SramControl Scb;
+static struct SramControl Scb ATTRIBUTE_ALIGN(32);
 
 static int GetRTC(unsigned long * rtc);
 static int ReadSram(void * buffer);

@@ -8,6 +8,8 @@ extern "C" {
 #endif
 
 void GXReadXfRasMetric(u32 *xf_wait_in, u32 *xf_wait_out, u32 *ras_busy, u32 *clocks);
+void GXInitXfRasMetric();
+void GXClearGPMetric();
 
 #ifdef __cplusplus
 }
