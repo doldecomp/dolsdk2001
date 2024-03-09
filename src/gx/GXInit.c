@@ -146,11 +146,11 @@ GXFifoObj *GXInit(void *base, u32 size)
     freqBase = __OSBusClock / 0x1F4;
     __GXFlushTextureState();
     reg = (freqBase >> 11) | 0x400 | 0x69000000;
-    GX_WRITE_RAS_REG_alt(reg);
+    GX_WRITE_RAS_REG(reg);
 
     __GXFlushTextureState();
     reg = (freqBase / 0x1080) | 0x200 | 0x46000000;
-    GX_WRITE_RAS_REG_alt(reg);
+    GX_WRITE_RAS_REG(reg);
 
     for (i = GX_VTXFMT0; i < GX_MAX_VTXFMT; i++)
     {
@@ -187,7 +187,7 @@ GXFifoObj *GXInit(void *base, u32 size)
         SET_REG_FIELD(0, reg, 1, 2, 1);
         SET_REG_FIELD(0, reg, 1, 3, 1);
         SET_REG_FIELD(0, reg, 8, 24, 0x58);
-        GX_WRITE_RAS_REG_alt(reg);
+        GX_WRITE_RAS_REG(reg);
     }
     switch (VIGetTvFormat()) {
     case VI_NTSC: rmode = &GXNtsc480IntDf; break;

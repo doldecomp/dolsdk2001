@@ -464,8 +464,8 @@ void GXSetScissor(u32 left, u32 top, u32 wd, u32 ht)
     SET_REG_FIELD(0x3C2, gx->suScis1, 11, 0, bm);
     SET_REG_FIELD(0x3C3, gx->suScis1, 11, 12, rt);
 
-    GX_WRITE_RAS_REG_alt(gx->suScis0);
-    GX_WRITE_RAS_REG_alt(gx->suScis1);
+    GX_WRITE_RAS_REG(gx->suScis0);
+    GX_WRITE_RAS_REG(gx->suScis1);
     gx->bpSent = 1;
 }
 
@@ -506,7 +506,7 @@ void GXSetScissorBoxOffset(s32 x_off, s32 y_off)
     SET_REG_FIELD(0x405, reg, 10, 0, hx);
     SET_REG_FIELD(0x406, reg, 10, 10, hy);
     SET_REG_FIELD(0x407, reg, 8, 24, 0x59);
-    GX_WRITE_RAS_REG_alt(reg);
+    GX_WRITE_RAS_REG(reg);
     gx->bpSent = 1;
 }
 
