@@ -876,32 +876,32 @@ GXTlutRegionCallback GXSetTlutRegionCallback(GXTlutRegionCallback f)
 
 void GXPreLoadEntireTexture(GXTexObj *tex_obj, GXTexRegion *region)
 {
-    u8 isMipMap; // r1+0x2D
-    u8 is32bit; // r1+0x2C
-    u32 wd; // r1+0x28
-    u32 ht; // r1+0x24
-    u32 maxLevelIndex; // r17
-    u32 loadImage0; // r27
-    u32 loadImage1; // r26
-    u32 loadImage2; // r25
-    u32 loadImage3; // r30
-    u32 base; // r21
-    u32 tmem1; // r20
-    u32 tmem2; // r19
-    u32 tmemAR; // r1+0x20
-    u32 tmemGB; // r1+0x1C
-    u32 nTiles; // r24
-    u32 totalOdd; // r18
-    u32 totalEven; // r22
+    u8 isMipMap;
+    u8 is32bit; 
+    u32 wd;
+    u32 ht;
+    u32 maxLevelIndex;
+    u32 loadImage0;
+    u32 loadImage1;
+    u32 loadImage2;
+    u32 loadImage3;
+    u32 base; 
+    u32 tmem1; 
+    u32 tmem2; 
+    u32 tmemAR;
+    u32 tmemGB;
+    u32 nTiles;
 #if DEBUG
-    u32 count; // r16
+    u32 totalOdd; 
+    u32 totalEven;
+    u32 count; 
 #endif
-    u32 rowTiles; // r1+0x18
-    u32 colTiles; // r1+0x14
-    u32 cmpTiles; // r1+0x10
-    u32 i; // r28
-    __GXTexObjInt *t = (__GXTexObjInt *)tex_obj; // r23
-    __GXTexRegionInt *r = (__GXTexRegionInt *)region; // r29
+    u32 rowTiles; 
+    u32 colTiles; 
+    u32 cmpTiles; 
+    u32 i;
+    __GXTexObjInt *t = (__GXTexObjInt *)tex_obj;
+    __GXTexRegionInt *r = (__GXTexRegionInt *)region;
 
     ASSERTMSGLINE(0x628, tex_obj, "Texture Object Pointer is null");
     ASSERTMSGLINE(0x628, region, "TexRegion Object Pointer is null");
@@ -958,9 +958,12 @@ void GXPreLoadEntireTexture(GXTexObj *tex_obj, GXTexRegion *region)
         }
 #endif
     } else {
+#if DEBUG
         totalEven = (nTiles == 0) ? 1 : nTiles;
         totalOdd = totalEven;
+#endif
     }
+#if DEBUG
     if (is32bit) {
         totalOdd = isMipMap ? totalOdd : 0;
         totalEven = totalEven + totalOdd;
@@ -979,6 +982,7 @@ void GXPreLoadEntireTexture(GXTexObj *tex_obj, GXTexRegion *region)
     } else {
         ASSERTMSGLINE(0x680, totalOdd <= r->sizeOdd, "GXPreLoadEntireTexture: Odd tmem size does not match the texture size");
     }
+#endif
     __GXFlushTextureState();
     GX_WRITE_RAS_REG(loadImage0);
     GX_WRITE_RAS_REG(loadImage1);
@@ -1061,7 +1065,7 @@ void GXSetTexCoordBias(GXTexCoordID coord, u8 s_enable, u8 t_enable)
     }
 }
 
-void __SetSURegs(u32 tmap, u32 tcoord)
+static void __SetSURegs(u32 tmap, u32 tcoord)
 {
     u32 w;
     u32 h;
@@ -1081,7 +1085,7 @@ void __SetSURegs(u32 tmap, u32 tcoord)
     gx->bpSent = 1;
 }
 
-static void __GXSetSUTexRegs(void)
+void __GXSetSUTexRegs(void)
 {
     u32 nStages;
     u32 nIndStages;
