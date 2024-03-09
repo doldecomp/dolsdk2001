@@ -271,7 +271,7 @@ perf.a  : $(addprefix $(BUILD_DIR)/release/,$(perf_c_files:.c=.o))
 perfD.a : $(addprefix $(BUILD_DIR)/debug/,$(perf_c_files:.c=.o))
 
 # either the stub or non-stub version of some libraries can be linked, but not both
-TEST_LIBS := amcnotstub odenotstub card os pad
+TEST_LIBS := amcnotstub odenotstub card os pad perf
 
 baserom-release.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
 test-release.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)
