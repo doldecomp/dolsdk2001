@@ -28,7 +28,7 @@ Currently this repository supports building the following libraries:
 | dvd          | :warning: |
 | fileCache    | :x: |
 | G2D          | :x: |
-| gx           | :x: |
+| gx           | :heavy_check_mark: |
 | hio          | :x: |
 | mcc          | :x: |
 | mix          | :x: |
