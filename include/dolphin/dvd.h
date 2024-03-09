@@ -3,7 +3,7 @@
 
 #include <dolphin/types.h>
 
-typedef struct
+typedef struct DVDDiskID
 {
     char gameName[4];
     char company[2];
@@ -56,6 +56,17 @@ typedef struct
     char *name;
 } DVDDirEntry;
 
+typedef struct DVDBB2 {
+    /* 0x00 */ u32 bootFilePosition;
+    /* 0x04 */ u32 FSTPosition;
+    /* 0x08 */ u32 FSTLength;
+    /* 0x0C */ u32 FSTMaxLength;
+    /* 0x10 */ void * FSTAddress;
+    /* 0x14 */ u32 userPosition;
+    /* 0x18 */ u32 userLength;
+    /* 0x1C */ u32 padding0;
+} DVDBB2;
+
 void DVDInit(void);
 BOOL DVDOpen(char *, DVDFileInfo *);
 BOOL DVDClose(DVDFileInfo *);
@@ -91,5 +102,9 @@ BOOL DVDReadDir(DVDDir *dir, DVDDirEntry *dirent);
 #define DVD_STATE_IGNORED        9
 #define DVD_STATE_CANCELED       10
 #define DVD_STATE_RETRY          11
+
+// unidentified externs
+extern int DVDReadAbsAsyncForBS(struct DVDCommandBlock * block, void * addr, long length, long offset, void (* callback)(long, struct DVDCommandBlock *));
+extern int DVDReadDiskID(struct DVDCommandBlock * block, struct DVDDiskID * diskID, void (* callback)(long, struct DVDCommandBlock *));
 
 #endif
