@@ -143,8 +143,8 @@ default: all
 
 all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a gx.a gxD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a
 
-verify: test-release.bin test-debug.bin verify.sha1
-	@sha1sum -c verify.sha1
+verify: build/release/test.bin build/debug/test.bin build/verify.sha1
+	@sha1sum -c build/verify.sha1
 
 extract: $(DTK)
 	$(info Extracting files...)
@@ -309,10 +309,10 @@ dvdD.a : $(addprefix $(BUILD_DIR)/debug/,$(dvd_c_files:.c=.o))
 # either the stub or non-stub version of some libraries can be linked, but not both
 TEST_LIBS := amcnotstub dsp odenotstub card gx os pad perf
 
-baserom-release.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
-test-release.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)
-baserom-debug.elf:   build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l)D.a)
-test-debug.elf:      build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l)D.a)
+build/release/baserom.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
+build/release/test.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)
+build/debug/baserom.elf:   build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l)D.a)
+build/debug/test.elf:      build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l)D.a)
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
@@ -326,7 +326,7 @@ test-debug.elf:      build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l)D.a)
 	$(AR) -v -r $@ $(filter %.o,$?)
 
 # generate baserom hashes
-verify.sha1: baserom-release.bin baserom-debug.bin
+build/verify.sha1: build/release/baserom.bin build/debug/baserom.bin
 	sha1sum $^ | sed 's/baserom/test/' > $@
 
 # ------------------------------------------------------------------------------
