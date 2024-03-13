@@ -50,11 +50,6 @@ static u32 XPatchBits = 0xF0000000;
 #endif
 static unsigned long AnalogMode = 0x00000300; // size: 0x4, address: 0x4
 static unsigned long Spec = 0x00000005; // size: 0x4, address: 0x8
-#if DOLPHIN_REVISION >= 37
-static void (* MakeStatus)(long, struct PADStatus *, unsigned long *) = SPEC2_MakeStatus; // size: 0x4, address: 0xC
-static u32 cmdReadOrigin = 0x41000000;
-static u32 cmdCalibrate = 0x42000000;
-#endif
 
 static int Initialized; // size: 0x4, address: 0x0
 static unsigned long EnabledBits; // size: 0x4, address: 0x4
@@ -71,8 +66,11 @@ static unsigned long Type[4]; // size: 0x10, address: 0x0
 static struct PADStatus Origin[4]; // size: 0x30, address: 0x10
 #if DOLPHIN_REVISION >= 37
 u32 CmdProbeDevice[4];
-#else
+#endif
 static void (* MakeStatus)(long, struct PADStatus *, unsigned long *) = SPEC2_MakeStatus; // size: 0x4, address: 0xC
+#if DOLPHIN_REVISION >= 37
+static u32 cmdReadOrigin = 0x41000000;
+static u32 cmdCalibrate = 0x42000000;
 #endif
 
 static OSResetFunctionInfo ResetFunctionInfo = {
@@ -206,19 +204,13 @@ static void ProbeWireless(long chan) {
 }
 
 static void PADProbeCallback(s32 chan, u32 error, OSContext *context) {
-#if DOLPHIN_REVISION < 37
     unsigned long type;
-#endif
     ASSERTLINE(0x1F5, 0 <= ResettingChan && ResettingChan < SI_MAX_CHAN);
     ASSERTLINE(0x1F6, chan == ResettingChan);
     if (!(error & (SI_ERROR_UNDER_RUN | SI_ERROR_OVER_RUN | SI_ERROR_NO_RESPONSE | SI_ERROR_COLLISION)))
     {
-#if DOLPHIN_REVISION >= 37
-        if (!(Type[chan] & 0x80000) && !(Type[chan] & 0x40000))
-#else
         type = Type[chan];
         if (!(type & 0x80000) && !(type & 0x40000))
-#endif
         {
             PADEnable(ResettingChan);
             WaitingBits |= PAD_CHAN0_BIT >> ResettingChan;
