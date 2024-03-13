@@ -3,9 +3,9 @@
 
 #include <dolphin/os.h>
 
-typedef struct DSPTaskInfo DSPTaskInfo;
+typedef struct STRUCT_DSP_TASK DSPTaskInfo;
 typedef void (*DSPCallback)(void *task);
-struct DSPTaskInfo
+struct STRUCT_DSP_TASK
 {                                   
     /*0x00*/ volatile u32 state;
     /*0x04*/ volatile u32 priority;                  
