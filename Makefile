@@ -290,6 +290,10 @@ card_c_files := \
 card.a  : $(addprefix $(BUILD_DIR)/release/,$(card_c_files:.c=.o))
 cardD.a : $(addprefix $(BUILD_DIR)/debug/,$(card_c_files:.c=.o))
 
+db_c_files := $(wildcard src/db/*.c)
+db.a  : $(addprefix $(BUILD_DIR)/release/,$(db_c_files:.c=.o))
+dbD.a : $(addprefix $(BUILD_DIR)/debug/,$(db_c_files:.c=.o))
+
 pad_c_files := src/pad/Padclamp.c src/pad/Pad.c
 pad.a  : $(addprefix $(BUILD_DIR)/release/,$(pad_c_files:.c=.o))
 padD.a : $(addprefix $(BUILD_DIR)/debug/,$(pad_c_files:.c=.o))
@@ -303,7 +307,7 @@ dvd.a  : $(addprefix $(BUILD_DIR)/release/,$(dvd_c_files:.c=.o))
 dvdD.a : $(addprefix $(BUILD_DIR)/debug/,$(dvd_c_files:.c=.o))
 
 # either the stub or non-stub version of some libraries can be linked, but not both
-TEST_LIBS := amcnotstub odenotstub card gx os pad perf
+TEST_LIBS := amcnotstub db odenotstub card gx os pad perf
 
 build/release/baserom.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
 build/release/test.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)
