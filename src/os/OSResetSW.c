@@ -7,7 +7,6 @@ static int Down;
 static int LastState;
 static long long HoldUp;
 static long long HoldDown;
-#define Hold HoldUp  // Hold was renamed to HoldUp
 #else
 static long long Hold;
 #endif
@@ -16,7 +15,7 @@ void __OSResetSWInterruptHandler(short exception, struct OSContext *context) {
     void (* callback)();
 
 #if DOLPHIN_REVISION >= 37
-    HoldDown = __OSGetSystemTime();  // return value unused?
+    HoldDown = __OSGetSystemTime();
     do {
         if (__OSGetSystemTime() - HoldDown >= OSMicrosecondsToTicks(100))
             break;
