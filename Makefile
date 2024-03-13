@@ -255,6 +255,7 @@ os_c_files := \
 	src/os/OSMessage.c \
 	src/os/OSMemory.c \
 	src/os/OSMutex.c \
+	src/os/OSReboot.c \
 	src/os/OSReset.c \
 	src/os/OSResetSW.c \
 	src/os/OSRtc.c \

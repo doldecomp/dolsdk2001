@@ -51,11 +51,7 @@ static void Callback(void) {
 
 static void someinline(void *ptr, u32 size, u32 arg2)
 {
-    struct {
-        u8 filler0[0xC];
-        volatile s32 unkC;
-        u8 filler10[0x20];
-    } sp40;
+    DVDCommandBlock sp40;
     u32 unused;
 
     while (!Prepared) {
@@ -63,7 +59,7 @@ static void someinline(void *ptr, u32 size, u32 arg2)
     DVDReadAbsAsyncForBS(&sp40, ptr, size, arg2, NULL);
     while(1)
     {
-        switch (sp40.unkC) {
+        switch (sp40.state) {
         case -1:
         case 2:
         case 3:
