@@ -9,80 +9,78 @@
 #include "__vi.h"
 
 typedef struct {
-    // total size: 0x26
-    u8 equ; // offset 0x0, size 0x1
-    u16 acv; // offset 0x2, size 0x2
-    u16 prbOdd; // offset 0x4, size 0x2
-    u16 prbEven; // offset 0x6, size 0x2
-    u16 psbOdd; // offset 0x8, size 0x2
-    u16 psbEven; // offset 0xA, size 0x2
-    u8 bs1; // offset 0xC, size 0x1
-    u8 bs2; // offset 0xD, size 0x1
-    u8 bs3; // offset 0xE, size 0x1
-    u8 bs4; // offset 0xF, size 0x1
-    u16 be1; // offset 0x10, size 0x2
-    u16 be2; // offset 0x12, size 0x2
-    u16 be3; // offset 0x14, size 0x2
-    u16 be4; // offset 0x16, size 0x2
-    u16 nhlines; // offset 0x18, size 0x2
-    u16 hlw; // offset 0x1A, size 0x2
-    u8 hsy; // offset 0x1C, size 0x1
-    u8 hcs; // offset 0x1D, size 0x1
-    u8 hce; // offset 0x1E, size 0x1
-    u8 hbe640; // offset 0x1F, size 0x1
-    u16 hbs640; // offset 0x20, size 0x2
-    u8 hbeCCIR656; // offset 0x22, size 0x1
-    u16 hbsCCIR656; // offset 0x24, size 0x2
+    u8 equ;
+    u16 acv;
+    u16 prbOdd;
+    u16 prbEven;
+    u16 psbOdd;
+    u16 psbEven;
+    u8 bs1;
+    u8 bs2;
+    u8 bs3;
+    u8 bs4;
+    u16 be1;
+    u16 be2;
+    u16 be3;
+    u16 be4;
+    u16 nhlines;
+    u16 hlw;
+    u8 hsy;
+    u8 hcs;
+    u8 hce;
+    u8 hbe640;
+    u16 hbs640;
+    u8 hbeCCIR656;
+    u16 hbsCCIR656;
 } VITiming;
 
 typedef struct {
-    // total size: 0x58
-    unsigned short DispPosX; // offset 0x0, size 0x2
-    unsigned short DispPosY; // offset 0x2, size 0x2
-    unsigned short DispSizeX; // offset 0x4, size 0x2
-    unsigned short DispSizeY; // offset 0x6, size 0x2
-    unsigned short AdjustedDispPosX; // offset 0x8, size 0x2
-    unsigned short AdjustedDispPosY; // offset 0xA, size 0x2
-    unsigned short AdjustedDispSizeY; // offset 0xC, size 0x2
-    unsigned short AdjustedPanPosY; // offset 0xE, size 0x2
-    unsigned short AdjustedPanSizeY; // offset 0x10, size 0x2
-    unsigned short FBSizeX; // offset 0x12, size 0x2
-    unsigned short FBSizeY; // offset 0x14, size 0x2
-    unsigned short PanPosX; // offset 0x16, size 0x2
-    unsigned short PanPosY; // offset 0x18, size 0x2
-    unsigned short PanSizeX; // offset 0x1A, size 0x2
-    unsigned short PanSizeY; // offset 0x1C, size 0x2
-    VIXFBMode FBMode; // offset 0x20, size 0x4
-    unsigned long nonInter; // offset 0x24, size 0x4
-    unsigned long tv; // offset 0x28, size 0x4
-    unsigned char wordPerLine; // offset 0x2C, size 0x1
-    unsigned char std; // offset 0x2D, size 0x1
-    unsigned char wpl; // offset 0x2E, size 0x1
-    unsigned long bufAddr; // offset 0x30, size 0x4
-    unsigned long tfbb; // offset 0x34, size 0x4
-    unsigned long bfbb; // offset 0x38, size 0x4
-    unsigned char xof; // offset 0x3C, size 0x1
-    int black; // offset 0x40, size 0x4
-    int threeD; // offset 0x44, size 0x4
-    unsigned long rbufAddr; // offset 0x48, size 0x4
-    unsigned long rtfbb; // offset 0x4C, size 0x4
-    unsigned long rbfbb; // offset 0x50, size 0x4
-    VITiming *timing; // offset 0x54, size 0x4
+    u16 DispPosX;
+    u16 DispPosY;
+    u16 DispSizeX;
+    u16 DispSizeY;
+    u16 AdjustedDispPosX;
+    u16 AdjustedDispPosY;
+    u16 AdjustedDispSizeY;
+    u16 AdjustedPanPosY;
+    u16 AdjustedPanSizeY;
+    u16 FBSizeX;
+    u16 FBSizeY;
+    u16 PanPosX;
+    u16 PanPosY;
+    u16 PanSizeX;
+    u16 PanSizeY;
+    VIXFBMode FBMode;
+    u32 nonInter;
+    u32 tv;
+    u8 wordPerLine;
+    u8 std;
+    u8 wpl;
+    u32 bufAddr;
+    u32 tfbb;
+    u32 bfbb;
+    u8 xof;
+    int black;
+    int threeD;
+    u32 rbufAddr;
+    u32 rtfbb;
+    u32 rbfbb;
+    VITiming *timing;
 } SomeVIStruct;
 
-static unsigned long retraceCount; // size: 0x4, address: 0x0
-static unsigned long changeMode; // size: 0x4, address: 0x4
-static unsigned long flushFlag; // size: 0x4, address: 0x8
-static struct OSThreadQueue retraceQueue; // size: 0x8, address: 0xC
-static void (*PreCB)(unsigned long); // size: 0x4, address: 0x14
-static void (*PostCB)(unsigned long); // size: 0x4, address: 0x18
-static unsigned long encoderType; // size: 0x4, address: 0x1C
-static signed short displayOffsetH; // size: 0x2, address: 0x20
-static signed short displayOffsetV; // size: 0x2, address: 0x22
-static volatile u64 changed; // size: 0x8, address: 0x28
-static u16 regs[59]; // size: 0x76, address: 0x0
-static volatile u64 shdwChanged; // size: 0x8, address: 0x30
-static u16 shdwRegs[59]; // size: 0x76, address: 0x78
+static volatile u32 retraceCount;
+static u32 changeMode;
+static volatile u32 flushFlag;
+static struct OSThreadQueue retraceQueue;
+static void (*PreCB)(u32);
+static void (*PostCB)(u32);
+static u32 encoderType;
+static s16 displayOffsetH;
+static s16 displayOffsetV;
+static volatile u64 changed;
+static u16 regs[59];
+static volatile u64 shdwChanged;
+static u16 shdwRegs[59];
 
 #define MARK_CHANGED(index) (changed |= 1LL << (63 - (index)))
 
@@ -112,7 +110,7 @@ static u16 taps[25] = {
     0x0001
 };
 
-static SomeVIStruct HorVer; // size: 0x58, address: 0xF0
+static SomeVIStruct HorVer;
 static u32 FBSet;
 
 static u32 getCurrentFieldEvenOdd(void);
@@ -712,7 +710,7 @@ void VIConfigure(GXRenderModeObj *rm)
         rm->viXOrigin + rm->viWidth, 0x2A8 - tm->hbs640);
 
     if (encoderType == 0) {
-        HorVer.tv = 3U;
+        HorVer.tv = 3;
     }
     setInterruptRegs(tm);
     reg = regs[1];
@@ -747,21 +745,206 @@ void VIConfigurePan(u16 xOrg, u16 yOrg, u16 width, u16 height)
     }
 #endif
     enabled = OSDisableInterrupts();
-    HorVer.PanPosX = xOrg;
-    HorVer.PanPosY = yOrg;
-    HorVer.PanSizeX = width;
-    HorVer.PanSizeY = height;
+    HorVer.PanPosX   = xOrg;
+    HorVer.PanPosY   = yOrg;
+    HorVer.PanSizeX  = width;
+    HorVer.PanSizeY  = height;
     HorVer.DispSizeY = (HorVer.nonInter == 2) ? HorVer.PanSizeY
                      : (HorVer.FBMode == VI_XFBMODE_SF) ? (u16)(HorVer.PanSizeY * 2)
                      : HorVer.PanSizeY;
     tm = HorVer.timing;
     AdjustPosition(tm->acv);
-    //HorVer.FBMode = 0;
     setScalingRegs(HorVer.PanSizeX, HorVer.DispSizeX, HorVer.threeD);
     setPicConfig(HorVer.FBSizeX, HorVer.FBMode, HorVer.PanPosX, HorVer.PanSizeX, &HorVer.wordPerLine, &HorVer.std, &HorVer.wpl, &HorVer.xof);
     if (FBSet != 0) {
         setFbbRegs(&HorVer, &HorVer.tfbb, &HorVer.bfbb, &HorVer.rtfbb, &HorVer.rbfbb);
     }
     setVerticalRegs(HorVer.AdjustedDispPosY, HorVer.DispSizeY, tm->equ, tm->acv, tm->prbOdd, tm->prbEven, tm->psbOdd, tm->psbEven, HorVer.black);
+    OSRestoreInterrupts(enabled);
+}
+
+void VIFlush(void)
+{
+    BOOL enabled;
+    s32 regIndex;
+
+    enabled = OSDisableInterrupts();
+    shdwChanged |= changed;
+    while (changed != 0) {
+        regIndex = cntlzd(changed);
+        shdwRegs[regIndex] = regs[regIndex];
+        changed &= ~((u64)1 << (63 - regIndex));
+    }
+    flushFlag = 1;
+    OSRestoreInterrupts(enabled);
+}
+
+void VISetNextFrameBuffer(void *fb)
+{
+    BOOL enabled;
+
+    ASSERTMSGLINEV(0x6F7, ((u32)fb & 0x1F) == 0,
+        "VISetNextFrameBuffer(): Frame buffer address(0x%08x) is not 32byte aligned\n",
+        fb);
+    enabled = OSDisableInterrupts();
+    HorVer.bufAddr = (u32)fb;
+    FBSet = 1;
+    setFbbRegs(&HorVer, &HorVer.tfbb, &HorVer.bfbb, &HorVer.rtfbb, &HorVer.rbfbb);
+    OSRestoreInterrupts(enabled);
+}
+
+void VISetNextRightFrameBuffer(void *fb)
+{
+    BOOL enabled;
+
+    ASSERTMSGLINEV(0x71F, ((u32)fb & 0x1F) == 0,
+        "VISetNextFrameBuffer(): Frame buffer address(0x%08x) is not 32byte aligned\n",
+        fb);
+    enabled = OSDisableInterrupts();
+    HorVer.rbufAddr = (u32)fb;
+    FBSet = 1;
+    setFbbRegs(&HorVer, &HorVer.tfbb, &HorVer.bfbb, &HorVer.rtfbb, &HorVer.rbfbb);
+    OSRestoreInterrupts(enabled);
+}
+
+void VISetBlack(int black)
+{
+    BOOL enabled;
+    VITiming *tm;
+
+    enabled = OSDisableInterrupts();
+    HorVer.black = black;
+    tm = HorVer.timing;
+    setVerticalRegs(HorVer.AdjustedDispPosY, HorVer.DispSizeY, tm->equ, tm->acv, tm->prbOdd, tm->prbEven, tm->psbOdd, tm->psbEven, HorVer.black);
+    OSRestoreInterrupts(enabled);
+}
+
+void VISet3D(int threeD)
+{
+    BOOL enabled;
+    u32 reg;
+
+    enabled = OSDisableInterrupts();
+    HorVer.threeD = threeD;
+    reg = regs[1];
+    SET_REG_FIELD(0x766, reg, 1, 3, HorVer.threeD);
+    regs[1] = reg;
+    MARK_CHANGED(1);
+    setScalingRegs(HorVer.PanSizeX, HorVer.DispSizeX, HorVer.threeD);
+    OSRestoreInterrupts(enabled);
+}
+
+u32 VIGetRetraceCount(void)
+{
+    return retraceCount;
+}
+
+static u32 getCurrentHalfLine(void)
+{
+    u32 hcount;
+    u32 vcount0;
+    u32 vcount;
+    VITiming *tm;
+
+    tm = HorVer.timing;
+    vcount = __VIRegs[22] & 0x7FF;
+    do {
+        vcount0 = vcount;
+        hcount = __VIRegs[23] & 0x7FF;
+        vcount = __VIRegs[22] & 0x7FF;
+    } while (vcount0 != vcount);
+    return ((vcount - 1) * 2) + ((hcount - 1) / tm->hlw);
+}
+
+static u32 getCurrentFieldEvenOdd(void)
+{
+    u16 value;
+    u32 nin;
+    u32 fmt;
+    VITVMode tvMode;
+    u32 nhlines;
+    VITiming *tm;
+
+    if (__VIRegs[54] & 1) {
+        tm = getTiming(VI_TVMODE_NTSC_PROG);
+    } else {
+        value = __VIRegs[1];
+        nin = ((value >> 2U) & 1);
+        fmt = ((value >> 8U) & 3);
+        tvMode = (fmt << 2) + nin;
+        tm = getTiming(tvMode);
+    }
+    nhlines = tm->nhlines;
+    if (getCurrentHalfLine() < nhlines) {
+        return 1U;
+    }
+    return 0U;
+}
+
+u32 VIGetNextField(void)
+{
+    s32 nextField;
+    BOOL enabled;
+#if !DEBUG
+    u8 unused[4];
+#endif
+
+    enabled = OSDisableInterrupts();
+    nextField = getCurrentFieldEvenOdd() ^ 1;
+    OSRestoreInterrupts(enabled);
+    return nextField ^ (HorVer.AdjustedDispPosY & 1);
+}
+
+u32 VIGetCurrentLine(void)
+{
+    u32 halfLine;
+    VITiming *tm;
+    BOOL enabled;
+
+    tm = HorVer.timing;
+    enabled = OSDisableInterrupts();
+    halfLine = getCurrentHalfLine();
+    OSRestoreInterrupts(enabled);
+    if (halfLine >= tm->nhlines) {
+        halfLine -= tm->nhlines;
+    }
+    return halfLine >> 1U;
+}
+
+u32 VIGetTvFormat(void)
+{
+    u32 format = *(u32 *)OSPhysicalToCached(0xCC);
+
+    ASSERTMSGLINE(0x80D, format == 0 || format == 1 || format == 2,
+        "VIGetTvFormat(): Wrong format is stored in lo mem. Maybe lo mem is trashed");
+    return format;
+}
+
+void __VISetAdjustingValues(s16 x, s16 y)
+{
+    BOOL enabled;
+    VITiming *tm;
+
+    ASSERTMSGLINE(0x822, (y & 1) == 0, "__VISetAdjustValues(): y offset should be an even number");
+    enabled = OSDisableInterrupts();
+    displayOffsetH = x;
+    displayOffsetV = y;
+    tm = HorVer.timing;
+    AdjustPosition(tm->acv);
+    setHorizontalRegs(tm, HorVer.AdjustedDispPosX, HorVer.DispSizeX);
+    if (FBSet != 0) {
+        setFbbRegs(&HorVer, &HorVer.tfbb, &HorVer.bfbb, &HorVer.rtfbb, &HorVer.rbfbb);
+    }
+    setVerticalRegs(HorVer.AdjustedDispPosY, HorVer.AdjustedDispSizeY, tm->equ, tm->acv, tm->prbOdd, tm->prbEven, tm->psbOdd, tm->psbEven, HorVer.black);
+    OSRestoreInterrupts(enabled);
+}
+
+void __VIGetAdjustingValues(s16 *x, s16 *y)
+{
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    *x = displayOffsetH;
+    *y = displayOffsetV;
     OSRestoreInterrupts(enabled);
 }
