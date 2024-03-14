@@ -42,7 +42,7 @@ Currently this repository supports building the following libraries:
 | support      | :x: |
 | syn          | :x: |
 | texPalette   | :x: |
-| vi           | :x: |
+| vi           | :heavy_check_mark: |
 
 ## Preparation
 
