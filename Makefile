@@ -141,7 +141,7 @@ TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a gx.a gxD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a
+all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a db.a dbD.a dsp.a dspD.a gx.a gxD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a
 
 verify: build/release/test.bin build/debug/test.bin build/verify.sha1
 	@sha1sum -c build/verify.sha1
@@ -293,6 +293,10 @@ cardD.a : $(addprefix $(BUILD_DIR)/debug/,$(card_c_files:.c=.o))
 db_c_files := $(wildcard src/db/*.c)
 db.a  : $(addprefix $(BUILD_DIR)/release/,$(db_c_files:.c=.o))
 dbD.a : $(addprefix $(BUILD_DIR)/debug/,$(db_c_files:.c=.o))
+
+dsp_c_files := $(wildcard src/dsp/*.c)
+dsp.a  : $(addprefix $(BUILD_DIR)/release/,$(dsp_c_files:.c=.o))
+dspD.a : $(addprefix $(BUILD_DIR)/debug/,$(dsp_c_files:.c=.o))
 
 pad_c_files := src/pad/Padclamp.c src/pad/Pad.c
 pad.a  : $(addprefix $(BUILD_DIR)/release/,$(pad_c_files:.c=.o))
