@@ -12,4 +12,7 @@ void VIWaitForRetrace(void);
 void VISetBlack(BOOL black);
 u32 VIGetNextField(void);
 
+VIRetraceCallback VISetPreRetraceCallback(VIRetraceCallback cb);
+VIRetraceCallback VISetPostRetraceCallback(VIRetraceCallback cb);
+
 #endif

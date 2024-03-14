@@ -36,4 +36,6 @@ typedef enum
     VI_XFBMODE_DF
 } VIXFBMode;
 
+typedef void (*VIRetraceCallback)(u32 retraceCount);
+
 #endif

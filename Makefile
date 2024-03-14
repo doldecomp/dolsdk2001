@@ -141,7 +141,7 @@ TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a db.a dbD.a dsp.a dspD.a gx.a gxD.a hio.a hioD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a
+all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a db.a dbD.a dsp.a dspD.a gx.a gxD.a hio.a hioD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a vi.a viD.a
 
 verify: build/release/test.bin build/debug/test.bin build/verify.sha1
 	@sha1sum -c build/verify.sha1
@@ -314,8 +314,16 @@ dvd_c_files := $(wildcard src/dvd/*.c)
 dvd.a  : $(addprefix $(BUILD_DIR)/release/,$(dvd_c_files:.c=.o))
 dvdD.a : $(addprefix $(BUILD_DIR)/debug/,$(dvd_c_files:.c=.o))
 
+vi_c_files := \
+	src/vi/vi.c \
+	src/vi/i2c.c \
+	src/vi/initphilips.c \
+	src/vi/gpioexi.c
+vi.a  : $(addprefix $(BUILD_DIR)/release/,$(vi_c_files:.c=.o))
+viD.a : $(addprefix $(BUILD_DIR)/debug/,$(vi_c_files:.c=.o))
+
 # either the stub or non-stub version of some libraries can be linked, but not both
-TEST_LIBS := amcnotstub db hio odenotstub card gx os pad perf
+TEST_LIBS := amcnotstub db hio odenotstub card gx os pad perf vi
 
 build/release/baserom.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
 build/release/test.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)
