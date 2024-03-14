@@ -1,8 +1,10 @@
+#include <dolphin/gx.h>
 #include <dolphin/os.h>
 #include <dolphin/vi.h>
 #include <dolphin/hw_regs.h>
 #include <macros.h>
 
+#include "__gx.h"
 #include "__os.h"
 #include "__vi.h"
 
@@ -33,47 +35,7 @@ typedef struct {
     u16 hbsCCIR656; // offset 0x24, size 0x2
 } VITiming;
 
-static unsigned long retraceCount; // size: 0x4, address: 0x0
-static unsigned long changeMode; // size: 0x4, address: 0x4
-static unsigned long flushFlag; // size: 0x4, address: 0x8
-static struct OSThreadQueue retraceQueue; // size: 0x8, address: 0xC
-static void (*PreCB)(unsigned long); // size: 0x4, address: 0x14
-static void (*PostCB)(unsigned long); // size: 0x4, address: 0x18
-static unsigned long encoderType; // size: 0x4, address: 0x1C
-static signed short displayOffsetH; // size: 0x2, address: 0x20
-static signed short displayOffsetV; // size: 0x2, address: 0x22
-static volatile u64 changed; // size: 0x8, address: 0x28
-static u16 regs[59]; // size: 0x76, address: 0x0
-static volatile u64 shdwChanged; // size: 0x8, address: 0x30
-static u16 shdwRegs[59]; // size: 0x76, address: 0x78
-
-static VITiming timing[7] =
-{
-    { 6, 240, 24, 25, 3, 2, 12, 13, 12, 13, 520, 519, 520, 519, 525, 429, 64, 71, 105, 162, 373, 122, 412 },
-    { 6, 240, 24, 24, 4, 4, 12, 12, 12, 12, 520, 520, 520, 520, 526, 429, 64, 71, 105, 162, 373, 122, 412 },
-    { 5, 287, 35, 36, 1, 0, 13, 12, 11, 10, 619, 618, 617, 620, 625, 432, 64, 75, 106, 172, 380, 133, 420 },
-    { 5, 287, 35, 35, 2, 2, 13, 11, 13, 11, 619, 621, 619, 621, 626, 432, 64, 75, 106, 172, 380, 133, 420 },
-    { 6, 240, 24, 25, 3, 2, 16, 15, 14, 13, 518, 517, 516, 519, 525, 429, 64, 78, 112, 162, 373, 122, 412 },
-    { 6, 240, 24, 24, 4, 4, 16, 14, 16, 14, 518, 520, 518, 520, 526, 429, 64, 78, 112, 162, 373, 122, 412 },
-    { 12, 480, 44, 44, 10, 10, 24, 24, 24, 24, 1038, 1038, 1038, 1038, 1050, 429, 64, 71, 105, 162, 373, 122, 496 },
-};
-static u16 taps[25] = {
-    0x01F0, 0x01DC,
-    0x01AE, 0x0174,
-    0x0129, 0x00DB,
-    0x008E, 0x0046,
-    0x000C, 0x00E2,
-    0x00CB, 0x00C0,
-    0x00C4, 0x00CF,
-    0x00DE, 0x00EC,
-    0x00FC, 0x0008,
-    0x000F, 0x0013,
-    0x0013, 0x000F,
-    0x000C, 0x0008,
-    0x0001
-};
-
-static struct {
+typedef struct {
     // total size: 0x58
     unsigned short DispPosX; // offset 0x0, size 0x2
     unsigned short DispPosY; // offset 0x2, size 0x2
@@ -106,7 +68,52 @@ static struct {
     unsigned long rtfbb; // offset 0x4C, size 0x4
     unsigned long rbfbb; // offset 0x50, size 0x4
     VITiming *timing; // offset 0x54, size 0x4
-} HorVer; // size: 0x58, address: 0xF0
+} SomeVIStruct;
+
+static unsigned long retraceCount; // size: 0x4, address: 0x0
+static unsigned long changeMode; // size: 0x4, address: 0x4
+static unsigned long flushFlag; // size: 0x4, address: 0x8
+static struct OSThreadQueue retraceQueue; // size: 0x8, address: 0xC
+static void (*PreCB)(unsigned long); // size: 0x4, address: 0x14
+static void (*PostCB)(unsigned long); // size: 0x4, address: 0x18
+static unsigned long encoderType; // size: 0x4, address: 0x1C
+static signed short displayOffsetH; // size: 0x2, address: 0x20
+static signed short displayOffsetV; // size: 0x2, address: 0x22
+static volatile u64 changed; // size: 0x8, address: 0x28
+static u16 regs[59]; // size: 0x76, address: 0x0
+static volatile u64 shdwChanged; // size: 0x8, address: 0x30
+static u16 shdwRegs[59]; // size: 0x76, address: 0x78
+
+#define MARK_CHANGED(index) (changed |= 1LL << (63 - (index)))
+
+static VITiming timing[7] =
+{
+    { 6, 240, 24, 25, 3, 2, 12, 13, 12, 13, 520, 519, 520, 519, 525, 429, 64, 71, 105, 162, 373, 122, 412 },
+    { 6, 240, 24, 24, 4, 4, 12, 12, 12, 12, 520, 520, 520, 520, 526, 429, 64, 71, 105, 162, 373, 122, 412 },
+    { 5, 287, 35, 36, 1, 0, 13, 12, 11, 10, 619, 618, 617, 620, 625, 432, 64, 75, 106, 172, 380, 133, 420 },
+    { 5, 287, 35, 35, 2, 2, 13, 11, 13, 11, 619, 621, 619, 621, 626, 432, 64, 75, 106, 172, 380, 133, 420 },
+    { 6, 240, 24, 25, 3, 2, 16, 15, 14, 13, 518, 517, 516, 519, 525, 429, 64, 78, 112, 162, 373, 122, 412 },
+    { 6, 240, 24, 24, 4, 4, 16, 14, 16, 14, 518, 520, 518, 520, 526, 429, 64, 78, 112, 162, 373, 122, 412 },
+    { 12, 480, 44, 44, 10, 10, 24, 24, 24, 24, 1038, 1038, 1038, 1038, 1050, 429, 64, 71, 105, 162, 373, 122, 496 },
+};
+static u16 taps[25] = {
+    0x01F0, 0x01DC,
+    0x01AE, 0x0174,
+    0x0129, 0x00DB,
+    0x008E, 0x0046,
+    0x000C, 0x00E2,
+    0x00CB, 0x00C0,
+    0x00C4, 0x00CF,
+    0x00DE, 0x00EC,
+    0x00FC, 0x0008,
+    0x000F, 0x0013,
+    0x0013, 0x000F,
+    0x000C, 0x0008,
+    0x0001
+};
+
+static SomeVIStruct HorVer; // size: 0x58, address: 0xF0
+static u32 FBSet;
 
 static u32 getCurrentFieldEvenOdd(void);
 
@@ -439,8 +446,11 @@ void VIWaitForRetrace(void)
 
 static void setInterruptRegs(VITiming *tm)
 {
-    u16 vct;
-    u16 hct;
+#if DEBUG
+    u16 vct, hct;
+#else
+    u16 hct, vct;
+#endif
     u16 borrow;
 
     vct = tm->nhlines / 2;
@@ -452,10 +462,10 @@ static void setInterruptRegs(VITiming *tm)
     }
     vct++;
     hct++;
-    regs[0x19] = (u16)(u32)hct;
-    changed |= 0x4000000000;
-    regs[0x18] = vct | 0x1000;
-    changed |= 0x8000000000;
+    regs[25] = (u16)(u32)hct;
+    MARK_CHANGED(25);
+    regs[24] = vct | 0x1000;
+    MARK_CHANGED(24);
 
     vct;
 }
@@ -463,7 +473,7 @@ static void setInterruptRegs(VITiming *tm)
 static void setPicConfig(u16 fbSizeX, VIXFBMode xfbMode, u16 panPosX, u16 panSizeX, u8 *wordPerLine, u8 *std, u8 *wpl, u8 *xof)
 {
     *wordPerLine = (fbSizeX + 15) / 16;
-    *std = (xfbMode == VI_XFBMODE_SF) ? *wordPerLine : (u8)(*wordPerLine << 1);
+    *std = (xfbMode == VI_XFBMODE_SF) ? *wordPerLine : (u8)(*wordPerLine * 2);
     *xof = panPosX % 16;
     *wpl = (*xof + panSizeX + 15) / 16;
     regs[0x24] = *std | (*wpl << 8);
@@ -488,7 +498,7 @@ static void setBBIntervalRegs(VITiming *tm)
 
     val = tm->bs4 | (tm->be4 << 5);
     regs[12] = val;
-    changed |= 0x8000000000000;
+    changed |= (1LL << (63-12));
 }
 
 static void setScalingRegs(u16 panSizeX, u16 dispSizeX, int threeD)
@@ -506,4 +516,252 @@ static void setScalingRegs(u16 panSizeX, u16 dispSizeX, int threeD)
         regs[37] = 0x100;
         changed |= 0x04000000;
     }
+}
+
+static void calcFbbs(u32 bufAddr, u16 panPosX, u16 panPosY, u8 wordPerLine, VIXFBMode xfbMode, u16 dispPosY, u32 *tfbb, u32 *bfbb)
+{
+    u32 bytesPerLine;
+    u32 xoffInWords;
+    u32 tmp;
+
+    xoffInWords = (panPosX & ~0xF) >> 4;
+    bytesPerLine = (wordPerLine & 0xFF) << 5;
+    *tfbb = bufAddr + (xoffInWords << 5) + (bytesPerLine * panPosY);
+    *bfbb = (xfbMode == VI_XFBMODE_SF) ? *tfbb : *tfbb + bytesPerLine;
+    if (dispPosY % 2 == 1) {
+        tmp = *tfbb;
+        *tfbb = *bfbb;
+        *bfbb = tmp;
+    }
+    *tfbb &= 0x3FFFFFFF;
+    *bfbb &= 0x3FFFFFFF;
+}
+
+static void setFbbRegs(SomeVIStruct *HorVer, u32 *tfbb, u32 *bfbb, u32 *rtfbb, u32 *rbfbb)
+{
+    u32 shifted;
+
+    calcFbbs(HorVer->bufAddr, HorVer->PanPosX, HorVer->AdjustedPanPosY, HorVer->wordPerLine, HorVer->FBMode, HorVer->AdjustedDispPosY, tfbb, bfbb);
+    if (HorVer->threeD != 0) {
+        calcFbbs(HorVer->rbufAddr, HorVer->PanPosX, HorVer->AdjustedPanPosY, HorVer->wordPerLine, HorVer->FBMode, HorVer->AdjustedDispPosY, rtfbb, rbfbb);
+    }
+    if (*tfbb < 0x01000000U && *bfbb < 0x01000000U && *rtfbb < 0x01000000U && *rbfbb < 0x01000000U) {
+        shifted = 0;
+    } else {
+        shifted = 1;
+    }
+    if (shifted) {
+        *tfbb >>= 5;
+        *bfbb >>= 5;
+        *rtfbb >>= 5;
+        *rbfbb >>= 5;
+    }
+
+    regs[15] = *tfbb;
+    MARK_CHANGED(15);
+    regs[14] = (shifted << 12) | ((*tfbb >> 16) | (HorVer->xof << 8));
+    MARK_CHANGED(14);
+    regs[19] = *bfbb;
+    MARK_CHANGED(19);
+    regs[18] = (*bfbb >> 16);
+    MARK_CHANGED(18);
+    if (HorVer->threeD != 0) {
+        regs[17] = *rtfbb;
+        MARK_CHANGED(17);
+        regs[16] = *rtfbb >> 16;
+        MARK_CHANGED(16);
+        regs[21] = *rbfbb;
+        MARK_CHANGED(21);
+        regs[20] = *rbfbb >> 16;
+        MARK_CHANGED(20);
+    }
+}
+
+static void setHorizontalRegs(VITiming *tm, u16 dispPosX, u16 dispSizeX)
+{
+    u32 hbe;
+    u32 hbs;
+    u32 hbeLo;
+    u32 hbeHi;
+
+    regs[3] = (u16)(u32)tm->hlw;
+    MARK_CHANGED(3);
+    regs[2] = tm->hce | (tm->hcs << 8);
+    MARK_CHANGED(2);
+    hbe = tm->hbe640 - 40 + dispPosX;
+    hbs = tm->hbs640 + 40 + dispPosX - (720 - dispSizeX);
+    hbeLo = hbe & 0x1FF;
+    hbeHi = hbe >> 9;
+    regs[5] = tm->hsy | (hbeLo << 7);
+    MARK_CHANGED(5);
+    regs[4] = hbeHi | (hbs * 2);
+    MARK_CHANGED(4);
+}
+
+static void setVerticalRegs(u16 dispPosY, u16 dispSizeY, u8 equ, u16 acv, u16 prbOdd, u16 prbEven, u16 psbOdd, u16 psbEven, int black)
+{
+    u16 actualPrbOdd;
+    u16 actualPrbEven;
+    u16 actualPsbOdd;
+    u16 actualPsbEven;
+    u16 actualAcv;
+    u16 c;
+    u16 d;
+
+    if (equ >= 10) {
+        c = 1;
+        d = 2;
+    } else {
+        c = 2;
+        d = 1;
+    }
+    if ((dispPosY % 2) == 0) {
+        actualPrbOdd = prbOdd + (d * dispPosY);
+        actualPsbOdd = psbOdd + (d * (((c * acv) - dispSizeY) - dispPosY));
+        actualPrbEven = prbEven + (d * dispPosY);
+        actualPsbEven = psbEven + (d * (((c * acv) - dispSizeY) - dispPosY));
+    } else {
+        actualPrbOdd = prbEven + (d * dispPosY);
+        actualPsbOdd = psbEven + (d * (((c * acv) - dispSizeY) - dispPosY));
+        actualPrbEven = prbOdd + (d * dispPosY);
+        actualPsbEven = psbOdd + (d * (((c * acv) - dispSizeY) - dispPosY));
+    }
+    actualAcv = dispSizeY / c;
+    if (black) {
+        actualPrbOdd += dispSizeY - 2;
+        actualPsbOdd += 2;
+        actualPrbEven += dispSizeY - 2;
+        actualPsbEven += 2;
+        actualAcv = 0;
+    }
+    regs[0] = equ | (actualAcv << 4);
+    MARK_CHANGED(0);
+    regs[7] = (u16)(u32)actualPrbOdd;
+    MARK_CHANGED(7);
+    regs[6] = (u16)(u32)actualPsbOdd;
+    MARK_CHANGED(6);
+    regs[9] = (u16)(u32)actualPrbEven;
+    MARK_CHANGED(9);
+    regs[8] = (u16)(u32)actualPsbEven;
+    MARK_CHANGED(8);
+}
+
+void VIConfigure(GXRenderModeObj *rm)
+{
+    VITiming *tm;
+    u32 reg;
+    int enabled;
+    u32 newNonInter;
+    u32 tvInBootrom;
+    u32 tvInGame;
+
+    ASSERTMSGLINEV(0x601, (rm->viHeight & 1) == 0,
+        "VIConfigure(): Odd number(%d) is specified to viHeight\n",
+        rm->viHeight);
+
+    if (rm->xFBmode == VI_XFBMODE_DF || rm->viTVmode == VI_TVMODE_NTSC_PROG) {
+        ASSERTMSGLINEV(0x607, rm->xfbHeight == rm->viHeight,
+            "VIConfigure(): xfbHeight(%d) is not equal to viHeight(%d) when DF XFB mode or progressive mode is specified\n",
+            rm->xfbHeight, rm->viHeight);
+    }
+    if (rm->xFBmode == VI_XFBMODE_SF && rm->viTVmode != VI_TVMODE_NTSC_PROG) {
+        ASSERTMSGLINEV(0x60E, rm->viHeight == rm->xfbHeight * 2,
+            "VIConfigure(): xfbHeight(%d) is not as twice as viHeight(%d) when SF XFB mode is specified\n",
+            rm->xfbHeight, rm->viHeight);
+    }
+
+    enabled = OSDisableInterrupts();
+    if (rm->viTVmode == VI_TVMODE_NTSC_PROG) {
+        HorVer.nonInter = 2;
+    } else {
+        newNonInter = rm->viTVmode & 1;
+        if (HorVer.nonInter != newNonInter) {
+            changeMode = 1;
+        }
+        HorVer.nonInter = newNonInter;
+    }
+
+    tvInBootrom = VIGetTvFormat();
+    tvInGame = (u32)rm->viTVmode >> 2;
+    ASSERTMSGLINEV(0x635, tvInBootrom == tvInGame || (tvInBootrom == 2 && tvInGame == 0) || (tvInBootrom == 0 && tvInGame == 2),
+        "Doesn't match TV format: TV format in bootrom is %d but TV format specified in the game is %d (0:NTSC, 1:PAL, 2:MPAL)\n"
+        /* BUG: forgot to pass in additional parameters! */);
+
+    HorVer.tv        = tvInBootrom;
+    HorVer.DispPosX  = rm->viXOrigin;
+    HorVer.DispPosY  = (HorVer.nonInter == 1) ? (u16)(rm->viYOrigin * 2) : rm->viYOrigin;
+    HorVer.DispSizeX = rm->viWidth;
+    HorVer.FBSizeX   = rm->fbWidth;
+    HorVer.FBSizeY   = rm->xfbHeight;
+    HorVer.FBMode    = rm->xFBmode;
+    HorVer.PanSizeX  = HorVer.FBSizeX;
+    HorVer.PanSizeY  = HorVer.FBSizeY;
+    HorVer.PanPosX   = 0;
+    HorVer.PanPosY   = 0;
+    HorVer.DispSizeY = (HorVer.nonInter == 2) ? HorVer.PanSizeY
+                     : (HorVer.FBMode == VI_XFBMODE_SF) ? (u16)(HorVer.PanSizeY * 2)
+                     : HorVer.PanSizeY;
+    tm = getTiming(rm->viTVmode);
+    HorVer.timing = tm;
+    AdjustPosition(tm->acv);
+    ASSERTMSGLINEV(0x654, rm->viXOrigin <= tm->hlw + 40 - tm->hbe640,
+        "VIConfigure(): viXOrigin(%d) cannot be greater than %d in this TV mode\n",
+        rm->viXOrigin, tm->hlw + 40 - tm->hbe640);
+    ASSERTMSGLINEV(0x659,  rm->viXOrigin + rm->viWidth >= 0x2A8 - tm->hbs640,
+        "VIConfigure(): viXOrigin + viWidth (%d) cannot be less than %d in this TV mode\n",
+        rm->viXOrigin + rm->viWidth, 0x2A8 - tm->hbs640);
+
+    if (encoderType == 0) {
+        HorVer.tv = 3U;
+    }
+    setInterruptRegs(tm);
+    reg = regs[1];
+    SET_REG_FIELD(0x66A, reg, 1, 2, (HorVer.nonInter & 1));
+    SET_REG_FIELD(0x66B, reg, 2, 8, HorVer.tv);
+    regs[1] = reg;
+    MARK_CHANGED(1);
+    setScalingRegs(HorVer.PanSizeX, HorVer.DispSizeX, HorVer.threeD);
+    setHorizontalRegs(tm, HorVer.AdjustedDispPosX, HorVer.DispSizeX);
+    setBBIntervalRegs(tm);
+    setPicConfig(HorVer.FBSizeX, HorVer.FBMode, HorVer.PanPosX, HorVer.PanSizeX, &HorVer.wordPerLine, &HorVer.std, &HorVer.wpl, &HorVer.xof);
+    if (FBSet != 0) {
+        setFbbRegs(&HorVer, &HorVer.tfbb, &HorVer.bfbb, &HorVer.rtfbb, &HorVer.rbfbb);
+    }
+    setVerticalRegs(HorVer.AdjustedDispPosY, HorVer.AdjustedDispSizeY, tm->equ, tm->acv, tm->prbOdd, tm->prbEven, tm->psbOdd, tm->psbEven, HorVer.black);
+    OSRestoreInterrupts(enabled);
+}
+
+void VIConfigurePan(u16 xOrg, u16 yOrg, u16 width, u16 height)
+{
+    BOOL enabled;
+    VITiming *tm;
+
+#if DEBUG
+    ASSERTMSGLINEV(0x69C, (xOrg & 1) == 0,
+        "VIConfigurePan(): Odd number(%d) is specified to xOrg\n",
+        xOrg);
+    if (HorVer.FBMode == VI_XFBMODE_DF) {
+        ASSERTMSGLINEV(0x6A1, (height & 1) == 0,
+            "VIConfigurePan(): Odd number(%d) is specified to height when DF XFB mode\n",
+            height);
+    }
+#endif
+    enabled = OSDisableInterrupts();
+    HorVer.PanPosX = xOrg;
+    HorVer.PanPosY = yOrg;
+    HorVer.PanSizeX = width;
+    HorVer.PanSizeY = height;
+    HorVer.DispSizeY = (HorVer.nonInter == 2) ? HorVer.PanSizeY
+                     : (HorVer.FBMode == VI_XFBMODE_SF) ? (u16)(HorVer.PanSizeY * 2)
+                     : HorVer.PanSizeY;
+    tm = HorVer.timing;
+    AdjustPosition(tm->acv);
+    //HorVer.FBMode = 0;
+    setScalingRegs(HorVer.PanSizeX, HorVer.DispSizeX, HorVer.threeD);
+    setPicConfig(HorVer.FBSizeX, HorVer.FBMode, HorVer.PanPosX, HorVer.PanSizeX, &HorVer.wordPerLine, &HorVer.std, &HorVer.wpl, &HorVer.xof);
+    if (FBSet != 0) {
+        setFbbRegs(&HorVer, &HorVer.tfbb, &HorVer.bfbb, &HorVer.rtfbb, &HorVer.rbfbb);
+    }
+    setVerticalRegs(HorVer.AdjustedDispPosY, HorVer.DispSizeY, tm->equ, tm->acv, tm->prbOdd, tm->prbEven, tm->psbOdd, tm->psbEven, HorVer.black);
+    OSRestoreInterrupts(enabled);
 }
