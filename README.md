@@ -20,7 +20,7 @@ Currently this repository supports building the following libraries:
 | axfx         | :x: |
 | base         | :x: |
 | card         | :heavy_check_mark: |
-| db           | :x: |
+| db           | :heavy_check_mark: |
 | demo         | :x: |
 | dolformat    | :x: |
 | dsp          | :x: |
