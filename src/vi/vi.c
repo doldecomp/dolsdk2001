@@ -92,7 +92,7 @@ static VITiming timing[7] =
     { 5, 287, 35, 35, 2, 2, 13, 11, 13, 11, 619, 621, 619, 621, 626, 432, 64, 75, 106, 172, 380, 133, 420 },
     { 6, 240, 24, 25, 3, 2, 16, 15, 14, 13, 518, 517, 516, 519, 525, 429, 64, 78, 112, 162, 373, 122, 412 },
     { 6, 240, 24, 24, 4, 4, 16, 14, 16, 14, 518, 520, 518, 520, 526, 429, 64, 78, 112, 162, 373, 122, 412 },
-    { 12, 480, 44, 44, 10, 10, 24, 24, 24, 24, 1038, 1038, 1038, 1038, 1050, 429, 64, 71, 105, 162, 373, 122, 496 },
+    { 12, 480, 44, 44, 10, 10, 24, 24, 24, 24, 1038, 1038, 1038, 1038, 1050, 429, 64, 71, 105, 162, 373, 122, 412 },
 };
 static u16 taps[25] = {
     0x01F0, 0x01DC,
@@ -555,20 +555,20 @@ static void setFbbRegs(SomeVIStruct *HorVer, u32 *tfbb, u32 *bfbb, u32 *rtfbb, u
         *rbfbb >>= 5;
     }
 
-    regs[15] = *tfbb;
+    regs[15] = (u16)*tfbb & 0xFFFF;
     MARK_CHANGED(15);
     regs[14] = (shifted << 12) | ((*tfbb >> 16) | (HorVer->xof << 8));
     MARK_CHANGED(14);
-    regs[19] = *bfbb;
+    regs[19] = (u16)*bfbb & 0xFFFF;
     MARK_CHANGED(19);
     regs[18] = (*bfbb >> 16);
     MARK_CHANGED(18);
     if (HorVer->threeD != 0) {
-        regs[17] = *rtfbb;
+        regs[17] = (u16)*rtfbb & 0xFFFF;
         MARK_CHANGED(17);
         regs[16] = *rtfbb >> 16;
         MARK_CHANGED(16);
-        regs[21] = *rbfbb;
+        regs[21] = (u16)*rbfbb & 0xFFFF;
         MARK_CHANGED(21);
         regs[20] = *rbfbb >> 16;
         MARK_CHANGED(20);
