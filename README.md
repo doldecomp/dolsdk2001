@@ -23,13 +23,13 @@ Currently this repository supports building the following libraries:
 | db           | :heavy_check_mark: |
 | demo         | :x: |
 | dolformat    | :x: |
-| dsp          | :x: |
+| dsp          | :heavy_check_mark: |
 | dtk          | :x: |
 | dvd          | :warning: |
 | fileCache    | :x: |
 | G2D          | :x: |
 | gx           | :heavy_check_mark: |
-| hio          | :x: |
+| hio          | :heavy_check_mark: |
 | mcc          | :x: |
 | mix          | :x: |
 | mtx          | :x: |
