@@ -3,10 +3,10 @@
 #include <dolphin/hw_regs.h>
 #include <macros.h>
 
-static s32 Chan = -1; // size: 0x4, address: 0x0
-static void (*ExiCallback)(void); // size: 0x4, address: 0x0
-static void (*TxCallback)(void); // size: 0x4, address: 0x4
-static void (*RxCallback)(void); // size: 0x4, address: 0x8
+static s32 Chan = -1;
+static void (*ExiCallback)(void);
+static void (*TxCallback)(void);
+static void (*RxCallback)(void);
 
 static void ExtHandler(s32 chan, OSContext *context)
 {
