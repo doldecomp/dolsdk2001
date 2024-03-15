@@ -1,4 +1,4 @@
-#include <dolphin.h>
+#include <dolphin/exi.h>
 #include <dolphin/os.h>
 
 static unsigned long serEnabled; // .bss

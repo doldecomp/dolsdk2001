@@ -1,6 +1,8 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+#include "__os.h"
+
 #define ENQUEUE_MUTEX(mutex, queue, link)        \
     do {                                         \
         struct OSMutex * __prev = (queue)->tail; \
@@ -48,7 +50,6 @@ struct OSCond {
 void OSInitMutex(struct OSMutex * mutex);
 void OSLockMutex(struct OSMutex * mutex);
 void OSUnlockMutex(struct OSMutex * mutex);
-void __OSUnlockAllMutex(struct OSThread * thread);
 int OSTryLockMutex(struct OSMutex * mutex);
 void OSInitCond(struct OSCond * cond);
 void OSWaitCond(struct OSCond * cond, struct OSMutex * mutex);

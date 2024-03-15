@@ -5,20 +5,6 @@
 
 #include "__gx.h"
 
-struct __GXFifoObj {
-    // total size: 0x24
-    unsigned char * base; // offset 0x0, size 0x4
-    unsigned char * top; // offset 0x4, size 0x4
-    unsigned long size; // offset 0x8, size 0x4
-    unsigned long hiWatermark; // offset 0xC, size 0x4
-    unsigned long loWatermark; // offset 0x10, size 0x4
-    void * rdPtr; // offset 0x14, size 0x4
-    void * wrPtr; // offset 0x18, size 0x4
-    long count; // offset 0x1C, size 0x4
-    unsigned char bind_cpu; // offset 0x20, size 0x1
-    unsigned char bind_gp; // offset 0x21, size 0x1
-};
-
 static struct OSThread * __GXCurrentThread; // size: 0x4, address: 0x0
 static unsigned char CPGPLinked; // size: 0x1, address: 0x4
 static int GXOverflowSuspendInProgress; // size: 0x4, address: 0x8

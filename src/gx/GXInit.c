@@ -1,5 +1,6 @@
 #include <string.h>
 
+#include <dolphin/base/PPCArch.h>
 #include <dolphin/gx.h>
 #include <dolphin/vi.h>
 
@@ -13,7 +14,7 @@ u16 *__peReg;
 u16 *__cpReg;
 u32 *__piReg;
 #if DEBUG
-u8 __GXinBegin; // size: 0x1, address: 0x0
+u8 __GXinBegin;
 #endif
 
 asm int IsWriteGatherBufferEmpty(void)

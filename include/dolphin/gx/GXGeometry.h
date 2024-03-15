@@ -12,7 +12,7 @@ extern "C" {
 void GXSetVtxDesc(GXAttr attr, GXAttrType type);
 void GXSetVtxDescv(GXVtxDescList * attrPtr);
 void GXGetVtxDesc(GXAttr attr, GXAttrType *type);
-void GXGetVtxDescv(GXVtxDescList *vcd);;
+void GXGetVtxDescv(GXVtxDescList *vcd);
 void GXClearVtxDesc(void);
 void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt,
     GXCompType type, u8 frac);

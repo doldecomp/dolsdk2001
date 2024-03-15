@@ -1,12 +1,6 @@
+#include <dolphin/base/PPCArch.h>
+#include <dolphin/db.h>
 #include <dolphin/os.h>
-
-struct DBInterface
-{
-    u32 bPresent;
-    u32 exceptionMask;
-    void (*ExceptionDestination)(void);
-    void *exceptionReturn;
-};
 
 u8 DBStack[4096];
 u8 *DBStackEnd = DBStack + 4088;

@@ -24,6 +24,10 @@ extern "C" {
 #include <dolphin/os/OSMemory.h>
 #include <dolphin/os/OSException.h>
 #include <dolphin/os/OSAlarm.h>
+#include <dolphin/os/OSDC.h>
+#include <dolphin/os/OSIC.h>
+#include <dolphin/os/OSLC.h>
+#include <dolphin/os/OSL2.h>
 
 // private macro, maybe shouldn't be defined here?
 #define OFFSET(addr, align) (((u32)(addr) & ((align)-1)))
@@ -72,6 +76,8 @@ void *OSGetArenaHi(void);
 void *OSGetArenaLo(void);
 void OSSetArenaHi(void *);
 void OSSetArenaLo(void *);
+void *OSAllocFromArenaLo(u32 size, u32 align);
+void *OSAllocFromArenaHi(u32 size, u32 align);
 
 u32 OSGetPhysicalMemSize(void);
 

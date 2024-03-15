@@ -89,10 +89,7 @@ typedef u32  OSInterruptMask;
    OS_INTERRUPTMASK_PI_PE_TOKEN | OS_INTERRUPTMASK_PI_PE_FINISH | OS_INTERRUPTMASK_PI_DEBUG |      \
    OS_INTERRUPTMASK_PI_HSP)
 
-typedef s16 __OSInterrupt;
 typedef void (*__OSInterruptHandler)(__OSInterrupt interrupt, OSContext* context);
-
-typedef u32 OSInterruptMask;
 
 extern volatile __OSInterrupt __OSLastInterrupt;
 extern volatile u32 __OSLastInterruptSrr0;

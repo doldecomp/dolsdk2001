@@ -155,5 +155,11 @@ u32 OSSaveContext(OSContext *context);
 void OSClearContext(OSContext *context);
 OSContext *OSGetCurrentContext(void);
 void OSSetCurrentContext(OSContext *context);
+void OSLoadFPUContext(OSContext *fpuContext);
+void OSSaveFPUContext(OSContext *fpuContext);
+u32 OSSwitchStack(u32 newsp);
+int OSSwitchFiber(u32 pc, u32 newsp);
+void OSInitContext(OSContext *context, u32 pc, u32 newsp);
+void OSFillFPUContext(OSContext *context);
 
 #endif

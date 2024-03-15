@@ -1,5 +1,6 @@
-#include <dolphin.h>
+#include <dolphin/exi.h>
 #include <dolphin/os.h>
+#include <macros.h>
 
 // internal include
 #include "__os.h"
