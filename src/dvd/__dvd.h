@@ -3,6 +3,12 @@
 
 #include <dolphin/dvd.h>
 
+// dvdfs.c
+extern struct OSThreadQueue __DVDThreadQueue;
+extern unsigned long __DVDLongFileNameFlag;
+
+void __DVDFSInit();
+
 // dvdlow.c
 void __DVDInterruptHandler(int unused, struct OSContext * context);
 

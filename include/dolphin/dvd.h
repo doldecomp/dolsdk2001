@@ -68,18 +68,8 @@ typedef struct DVDBB2 {
 } DVDBB2;
 
 void DVDInit(void);
-BOOL DVDOpen(char *, DVDFileInfo *);
-BOOL DVDClose(DVDFileInfo *);
-BOOL DVDChangeDir(char *);
-BOOL DVDFastOpen(s32 entrynum, DVDFileInfo *fileInfo);
-BOOL DVDReadAsyncPrio(DVDFileInfo *fileInfo, void *addr, s32 length, s32 offset,
-    DVDCallback callback, s32 prio);
-s32 DVDConvertPathToEntrynum(char *pathPtr);
 s32 DVDCancel(DVDCommandBlock *block);
 s32 DVDGetDriveStatus(void);
-BOOL DVDOpenDir(char *dirName, DVDDir *dir);
-BOOL DVDCloseDir(DVDDir *dir);
-BOOL DVDReadDir(DVDDir *dir, DVDDirEntry *dirent);
 void DVDDumpWaitingQueue(void);
 int DVDLowRead(void * addr, unsigned long length, unsigned long offset, void (* callback)(unsigned long));
 int DVDLowSeek(unsigned long offset, void (* callback)(unsigned long));
@@ -97,13 +87,34 @@ int DVDLowBreak();
 void (* DVDLowClearCallback())(unsigned long);
 unsigned long DVDLowGetCoverStatus();
 
+// dvdfs.c
+s32 DVDConvertPathToEntrynum(char* pathPtr);
+BOOL DVDFastOpen(s32 entrynum, DVDFileInfo* fileInfo);
+BOOL DVDOpen(char* fileName, DVDFileInfo* fileInfo);
+BOOL DVDClose(DVDFileInfo* fileInfo);
+BOOL DVDGetCurrentDir(char* path, u32 maxlen);
+BOOL DVDChangeDir(char* dirName);
+BOOL DVDReadAsyncPrio(DVDFileInfo* fileInfo, void* addr, s32 length, s32 offset,
+                      DVDCallback callback, s32 prio);
+long DVDReadPrio(struct DVDFileInfo * fileInfo, void * addr, long length, long offset, long prio);
+int DVDSeekAsyncPrio(struct DVDFileInfo * fileInfo, long offset, void (* callback)(long, struct DVDFileInfo *), long prio);
+long DVDSeekPrio(struct DVDFileInfo * fileInfo, long offset, long prio);
+long DVDGetFileInfoStatus(struct DVDFileInfo * fileInfo);
+int DVDOpenDir(char * dirName, DVDDir * dir);
+int DVDReadDir(DVDDir * dir, DVDDirEntry* dirent);
+int DVDCloseDir(DVDDir* dir);
+void * DVDGetFSTLocation();
+BOOL DVDPrepareStreamAsync(DVDFileInfo* fileInfo, u32 length, u32 offset, DVDCallback callback);
+s32 DVDPrepareStream(DVDFileInfo* fileInfo, u32 length, u32 offset);
+s32 DVDGetTransferredSize(DVDFileInfo* fileinfo);
+
 #define DVDReadAsync(fileInfo, addr, length, offset, callback) \
     DVDReadAsyncPrio((fileInfo), (addr), (length), (offset), (callback), 2)
 
 #define DVD_RESULT_GOOD        0
 #define DVD_RESULT_FATAL_ERROR -1
 #define DVD_RESULT_IGNORED     -2
-#define DVD_RESULT_CANCELED    -3
+#define DVD_RESULT_CANCELED    -6
 
 #define DVD_STATE_FATAL_ERROR   -1
 #define DVD_STATE_END            0
@@ -118,6 +129,8 @@ unsigned long DVDLowGetCoverStatus();
 #define DVD_STATE_IGNORED        9
 #define DVD_STATE_CANCELED       10
 #define DVD_STATE_RETRY          11
+
+#define DVD_MIN_TRANSFER_SIZE    32
 
 // unidentified externs
 extern int DVDReadAbsAsyncForBS(struct DVDCommandBlock * block, void * addr, long length, long offset, void (* callback)(long, struct DVDCommandBlock *));
