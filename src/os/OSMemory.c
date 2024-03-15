@@ -2,7 +2,7 @@
 #include <dolphin/os.h>
 #include <dolphin/dvd.h>
 
-unsigned long OSGetPhysicalMemSize() {
+u32 OSGetPhysicalMemSize(void) {
 #if DEBUG
     OSBootInfo * BootInfo = (OSBootInfo *)OSPhysicalToCached(0);
 
@@ -12,7 +12,7 @@ unsigned long OSGetPhysicalMemSize() {
 #endif
 }
 
-unsigned long OSGetConsoleSimulatedMemSize() {
+u32 OSGetConsoleSimulatedMemSize(void) {
 #if DEBUG
     unsigned long * memSize = (unsigned long *)OSPhysicalToCached(0xF0);
 

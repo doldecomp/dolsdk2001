@@ -1,14 +1,14 @@
 #include <dolphin.h>
+#include <dolphin/db.h>
 #include <dolphin/os.h>
 
-extern void DBPrintf(char*, ...);
+#include "__os.h"
 
 // Can't use this due to weird condition register issues
 //#include "asm_types.h"
 #define HID2 920
 
-void L2Disable(void);
-void L2GlobalInvalidate(void);
+void DMAErrorHandler(OSError error, OSContext* context, ...);
 
 /* clang-format off */
 asm void DCFlashInvalidate(void) {

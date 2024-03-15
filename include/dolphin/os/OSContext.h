@@ -3,6 +3,10 @@
 
 #include <dolphin/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define __OS_CONTEXT_FRAME 768
 
 #define OS_CONTEXT_R0 0
@@ -161,5 +165,9 @@ u32 OSSwitchStack(u32 newsp);
 int OSSwitchFiber(u32 pc, u32 newsp);
 void OSInitContext(OSContext *context, u32 pc, u32 newsp);
 void OSFillFPUContext(OSContext *context);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

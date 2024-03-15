@@ -3,6 +3,10 @@
 
 #include <dolphin/os/OSContext.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef u16 OSError;
 typedef void (*OSErrorHandler)(OSError error, OSContext *context, ...);
 
@@ -24,5 +28,9 @@ typedef void (*OSErrorHandler)(OSError error, OSContext *context, ...);
 #define OS_ERROR_MAX                (OS_ERROR_THERMAL_INTERRUPT + 1)
 
 OSErrorHandler OSSetErrorHandler(OSError error, OSErrorHandler handler);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

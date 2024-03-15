@@ -1,9 +1,14 @@
 #ifndef _DOLPHIN_OS_H_
 #define _DOLPHIN_OS_H_
 
+#include <dolphin/types.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef s64 OSTime;
+typedef u32 OSTick;
 
 #include <dolphin/os/OSAlloc.h>
 #include <dolphin/os/OSCache.h>
@@ -21,7 +26,6 @@ extern "C" {
 #include <dolphin/os/OSSerial.h>
 #include <dolphin/os/OSRtc.h>
 #include <dolphin/os/OSMessage.h>
-#include <dolphin/os/OSMemory.h>
 #include <dolphin/os/OSException.h>
 #include <dolphin/os/OSAlarm.h>
 #include <dolphin/os/OSDC.h>
@@ -32,8 +36,8 @@ extern "C" {
 // private macro, maybe shouldn't be defined here?
 #define OFFSET(addr, align) (((u32)(addr) & ((align)-1)))
 
-typedef s64 OSTime;
-typedef u32 OSTick;
+u32 OSGetPhysicalMemSize(void);
+u32 OSGetConsoleSimulatedMemSize(void);
 
 // Upper words of the masks, since UIMM is only 16 bits
 #define OS_CACHED_REGION_PREFIX 0x8000
@@ -115,6 +119,7 @@ typedef struct OSBootInfo_s {
 OSTick OSGetTick(void);
 OSTime OSGetTime(void);
 void OSTicksToCalendarTime(OSTime ticks, OSCalendarTime *td);
+OSTime OSCalendarTimeToTicks(OSCalendarTime *td);
 BOOL OSEnableInterrupts(void);
 BOOL OSDisableInterrupts(void);
 BOOL OSRestoreInterrupts(BOOL level);
@@ -153,16 +158,19 @@ void OSPanic(char *file, int line, char *msg, ...);
 #define OSRoundUp32B(x)   (((u32)(x) + 32 - 1) & ~(32 - 1))
 #define OSRoundDown32B(x) (((u32)(x)) & ~(32 - 1))
 
-#ifdef DEBUG
-void *OSPhysicalToCached(u32 offset);
-void *OSPhysicalToUncached(u32 offset);
-u32 OSCachedToPhysical(void *offset);
-u32 OSUncachedToPhysical(void *offset);
-#else
-#define OSPhysicalToCached(offset) ((void*)((u32)(OS_BASE_CACHED + (u32)(offset))))
-#define OSPhysicalToUncached(offset) ((void*)((u32)(OS_BASE_UNCACHED + (u32)(offset))))
-#define OSCachedToPhysical(offset) ((u32)((u32)(offset) - OS_BASE_CACHED))
-#define OSUncachedToPhysical(offset) ((u32)((u32)(offset) - OS_BASE_UNCACHED))
+void *OSPhysicalToCached(u32 paddr);
+void *OSPhysicalToUncached(u32 paddr);
+u32 OSCachedToPhysical(void *caddr);
+u32 OSUncachedToPhysical(void *ucaddr);
+void *OSCachedToUncached(void *caddr);
+void *OSUncachedToCached(void *ucaddr);
+#if !DEBUG
+#define OSPhysicalToCached(paddr)    ((void*) ((u32)(OS_BASE_CACHED   + (u32)(paddr))))
+#define OSPhysicalToUncached(paddr)  ((void*) ((u32)(OS_BASE_UNCACHED + (u32)(paddr))))
+#define OSCachedToPhysical(caddr)    ((u32)   ((u32)(caddr)  - OS_BASE_CACHED))
+#define OSUncachedToPhysical(ucaddr) ((u32)   ((u32)(ucaddr) - OS_BASE_UNCACHED))
+#define OSCachedToUncached(caddr)    ((void*) ((u8*)(caddr)  + (OS_BASE_UNCACHED - OS_BASE_CACHED)))
+#define OSUncachedToCached(ucaddr)   ((void*) ((u8*)(ucaddr) - (OS_BASE_UNCACHED - OS_BASE_CACHED)))
 #endif
 
 #ifdef __cplusplus

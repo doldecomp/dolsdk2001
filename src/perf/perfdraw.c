@@ -3,6 +3,8 @@
 #include <dolphin/perf.h>
 #include "fake_tgmath.h"
 
+#include "__perf.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

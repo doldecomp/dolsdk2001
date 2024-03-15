@@ -7,8 +7,6 @@ u8 *DBStackEnd = DBStack + 4088;
 BOOL DBVerbose;
 struct DBInterface *__DBInterface;
 
-static void __DBExceptionDestination(void);
-
 void DBInit(void)
 {
     __DBInterface = OSPhysicalToCached(0x40);
@@ -44,7 +42,7 @@ asm void __DBExceptionDestination(void)
     b __DBExceptionDestinationAux
 }
 
-int __DBIsExceptionMarked(u8 exception)
+BOOL __DBIsExceptionMarked(__OSException exception)
 {
     u32 mask = (1 << exception);
     return __DBInterface->exceptionMask & mask;

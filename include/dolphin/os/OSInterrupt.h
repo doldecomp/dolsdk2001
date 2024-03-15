@@ -1,10 +1,12 @@
 #ifndef _DOLPHIN_OSINTERRUPT_H_
 #define _DOLPHIN_OSINTERRUPT_H_
 
-typedef s64 OSTime;
-
 #include <dolphin/types.h>
 #include <dolphin/os/OSException.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef s16 __OSInterrupt;
 typedef u32  OSInterruptMask;
@@ -105,5 +107,9 @@ OSInterruptMask OSGetInterruptMask(void);
 OSInterruptMask OSSetInterruptMask(OSInterruptMask mask);
 OSInterruptMask __OSMaskInterrupts(OSInterruptMask mask);
 OSInterruptMask __OSUnmaskInterrupts(OSInterruptMask mask);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

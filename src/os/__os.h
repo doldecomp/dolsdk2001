@@ -7,8 +7,6 @@
 extern char * __OSExceptionNames[15]; // D ONLY
 
 unsigned long __OSIsDebuggerPresent(void);
-__OSExceptionHandler __OSSetExceptionHandler(__OSException exception, __OSExceptionHandler handler);
-__OSExceptionHandler __OSGetExceptionHandler(__OSException exception);
 void __OSPSInit(void);
 
 // OSAlloc.c

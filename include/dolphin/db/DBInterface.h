@@ -1,6 +1,8 @@
 #ifndef _DOLPHIN_DBINTERFACE_H_
 #define _DOLPHIN_DBINTERFACE_H_
 
+#include <dolphin/os.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17,9 +19,11 @@ extern DBInterface* __DBInterface;
 
 void DBInit(void);
 void DBInitComm(int* inputFlagPtr, int* mtrCallback);
-static void __DBExceptionDestination(void);
-
-int __DBIsExceptionMarked(u8 exception);
+void __DBExceptionDestination(void);
+void __DBExceptionDestinationAux(void);
+BOOL __DBIsExceptionMarked(__OSException exception);
+void __DBMarkException(u8 exception, int value);
+void __DBSetPresent(u32 value);
 
 #ifdef __cplusplus
 }

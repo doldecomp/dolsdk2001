@@ -269,12 +269,15 @@ extern GXBool __GXinBegin;
 
 /* GXMisc.c */
 
+void __GXBypass(u32 reg);
+u16 __GXReadPEReg(u32 reg);
 void __GXPEInit(void);
 
 /* GXSave.c */
 
 void __GXShadowDispList(void *list, u32 nbytes);
 void __GXShadowIndexState(u32 idx_reg, u32 reg_data);
+void __GXPrintShadowState(void);
 
 /* GXStubs.c */
 

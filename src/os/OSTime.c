@@ -164,7 +164,7 @@ void OSTicksToCalendarTime(long long ticks, OSCalendarTime* td) {
     td->sec = secs % 60;
 }
 
-long long OSCalendarTimeToTicks(struct OSCalendarTime* td) {
+OSTime OSCalendarTimeToTicks(OSCalendarTime* td) {
     long long secs;
     int ov_mon;
     int mon;

@@ -132,6 +132,8 @@ build/release/src/perf/%.o: CFLAGS += -lang=c++
 build/debug/src/dvd/%.o: CFLAGS += -char signed
 build/release/src/dvd/%.o: CFLAGS += -char signed
 
+%/stub.o: CFLAGS += -warn off
+
 ######################## Build #############################
 
 A_FILES := $(foreach dir,$(BASEROM_DIR),$(wildcard $(dir)/*.a)) 

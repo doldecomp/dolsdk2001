@@ -4,6 +4,10 @@
 #include <dolphin/os/OSContext.h>
 #include <dolphin/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define __OS_EXCEPTION_SYSTEM_RESET         0
 #define __OS_EXCEPTION_MACHINE_CHECK        1
 #define __OS_EXCEPTION_DSI                  2
@@ -25,6 +29,9 @@
 typedef u8 __OSException;
 typedef void (*__OSExceptionHandler)(__OSException exception, OSContext* context);
 
+__OSExceptionHandler __OSSetExceptionHandler(__OSException exception, __OSExceptionHandler handler);
+__OSExceptionHandler __OSGetExceptionHandler(__OSException exception);
+
 #define OS_EXCEPTION_SAVE_GPRS(context)                                                            \
   stw r0, OS_CONTEXT_R0(context);                                                                  \
   stw r1, OS_CONTEXT_R1(context);                                                                  \
@@ -44,5 +51,9 @@ typedef void (*__OSExceptionHandler)(__OSException exception, OSContext* context
   stw r0, OS_CONTEXT_GQR6(context);                                                                \
   mfspr r0, GQR7;                                                                                  \
   stw r0, OS_CONTEXT_GQR7(context);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _DOLPHIN_OSEXCEPTION_H_
