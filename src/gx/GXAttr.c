@@ -90,7 +90,7 @@ void GXSetVtxDesc(GXAttr attr, GXAttrType type)
     gx->dirtyState |= 8;
 }
 
-void GXSetVtxDescv(GXVtxDescList * attrPtr)
+void GXSetVtxDescv(const GXVtxDescList *attrPtr)
 {
     CHECK_GXBEGIN(0xF5, "GXSetVtxDescv");
     CHECK_ATTRPTR(0xF6, attrPtr);
@@ -297,7 +297,7 @@ void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType typ
     gx->dirtyVAT |= (u8)(1 << (u8)vtxfmt);
 }
 
-void GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, GXVtxAttrFmtList *list)
+void GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, const GXVtxAttrFmtList *list)
 {
     u32 *va;
     u32 *vb;
@@ -432,7 +432,7 @@ void GXGetVtxAttrFmtv(GXVtxFmt fmt, GXVtxAttrFmtList *vat)
     vat->attr = GX_VA_NULL;
 }
 
-void GXSetArray(GXAttr attr, void *base_ptr, u8 stride)
+void GXSetArray(GXAttr attr, const void *base_ptr, u8 stride)
 {
     GXAttr cpAttr;
     unsigned long phyAddr;
@@ -456,7 +456,7 @@ void GXInvalidateVtxCache(void)
     GX_WRITE_U8(0x48);
 }
 
-void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, u8 normalize, u32 pt_texmtx)
+void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx)
 {
     u32 reg = 0;
     u32 row;

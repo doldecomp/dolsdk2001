@@ -1,6 +1,8 @@
 #include <stddef.h>
 #include <dolphin/base/PPCArch.h>
 #include <dolphin/gx.h>
+#include <dolphin/os.h>
+#include <macros.h>
 
 #include "__gx.h"
 
@@ -182,7 +184,7 @@ void GXPokeAlphaRead(GXAlphaReadMode mode)
     __peReg[4] = reg;
 }
 
-void GXPokeAlphaUpdate(u8 update_enable)
+void GXPokeAlphaUpdate(GXBool update_enable)
 {
     u32 reg;
 
@@ -208,7 +210,7 @@ void GXPokeBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor d
     __peReg[1] = reg;
 }
 
-void GXPokeColorUpdate(u8 update_enable)
+void GXPokeColorUpdate(GXBool update_enable)
 {
     u32 reg;
 
@@ -218,7 +220,7 @@ void GXPokeColorUpdate(u8 update_enable)
     __peReg[1] = reg;
 }
 
-void GXPokeDstAlpha(u8 enable, u8 alpha)
+void GXPokeDstAlpha(GXBool enable, u8 alpha)
 {
     u32 reg = 0;
 
@@ -228,7 +230,7 @@ void GXPokeDstAlpha(u8 enable, u8 alpha)
     __peReg[2] = reg;
 }
 
-void GXPokeDither(u8 dither)
+void GXPokeDither(GXBool dither)
 {
     u32 reg;
 
@@ -238,7 +240,7 @@ void GXPokeDither(u8 dither)
     __peReg[1] = reg;
 }
 
-void GXPokeZMode(u8 compare_enable, GXCompare func, u8 update_enable)
+void GXPokeZMode(GXBool compare_enable, GXCompare func, GXBool update_enable)
 {
     u32 reg = 0;
 

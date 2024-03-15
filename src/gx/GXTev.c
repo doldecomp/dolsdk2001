@@ -1,4 +1,6 @@
 #include <dolphin/gx.h>
+#include <dolphin/os.h>
+#include <macros.h>
 
 #include "__gx.h"
 
@@ -310,7 +312,7 @@ void GXSetAlphaCompare(GXCompare comp0, u8 ref0, GXAlphaOp op, GXCompare comp1, 
     gx->bpSent = 1;
 }
 
-void GXSetZTexture(GXZTexOp op,GXTexFmt fmt, u32 bias)
+void GXSetZTexture(GXZTexOp op, GXTexFmt fmt, u32 bias)
 {
     u32 zenv0;
     u32 zenv1;

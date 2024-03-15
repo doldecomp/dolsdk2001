@@ -264,8 +264,12 @@ extern u16 *__peReg;
 extern u16 *__cpReg;
 extern u32 *__piReg;
 #if DEBUG
-extern u8 __GXinBegin;
+extern GXBool __GXinBegin;
 #endif
+
+/* GXMisc.c */
+
+void __GXPEInit(void);
 
 /* GXSave.c */
 

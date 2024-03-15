@@ -617,20 +617,20 @@ typedef enum _GXTevScale
     GX_MAX_TEVSCALE
 } GXTevScale;
 
-typedef enum
+typedef enum _GXTevKColorSel
 {
-    GX_TEV_KCSEL_1 = 0x00,
-    GX_TEV_KCSEL_7_8 = 0x01,
-    GX_TEV_KCSEL_3_4 = 0x02,
-    GX_TEV_KCSEL_5_8 = 0x03,
-    GX_TEV_KCSEL_1_2 = 0x04,
-    GX_TEV_KCSEL_3_8 = 0x05,
-    GX_TEV_KCSEL_1_4 = 0x06,
-    GX_TEV_KCSEL_1_8 = 0x07,
-    GX_TEV_KCSEL_K0 = 0x0C,
-    GX_TEV_KCSEL_K1 = 0x0D,
-    GX_TEV_KCSEL_K2 = 0x0E,
-    GX_TEV_KCSEL_K3 = 0x0F,
+    GX_TEV_KCSEL_1    = 0x00,
+    GX_TEV_KCSEL_7_8  = 0x01,
+    GX_TEV_KCSEL_3_4  = 0x02,
+    GX_TEV_KCSEL_5_8  = 0x03,
+    GX_TEV_KCSEL_1_2  = 0x04,
+    GX_TEV_KCSEL_3_8  = 0x05,
+    GX_TEV_KCSEL_1_4  = 0x06,
+    GX_TEV_KCSEL_1_8  = 0x07,
+    GX_TEV_KCSEL_K0   = 0x0C,
+    GX_TEV_KCSEL_K1   = 0x0D,
+    GX_TEV_KCSEL_K2   = 0x0E,
+    GX_TEV_KCSEL_K3   = 0x0F,
     GX_TEV_KCSEL_K0_R = 0x10,
     GX_TEV_KCSEL_K1_R = 0x11,
     GX_TEV_KCSEL_K2_R = 0x12,
@@ -649,16 +649,16 @@ typedef enum
     GX_TEV_KCSEL_K3_A = 0x1F
 } GXTevKColorSel;
 
-typedef enum
+typedef enum _GXTevKAlphaSel
 {
-    GX_TEV_KASEL_1 = 0x00,
-    GX_TEV_KASEL_7_8 = 0x01,
-    GX_TEV_KASEL_3_4 = 0x02,
-    GX_TEV_KASEL_5_8 = 0x03,
-    GX_TEV_KASEL_1_2 = 0x04,
-    GX_TEV_KASEL_3_8 = 0x05,
-    GX_TEV_KASEL_1_4 = 0x06,
-    GX_TEV_KASEL_1_8 = 0x07,
+    GX_TEV_KASEL_1    = 0x00,
+    GX_TEV_KASEL_7_8  = 0x01,
+    GX_TEV_KASEL_3_4  = 0x02,
+    GX_TEV_KASEL_5_8  = 0x03,
+    GX_TEV_KASEL_1_2  = 0x04,
+    GX_TEV_KASEL_3_8  = 0x05,
+    GX_TEV_KASEL_1_4  = 0x06,
+    GX_TEV_KASEL_1_8  = 0x07,
     GX_TEV_KASEL_K0_R = 0x10,
     GX_TEV_KASEL_K1_R = 0x11,
     GX_TEV_KASEL_K2_R = 0x12,
@@ -677,7 +677,7 @@ typedef enum
     GX_TEV_KASEL_K3_A = 0x1F
 } GXTevKAlphaSel;
 
-typedef enum
+typedef enum _GXTevKColorID
 {
     GX_KCOLOR0 = 0,
     GX_KCOLOR1,
@@ -686,7 +686,7 @@ typedef enum
     GX_MAX_KCOLOR
 } GXTevKColorID;
 
-typedef enum
+typedef enum _GXZTexOp
 {
     GX_ZT_DISABLE,
     GX_ZT_ADD,
@@ -946,7 +946,8 @@ typedef enum _GXTlutSize
     GX_TLUT_16K = 1024,
 } GXTlutSize;
 
-typedef enum _GXMiscToken {
+typedef enum _GXMiscToken
+{
     GX_MT_XF_FLUSH = 1,
     GX_MT_DL_SAVE_CONTEXT = 2,
     GX_MT_NULL = 0,

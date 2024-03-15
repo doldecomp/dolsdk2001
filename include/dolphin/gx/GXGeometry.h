@@ -2,31 +2,20 @@
 #define _DOLPHIN_GX_GXGEOMETRY_H_
 
 #include <dolphin/gx/GXEnum.h>
-#include <dolphin/os.h>
-#include <macros.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void GXSetVtxDesc(GXAttr attr, GXAttrType type);
-void GXSetVtxDescv(GXVtxDescList * attrPtr);
-void GXGetVtxDesc(GXAttr attr, GXAttrType *type);
-void GXGetVtxDescv(GXVtxDescList *vcd);
+void GXSetVtxDescv(const GXVtxDescList *attrPtr);
 void GXClearVtxDesc(void);
-void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt,
-    GXCompType type, u8 frac);
-void GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, GXVtxAttrFmtList *list);
-void GXGetVtxAttrFmt(GXVtxFmt fmt, GXAttr attr, GXCompCnt *cnt, GXCompType *type, u8 *frac);
-void GXGetVtxAttrFmtv(GXVtxFmt fmt, GXVtxAttrFmtList *vat);
+void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType type, u8 frac);
+void GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, const GXVtxAttrFmtList *list);
+void GXSetArray(GXAttr attr, const void *base_ptr, u8 stride);
 void GXInvalidateVtxCache(void);
+void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx);
 void GXSetNumTexGens(u8 nTexGens);
-void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
-void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func,
-    GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 postmtx);
-void GXSetLineWidth(u8 width, GXTexOffset texOffsets);
-void GXSetPointSize(u8 pointSize, GXTexOffset texOffsets);
-void GXEnableTexOffsets(GXTexCoordID coord, GXBool line_enable, GXBool point_enable);
 
 static inline void GXSetTexCoordGen(GXTexCoordID dst_coord, GXTexGenType func,
     GXTexGenSrc src_param, u32 mtx)
@@ -34,14 +23,21 @@ static inline void GXSetTexCoordGen(GXTexCoordID dst_coord, GXTexGenType func,
     GXSetTexCoordGen2(dst_coord, func, src_param, mtx, GX_FALSE, GX_PTIDENTITY);
 }
 
+void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
 static inline void GXEnd(void)
 {
 #if DEBUG
-    extern u8 __GXinBegin;
-    ASSERTMSGLINE(0x6D, __GXinBegin, "GXEnd: called without a GXBegin");
-    __GXinBegin = 0;
+    extern GXBool __GXinBegin;
+    extern void OSPanic(char *file, int line, char *msg, ...);
+    if (!__GXinBegin) {
+        OSPanic(__FILE__, 0x6D, "GXEnd: called without a GXBegin");
+    }
+    __GXinBegin = GX_FALSE;
 #endif
 }
+void GXSetLineWidth(u8 width, GXTexOffset texOffsets);
+void GXSetPointSize(u8 pointSize, GXTexOffset texOffsets);
+void GXEnableTexOffsets(GXTexCoordID coord, u8 line_enable, u8 point_enable);
 
 #ifdef __cplusplus
 }
