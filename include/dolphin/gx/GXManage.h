@@ -10,12 +10,24 @@ extern "C" {
 typedef void (*GXDrawSyncCallback)(u16 token);
 typedef void (*GXDrawDoneCallback)(void);
 
+// Init
+BOOL IsWriteGatherBufferEmpty(void);
 GXFifoObj *GXInit(void *base, u32 size);
+
+// Misc
+void GXSetMisc(GXMiscToken token, u32 val);
+void GXFlush(void);
+void GXResetWriteGatherPipe(void);
+void GXAbortFrame(void);
+void GXSetDrawSync(u16 token);
+u16 GXReadDrawSync(void);
+void GXSetDrawDone(void);
+void GXWaitDrawDone(void);
+void GXDrawDone(void);
+void GXPixModeSync(void);
+void GXTexModeSync(void);
 GXDrawSyncCallback GXSetDrawSyncCallback(GXDrawSyncCallback cb);
 GXDrawDoneCallback GXSetDrawDoneCallback(GXDrawDoneCallback cb);
-void GXDrawDone(void);
-void GXSetDrawDone(void);
-void GXFlush(void);
 
 #ifdef __cplusplus
 }

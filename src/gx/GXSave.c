@@ -1,6 +1,7 @@
 #if DEBUG
 
 #include <dolphin/gx.h>
+#include <dolphin/os.h>
 
 #include "__gx.h"
 

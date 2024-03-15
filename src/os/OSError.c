@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <dolphin.h>
 #include <dolphin/os.h>
 

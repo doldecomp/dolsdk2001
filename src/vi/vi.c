@@ -60,8 +60,8 @@ typedef struct {
     u32 tfbb;
     u32 bfbb;
     u8 xof;
-    int black;
-    int threeD;
+    BOOL black;
+    BOOL threeD;
     u32 rbufAddr;
     u32 rtfbb;
     u32 rbfbb;
@@ -499,7 +499,7 @@ static void setBBIntervalRegs(VITiming *tm)
     changed |= (1LL << (63-12));
 }
 
-static void setScalingRegs(u16 panSizeX, u16 dispSizeX, int threeD)
+static void setScalingRegs(u16 panSizeX, u16 dispSizeX, BOOL threeD)
 {
     u32 scale;
 
@@ -540,7 +540,7 @@ static void setFbbRegs(SomeVIStruct *HorVer, u32 *tfbb, u32 *bfbb, u32 *rtfbb, u
     u32 shifted;
 
     calcFbbs(HorVer->bufAddr, HorVer->PanPosX, HorVer->AdjustedPanPosY, HorVer->wordPerLine, HorVer->FBMode, HorVer->AdjustedDispPosY, tfbb, bfbb);
-    if (HorVer->threeD != 0) {
+    if (HorVer->threeD) {
         calcFbbs(HorVer->rbufAddr, HorVer->PanPosX, HorVer->AdjustedPanPosY, HorVer->wordPerLine, HorVer->FBMode, HorVer->AdjustedDispPosY, rtfbb, rbfbb);
     }
     if (*tfbb < 0x01000000U && *bfbb < 0x01000000U && *rtfbb < 0x01000000U && *rbfbb < 0x01000000U) {
@@ -563,7 +563,7 @@ static void setFbbRegs(SomeVIStruct *HorVer, u32 *tfbb, u32 *bfbb, u32 *rtfbb, u
     MARK_CHANGED(19);
     regs[18] = (*bfbb >> 16);
     MARK_CHANGED(18);
-    if (HorVer->threeD != 0) {
+    if (HorVer->threeD) {
         regs[17] = (u16)*rtfbb & 0xFFFF;
         MARK_CHANGED(17);
         regs[16] = *rtfbb >> 16;
@@ -807,7 +807,7 @@ void VISetNextRightFrameBuffer(void *fb)
     OSRestoreInterrupts(enabled);
 }
 
-void VISetBlack(int black)
+void VISetBlack(BOOL black)
 {
     BOOL enabled;
     VITiming *tm;
@@ -819,7 +819,7 @@ void VISetBlack(int black)
     OSRestoreInterrupts(enabled);
 }
 
-void VISet3D(int threeD)
+void VISet3D(BOOL threeD)
 {
     BOOL enabled;
     u32 reg;

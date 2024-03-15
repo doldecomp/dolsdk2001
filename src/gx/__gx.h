@@ -140,16 +140,40 @@ do { \
 
 #define CHECK_GXBEGIN(line, name) ASSERTMSGLINE(line, !__GXinBegin, "'" name "' is not allowed between GXBegin/GXEnd")
 
+/* GXAttr.c */
+
+void __GXSetVCD(void);
+void __GXSetVAT(void);
+
 /* GXBump.c */
 
+void __GXUpdateBPMask(void);
 void __GXFlushTextureState(void);
 
 /* GXFifo.c */
 
+// GXFifoObj private data
+struct __GXFifoObj {
+    u8 *base;
+    u8 *top;
+    u32 size;
+    u32 hiWatermark;
+    u32 loWatermark;
+    void *rdPtr;
+    void *wrPtr;
+    s32 count;
+    u8 bind_cpu;
+    u8 bind_gp;
+};
+
+void __GXSaveCPUFifoAux(struct __GXFifoObj *realFifo);
 void __GXFifoInit(void);
+void __GXInsaneWatermark(void);
+void __GXCleanGPFifo(void);
 
 /* GXGeometry.c */
 
+void __GXSetDirtyState(void);
 void __GXSendFlushPrim(void);
 void __GXSetGenMode(void);
 
@@ -240,12 +264,34 @@ extern u16 *__peReg;
 extern u16 *__cpReg;
 extern u32 *__piReg;
 #if DEBUG
-extern u8 __GXinBegin;
+extern GXBool __GXinBegin;
 #endif
+
+/* GXMisc.c */
+
+void __GXBypass(u32 reg);
+u16 __GXReadPEReg(u32 reg);
+void __GXPEInit(void);
+
+/* GXSave.c */
+
+void __GXShadowDispList(void *list, u32 nbytes);
+void __GXShadowIndexState(u32 idx_reg, u32 reg_data);
+void __GXPrintShadowState(void);
+
+/* GXStubs.c */
+
+void __GXSetRange(float nearz, float fgSideX);
 
 /* GXTexture.c */
 
 void __GetImageTileCount(GXTexFmt fmt, u16 wd, u16 ht, u32 *rowTiles, u32 *colTiles, u32 *cmpTiles);
+void __GXSetSUTexRegs(void);
+void __GXGetSUTexSize(GXTexCoordID coord, u16 *width, u16 *height);
+
+/* GXTransform.c */
+
+void __GXSetMatrixIndex(GXAttr matIdxAttr);
 
 /* GXVerifRAS.c */
 
@@ -412,3 +458,7 @@ extern char __gxvDummyStr[256];
 void __GXVerifyGlobal(void);
 void __GXVerifyCP(GXVtxFmt fmt);
 void __GXVerifyState(GXVtxFmt vtxfmt);
+
+/* GXVerifXF.c */
+
+void __GXVerifyXF(void);

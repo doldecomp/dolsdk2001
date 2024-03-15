@@ -7,6 +7,7 @@ typedef void (*EXICallback)(s32 chan, OSContext *context);
 
 EXICallback EXISetExiCallback(s32 channel, EXICallback callback);
 
+void EXIInit(void);
 BOOL EXILock(s32 channel, u32 device, EXICallback callback);
 BOOL EXIUnlock(s32 channel);
 BOOL EXISelect(s32 channel, u32 device, u32 frequency);
@@ -21,5 +22,6 @@ BOOL EXIAttach(s32 channel, EXICallback callback);
 BOOL EXIDetach(s32 channel);
 u32 EXIGetState(s32 channel);
 s32 EXIGetID(s32 channel, u32 device, u32* id);
+void EXIProbeReset(void);
 
 #endif

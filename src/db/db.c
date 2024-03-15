@@ -1,19 +1,11 @@
+#include <dolphin/base/PPCArch.h>
+#include <dolphin/db.h>
 #include <dolphin/os.h>
-
-struct DBInterface
-{
-    u32 bPresent;
-    u32 exceptionMask;
-    void (*ExceptionDestination)(void);
-    void *exceptionReturn;
-};
 
 u8 DBStack[4096];
 u8 *DBStackEnd = DBStack + 4088;
 BOOL DBVerbose;
 struct DBInterface *__DBInterface;
-
-static void __DBExceptionDestination(void);
 
 void DBInit(void)
 {
@@ -50,7 +42,7 @@ asm void __DBExceptionDestination(void)
     b __DBExceptionDestinationAux
 }
 
-int __DBIsExceptionMarked(u8 exception)
+BOOL __DBIsExceptionMarked(__OSException exception)
 {
     u32 mask = (1 << exception);
     return __DBInterface->exceptionMask & mask;

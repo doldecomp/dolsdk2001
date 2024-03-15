@@ -2,11 +2,19 @@
 #define _DOLPHIN_OSRESETSW_H_
 
 #include <dolphin/types.h>
-#include <dolphin/hw_regs.h>
 
-void __OSResetSWInterruptHandler(short, struct OSContext *);
-void (* OSSetResetCallback(void (* callback)()))();
-int OSGetResetSwitchState();
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef void (*OSResetCallback)(void);
+
+OSResetCallback OSSetResetCallback(OSResetCallback callback);
+BOOL OSGetResetSwitchState();
 BOOL OSGetResetButtonState(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

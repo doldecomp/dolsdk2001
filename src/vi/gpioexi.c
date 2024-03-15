@@ -1,3 +1,4 @@
+#include <dolphin/exi.h>
 #include <dolphin/os.h>
 #include <dolphin/vi.h>
 

@@ -1,6 +1,10 @@
 #ifndef _DOLPHIN_OSRTC_H_
 #define _DOLPHIN_OSRTC_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // make the assert happy
 #define OS_SOUND_MODE_MONO 0
 #define OS_SOUND_MODE_STEREO 1
@@ -45,5 +49,9 @@ unsigned long OSGetVideoMode();
 void OSSetVideoMode(unsigned long mode);
 unsigned char OSGetLanguage();
 void OSSetLanguage(unsigned char language);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _DOLPHIN_OSRTC_H_

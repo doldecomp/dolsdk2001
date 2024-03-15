@@ -1,6 +1,8 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+#include "__os.h"
+
 #define ENQUEUE_THREAD(thread, queue, link)       \
     do {                                          \
         struct OSThread * __prev = (queue)->tail; \
@@ -199,7 +201,7 @@ static int __OSIsThreadActive(struct OSThread * thread) {
     return 0;
 }
 
-long OSDisableScheduler() {
+s32 OSDisableScheduler(void) {
     register int enabled;
     long count;
 
@@ -210,7 +212,7 @@ long OSDisableScheduler() {
     return count;
 }
 
-long OSEnableScheduler() {
+s32 OSEnableScheduler(void) {
     register int enabled;
     long count;
 
@@ -404,8 +406,8 @@ void OSYieldThread(void) {
 }
 
 int OSCreateThread(struct OSThread * thread, void * (* func)(void *), void * param, void * stack, unsigned long stackSize, long priority, unsigned short attr) {
-    int enabled; // r25
-    unsigned long sp; // r30
+    int enabled;
+    unsigned long sp;
 
     ASSERTMSGLINE(0x31C, ((priority >= 0) && (priority <= 0x1F)), "OSCreateThread(): priority out of range (0 <= priority <= 31).");
 
@@ -432,7 +434,7 @@ int OSCreateThread(struct OSThread * thread, void * (* func)(void *), void * par
     sp -= 8;
     ((u32*)sp)[0] = 0; 
     ((u32*)sp)[1] = 0;
-    OSInitContext(thread, func, sp);
+    OSInitContext(&thread->context, (u32)func, sp);
     thread->context.lr = (unsigned long)&OSExitThread;
     thread->context.gpr[3] = (unsigned long)param;
     thread->stackBase = stack;
