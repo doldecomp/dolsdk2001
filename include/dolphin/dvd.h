@@ -96,6 +96,7 @@ void (* DVDLowSetResetCoverCallback(void (* callback)(unsigned long)))(unsigned 
 int DVDLowBreak();
 void (* DVDLowClearCallback())(unsigned long);
 unsigned long DVDLowGetCoverStatus();
+BOOL DVDCheckDisk(void);
 
 #define DVDReadAsync(fileInfo, addr, length, offset, callback) \
     DVDReadAsyncPrio((fileInfo), (addr), (length), (offset), (callback), 2)

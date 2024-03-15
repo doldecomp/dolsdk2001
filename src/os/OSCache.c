@@ -1,17 +1,17 @@
 #include <dolphin.h>
+#include <dolphin/db.h>
 #include <dolphin/os.h>
 
-extern void DBPrintf(char*, ...);
+#include "__os.h"
 
 // Can't use this due to weird condition register issues
 //#include "asm_types.h"
 #define HID2 920
 
-void L2Disable(void);
-void L2GlobalInvalidate(void);
+void DMAErrorHandler(OSError error, OSContext* context, ...);
 
 /* clang-format off */
-asm void DCFlashInvalidate() {
+asm void DCFlashInvalidate(void) {
   nofralloc
   mfspr r3, HID0
   ori r3, r3, 0x400
@@ -19,7 +19,7 @@ asm void DCFlashInvalidate() {
   blr
 }
 
-asm void DCEnable() {
+asm void DCEnable(void) {
   nofralloc
   sync
   mfspr r3, HID0
@@ -28,7 +28,7 @@ asm void DCEnable() {
   blr
 }
 
-asm void DCDisable() {
+asm void DCDisable(void) {
   nofralloc
   sync
   mfspr r3, HID0
@@ -37,7 +37,7 @@ asm void DCDisable() {
   blr
 }
 
-asm void DCFreeze() {
+asm void DCFreeze(void) {
   nofralloc
   sync
   mfspr r3, HID0
@@ -46,7 +46,7 @@ asm void DCFreeze() {
   blr
 }
 
-asm void DCUnfreeze() {
+asm void DCUnfreeze(void) {
   nofralloc
   mfspr r3, HID0
   rlwinm r3, r3, 0, 20, 18
@@ -252,7 +252,7 @@ asm void ICInvalidateRange(register void* addr, register u32 nBytes) {
 }
 
 
-asm void ICFlashInvalidate() {
+asm void ICFlashInvalidate(void) {
   nofralloc
   mfspr r3, HID0
   ori r3, r3, 0x800
@@ -260,7 +260,7 @@ asm void ICFlashInvalidate() {
   blr
 }
 
-asm void ICEnable() {
+asm void ICEnable(void) {
   nofralloc
   isync
   mfspr r3, HID0
@@ -269,7 +269,7 @@ asm void ICEnable() {
   blr
 }
 
-asm void ICDisable() {
+asm void ICDisable(void) {
   nofralloc
   isync
   mfspr r3, HID0
@@ -278,7 +278,7 @@ asm void ICDisable() {
   blr
 }
 
-asm void ICFreeze() {
+asm void ICFreeze(void) {
   nofralloc
   isync
   mfspr r3, HID0
@@ -287,7 +287,7 @@ asm void ICFreeze() {
   blr
 }
 
-asm void ICUnfreeze() {
+asm void ICUnfreeze(void) {
   nofralloc
   mfspr r3, HID0
   rlwinm r3, r3, 0, 19, 17
@@ -301,7 +301,7 @@ asm void ICBlockInvalidate(register void * addr) {
   blr
 }
 
-asm void ICSync() {
+asm void ICSync(void) {
   nofralloc
   isync
   blr
@@ -310,7 +310,7 @@ asm void ICSync() {
 #define LC_LINES    512
 #define CACHE_LINES 1024
 
-static asm void __LCEnable() {
+static asm void __LCEnable(void) {
   nofralloc
   mfmsr   r5
   ori     r5, r5, 0x1000
@@ -372,7 +372,7 @@ _lockloop:
   blr
 }
 
-void LCEnable() {
+void LCEnable(void) {
   BOOL enabled;
 
   enabled = OSDisableInterrupts();
@@ -381,7 +381,7 @@ void LCEnable() {
 }
 
 
-asm void LCDisable() {
+asm void LCDisable(void) {
   nofralloc
   lis     r3, LC_BASE_PREFIX
   li      r4, LC_LINES
@@ -396,7 +396,7 @@ asm void LCDisable() {
   blr
 }
 
-asm void LCAllocOneTag(register int invalidate, register void * tag) {
+asm void LCAllocOneTag(register BOOL invalidate, register void * tag) {
   nofralloc
   cmpwi invalidate, 0
   beq @1
@@ -406,7 +406,7 @@ asm void LCAllocOneTag(register int invalidate, register void * tag) {
   blr
 }
 
-asm void LCAllocTags(register int invalidate, register void * startTag, register unsigned long numBlocks) {
+asm void LCAllocTags(register BOOL invalidate, register void * startTag, register u32 numBlocks) {
   nofralloc
   mflr r6
   cmplwi numBlocks, 0
@@ -457,7 +457,7 @@ asm void LCStoreBlocks(register void* destAddr, register void* srcTag, register 
 
 /* clang-format on */
 
-void LCAlloc(void * addr, unsigned long nBytes) {
+void LCAlloc(void * addr, u32 nBytes) {
     unsigned long numBlocks = nBytes >> 5;
     unsigned long hid2 = PPCMfhid2();
 
@@ -470,7 +470,7 @@ void LCAlloc(void * addr, unsigned long nBytes) {
     LCAllocTags(1, addr, numBlocks);
 }
 
-void LCAllocNoInvalidate(void * addr, unsigned long nBytes) {
+void LCAllocNoInvalidate(void * addr, u32 nBytes) {
     unsigned long numBlocks = nBytes >> 5;
     unsigned long hid2 = PPCMfhid2();
 
@@ -528,7 +528,7 @@ u32 LCStoreData(void* destAddr, void* srcAddr, u32 nBytes) {
 }
 
 /* clang-format off */
-asm u32 LCQueueLength() {
+asm u32 LCQueueLength(void) {
   nofralloc
   mfspr   r4, HID2
   rlwinm  r3, r4, 8, 28, 31
@@ -598,16 +598,16 @@ void L2GlobalInvalidate(void) {
   }
 }
 
-void L2SetDataOnly(int dataOnly) {
-    if (dataOnly != 0) {
+void L2SetDataOnly(BOOL dataOnly) {
+    if (dataOnly) {
         PPCMtl2cr(PPCMfl2cr() | 0x400000);
         return;
     }
     PPCMtl2cr(PPCMfl2cr() & 0xFFBFFFFF);
 }
 
-void L2SetWriteThrough(int writeThrough) {
-    if (writeThrough != 0) {
+void L2SetWriteThrough(BOOL writeThrough) {
+    if (writeThrough) {
         PPCMtl2cr(PPCMfl2cr() | 0x80000);
         return;
     }

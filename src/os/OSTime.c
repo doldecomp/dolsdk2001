@@ -1,5 +1,8 @@
-#include <dolphin.h>
+#include <dolphin/exi.h>
 #include <dolphin/os.h>
+#include <macros.h>
+
+#include "__os.h"
 
 // End of each month in standard year
 static int YearDays[MONTH_MAX] = {0,   31,  59,  90,  120, 151,
@@ -161,7 +164,7 @@ void OSTicksToCalendarTime(long long ticks, OSCalendarTime* td) {
     td->sec = secs % 60;
 }
 
-long long OSCalendarTimeToTicks(struct OSCalendarTime* td) {
+OSTime OSCalendarTimeToTicks(OSCalendarTime* td) {
     long long secs;
     int ov_mon;
     int mon;

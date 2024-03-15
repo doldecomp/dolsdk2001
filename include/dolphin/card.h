@@ -5,6 +5,10 @@
 #include <dolphin/dsp.h>
 #include <dolphin/dvd.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CARD_FILENAME_MAX 32
 #define CARD_MAX_FILE 127
 #define CARD_ICON_MAX 8
@@ -189,5 +193,10 @@ void CARDInit(void);
 s32 CARDGetResultCode(s32 chan);
 s32 CARDCheckAsync(s32 chan, CARDCallback callback);
 s32 CARDFreeBlocks(s32 chan, s32 *byteNotUsed, s32 *filesNotUsed);
+s32 CARDRenameAsync(s32 chan, const char *oldName, const char *newName, CARDCallback callback);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

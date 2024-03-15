@@ -1,5 +1,7 @@
 #include <stddef.h>
 #include <dolphin/gx.h>
+#include <dolphin/os.h>
+#include <macros.h>
 
 #include "__gx.h"
 
@@ -128,7 +130,7 @@ void GXGetCullMode(GXCullMode *mode)
     }
 }
 
-void GXSetCoPlanar(u8 enable)
+void GXSetCoPlanar(GXBool enable)
 {
     u32 reg;
 

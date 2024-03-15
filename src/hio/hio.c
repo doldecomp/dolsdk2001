@@ -1,12 +1,15 @@
 #include <dolphin/exi.h>
+#include <dolphin/hio.h>
 #include <dolphin/os.h>
 #include <dolphin/hw_regs.h>
 #include <macros.h>
 
+#include "__os.h"
+
 static s32 Chan = -1;
-static void (*ExiCallback)(void);
-static void (*TxCallback)(void);
-static void (*RxCallback)(void);
+static HIOCallback ExiCallback;
+static HIOCallback TxCallback;
+static HIOCallback RxCallback;
 
 static void ExtHandler(s32 chan, OSContext *context)
 {
@@ -46,7 +49,7 @@ static void RxHandler(s32 chan, OSContext *context)
     }
 }
 
-int HIOEnumDevices(int (*callback)(s32))
+BOOL HIOEnumDevices(HIOEnumCallback callback)
 {
     int result;
     s32 chan;
@@ -97,7 +100,7 @@ int HIOEnumDevices(int (*callback)(s32))
     return 0;
 }
 
-int HIOInit(s32 chan, void (*callback)(void))
+BOOL HIOInit(s32 chan, HIOCallback callback)
 {
     int err;
     u32 cmd;
@@ -155,7 +158,7 @@ int HIOInit(s32 chan, void (*callback)(void))
     return 1;
 }
 
-int HIOReadMailbox(u32 *word)
+BOOL HIOReadMailbox(u32 *word)
 {
     int err;
     u32 cmd;
@@ -187,7 +190,7 @@ int HIOReadMailbox(u32 *word)
     return !err;
 }
 
-int HIOWriteMailbox(u32 word)
+BOOL HIOWriteMailbox(u32 word)
 {
     int err;
     u32 cmd;
@@ -217,7 +220,7 @@ int HIOWriteMailbox(u32 word)
     return !err;
 }
 
-int HIORead(u32 addr, void *buffer, s32 size)
+BOOL HIORead(u32 addr, void *buffer, s32 size)
 {
     int err;
     u32 cmd;
@@ -250,7 +253,7 @@ int HIORead(u32 addr, void *buffer, s32 size)
     return !err;
 }
 
-int HIOWrite(u32 addr, void *buffer, s32 size)
+BOOL HIOWrite(u32 addr, void *buffer, s32 size)
 {
     int err;
     u32 cmd;
@@ -283,7 +286,7 @@ int HIOWrite(u32 addr, void *buffer, s32 size)
     return !err;
 }
 
-int HIOReadAsync(u32 addr, void *buffer, s32 size, void (*callback)(void))
+BOOL HIOReadAsync(u32 addr, void *buffer, s32 size, HIOCallback callback)
 {
     int err;
     u32 cmd;
@@ -308,7 +311,7 @@ int HIOReadAsync(u32 addr, void *buffer, s32 size, void (*callback)(void))
     return !err;
 }
 
-int HIOWriteAsync(u32 addr, void *buffer, s32 size, void (*callback)(void))
+BOOL HIOWriteAsync(u32 addr, void *buffer, s32 size, HIOCallback callback)
 {
     int err;
     u32 cmd;
@@ -333,7 +336,7 @@ int HIOWriteAsync(u32 addr, void *buffer, s32 size, void (*callback)(void))
     return !err;
 }
 
-int HIOReadStatus(u32 *status)
+BOOL HIOReadStatus(u32 *status)
 {
     int err;
     u32 cmd;

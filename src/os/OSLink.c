@@ -1,6 +1,8 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+#include "__os.h"
+
 #define SHN_UNDEF 0
 #define SHN_LORESERVE 0xff00
 #define SHN_LOPROC 0xff00

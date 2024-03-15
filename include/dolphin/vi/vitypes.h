@@ -1,6 +1,8 @@
 #ifndef _DOLPHIN_VITYPES_H_
 #define _DOLPHIN_VITYPES_H_
 
+#include <dolphin/types.h>
+
 #define VI_TVMODE(format, interlace)  (((format) << 2) + (interlace))
 
 #define VI_INTERLACE     0

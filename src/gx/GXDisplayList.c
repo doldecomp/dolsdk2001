@@ -6,20 +6,6 @@
 
 #include "__gx.h"
 
-// GXFifoObj private data
-struct __GXFifoObj {
-    u8 *base;
-    u8 *top;
-    u32 size;
-    u32 hiWatermark;
-    u32 loWatermark;
-    void *rdPtr;
-    void *wrPtr;
-    s32 count;
-    u8 bind_cpu;
-    u8 bind_gp;
-};
-
 static struct __GXFifoObj DisplayListFifo;
 static volatile struct __GXFifoObj *OldCPUFifo;
 static struct __GXData_struct __savedGXdata;

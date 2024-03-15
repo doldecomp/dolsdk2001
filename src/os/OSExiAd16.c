@@ -1,9 +1,13 @@
-#include <dolphin.h>
+#include <dolphin/exi.h>
 #include <dolphin/os.h>
 
 static int Initialized;
 
-int AD16Init() {
+int AD16Init(void);
+int AD16WriteReg(unsigned long word);
+int AD16ReadReg(unsigned long *word);
+
+int AD16Init(void) {
     int err;
     unsigned long cmd;
     unsigned long id;

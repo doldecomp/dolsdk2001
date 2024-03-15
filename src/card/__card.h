@@ -72,6 +72,7 @@ s32 __CARDClearStatus(s32 chan);
 long __CARDSleep(long chan);
 long __CARDWakeup(long chan);
 s32 __CARDReadSegment(s32 chan, CARDCallback callback);
+s32 __CARDWritePage(s32 chan, CARDCallback callback);
 long __CARDErase(long chan, void (* callback)(long, long));
 s32 __CARDEraseSector(s32 chan, u32 addr, CARDCallback callback);
 void __CARDSetDiskID(DVDDiskID *id);

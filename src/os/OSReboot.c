@@ -6,6 +6,8 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+extern void __DVDPrepareResetAsync();
+
 #include "__os.h"
 
 struct bb2struct

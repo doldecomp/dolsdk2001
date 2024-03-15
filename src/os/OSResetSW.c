@@ -1,7 +1,9 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
-static void (* ResetCallback)();
+#include "__os.h"
+
+static OSResetCallback ResetCallback;
 static int Down;
 #if DOLPHIN_REVISION >= 37
 static int LastState;
@@ -12,7 +14,7 @@ static long long Hold;
 #endif
 
 void __OSResetSWInterruptHandler(short exception, struct OSContext *context) {
-    void (* callback)();
+    OSResetCallback callback;
 
 #if DOLPHIN_REVISION >= 37
     HoldDown = __OSGetSystemTime();
@@ -46,9 +48,9 @@ void __OSResetSWInterruptHandler(short exception, struct OSContext *context) {
 #endif
 }
 
-void (* OSSetResetCallback(void (* callback)()))() {
+OSResetCallback OSSetResetCallback(OSResetCallback callback) {
     int enabled;
-    void (* prevCallback)();
+    OSResetCallback prevCallback;
 
     enabled = OSDisableInterrupts();
     prevCallback = ResetCallback;

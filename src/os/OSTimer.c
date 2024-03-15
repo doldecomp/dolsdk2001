@@ -1,6 +1,8 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+#include "__os.h"
+
 struct Timer {
     void (* callback)();
     unsigned long currval;
@@ -12,6 +14,10 @@ struct Timer {
 
 static struct Timer Timer; // .bss
 
+void (* OSSetTimerCallback(void (* callback)()))();
+void OSInitTimer(unsigned long time, unsigned short mode);
+void OSStartTimer(void);
+void OSStopTimer(void);
 static void DecrementerExceptionHandler(unsigned char exception, struct OSContext * context);
 
 void (* OSSetTimerCallback(void (* callback)()))() {
@@ -29,7 +35,7 @@ void (* OSSetTimerCallback(void (* callback)()))() {
     return prevCallback;
 }
 
-void OSInitTimer(unsigned long time /* r29 */, unsigned short mode /* r1+0xC */) {
+void OSInitTimer(unsigned long time, unsigned short mode) {
 #if DEBUG
     if (time >= 0x80000000) {
         OSPanic("OSTimer.c", 0x97, "OSInitTimer(): time param must be less than 0x80000000.");
@@ -50,7 +56,7 @@ void OSInitTimer(unsigned long time /* r29 */, unsigned short mode /* r1+0xC */)
     }
 }
 
-void OSStartTimer() {
+void OSStartTimer(void) {
     int enabled;
 
 #if DEBUG
@@ -64,7 +70,7 @@ void OSStartTimer() {
     OSRestoreInterrupts(enabled);
 }
 
-void OSStopTimer() {
+void OSStopTimer(void) {
     int enabled;
 
 #if DEBUG

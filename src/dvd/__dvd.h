@@ -3,6 +3,8 @@
 
 #include <dolphin/dvd.h>
 
+void DVDReset(void);
+
 // dvdlow.c
 void __DVDInterruptHandler(int unused, struct OSContext * context);
 

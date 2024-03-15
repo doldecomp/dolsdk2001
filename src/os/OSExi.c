@@ -1,5 +1,8 @@
+#include <string.h>
 #include <dolphin.h>
 #include <dolphin/os.h>
+
+#include "__os.h"
 
 typedef void (*EXICallback)(s32, OSContext*);
 
@@ -211,7 +214,7 @@ int EXISync(long chan) {
             if (exi->state & 4) {
                 CompleteTransfer(chan);
 #if DOLPHIN_REVISION >= 37
-            if ((u32)__OSGetDIConfig() != 0xFF || exi->immLen != 4
+            if (__OSGetDIConfig() != 0xFFu || exi->immLen != 4
              || ((u32)__EXIRegs[(chan * 5)] & 0x70) || (u32)__EXIRegs[chan * 5 + 4] != 0x01010000)
                 rc = 1;
 #else

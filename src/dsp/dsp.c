@@ -31,10 +31,10 @@ u32 DSPReadMailFromDSP(void)
     return (__DSPRegs[2] << 16) | __DSPRegs[3];
 }
 
-void DSPSendMailToDSP(u32 msg)
+void DSPSendMailToDSP(u32 mail)
 {
-    __DSPRegs[0] = msg >> 16;
-    __DSPRegs[1] = msg & 0xFFFF;
+    __DSPRegs[0] = mail >> 16;
+    __DSPRegs[1] = mail & 0xFFFF;
 }
 
 void DSPAssertInt(void)
@@ -82,7 +82,7 @@ void DSPInit(void)
     OSRestoreInterrupts(old);
 }
 
-int DSPCheckInit(void)
+BOOL DSPCheckInit(void)
 {
     return __DSP_init_flag;
 }

@@ -1,6 +1,8 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+#include "__os.h"
+
 #define ENQUEUE_THREAD(thread, queue, link)       \
     do {                                          \
         struct OSThread * __prev = (queue)->tail; \
@@ -159,11 +161,11 @@ static void OSInitMutexQueue(struct OSMutexQueue * queue) {
 }
 #endif
 
-void OSInitThreadQueue(struct OSThreadQueue * queue) {
+void OSInitThreadQueue(OSThreadQueue *queue) {
     queue->head = queue->tail = 0;
 }
 
-struct OSThread * OSGetCurrentThread() {
+OSThread *OSGetCurrentThread(void) {
     return __gCurrentThread;
 }
 
@@ -173,14 +175,14 @@ static void __OSSwitchThread(struct OSThread * nextThread) {
     OSLoadContext(&nextThread->context);
 }
 
-int OSIsThreadSuspended(struct OSThread * thread) {
+BOOL OSIsThreadSuspended(OSThread *thread) {
     if (thread->suspend > 0) {
         return 1;
     }
     return 0;
 }
 
-int OSIsThreadTerminated(struct OSThread * thread) {
+BOOL OSIsThreadTerminated(OSThread *thread) {
     return (thread->state == 8 || thread->state == 0) ? 1 : 0;
 }
 
@@ -199,7 +201,7 @@ static int __OSIsThreadActive(struct OSThread * thread) {
     return 0;
 }
 
-long OSDisableScheduler() {
+s32 OSDisableScheduler(void) {
     register int enabled;
     long count;
 
@@ -210,7 +212,7 @@ long OSDisableScheduler() {
     return count;
 }
 
-long OSEnableScheduler() {
+s32 OSEnableScheduler(void) {
     register int enabled;
     long count;
 
@@ -403,9 +405,9 @@ void OSYieldThread(void) {
     OSRestoreInterrupts(enabled);
 }
 
-int OSCreateThread(struct OSThread * thread, void * (* func)(void *), void * param, void * stack, unsigned long stackSize, long priority, unsigned short attr) {
-    int enabled; // r25
-    unsigned long sp; // r30
+BOOL OSCreateThread(OSThread *thread, void *(*func)(void *), void *param, void *stack, u32 stackSize, OSPriority priority, u16 attr) {
+    BOOL enabled;
+    unsigned long sp;
 
     ASSERTMSGLINE(0x31C, ((priority >= 0) && (priority <= 0x1F)), "OSCreateThread(): priority out of range (0 <= priority <= 31).");
 
@@ -432,7 +434,7 @@ int OSCreateThread(struct OSThread * thread, void * (* func)(void *), void * par
     sp -= 8;
     ((u32*)sp)[0] = 0; 
     ((u32*)sp)[1] = 0;
-    OSInitContext(thread, func, sp);
+    OSInitContext(&thread->context, (u32)func, sp);
     thread->context.lr = (unsigned long)&OSExitThread;
     thread->context.gpr[3] = (unsigned long)param;
     thread->stackBase = stack;
@@ -448,7 +450,7 @@ int OSCreateThread(struct OSThread * thread, void * (* func)(void *), void * par
     return 1;
 }
 
-void OSExitThread(void * val) {
+void OSExitThread(void *val) {
     int enabled = OSDisableInterrupts();
     struct OSThread * currentThread = OSGetCurrentThread();
 
@@ -480,7 +482,7 @@ void OSExitThread(void * val) {
     OSRestoreInterrupts(enabled);
 }
 
-void OSCancelThread(struct OSThread * thread) {
+void OSCancelThread(OSThread *thread) {
     int enabled = OSDisableInterrupts();
 
     ASSERTMSG1LINE(0x37E, __OSIsThreadActive(thread) != 0, 
@@ -520,7 +522,7 @@ void OSCancelThread(struct OSThread * thread) {
     OSRestoreInterrupts(enabled);
 }
 
-int OSJoinThread(struct OSThread * thread, void * val) {
+BOOL OSJoinThread(OSThread *thread, void *val) {
     int enabled = OSDisableInterrupts();
 
     ASSERTMSG1LINE(0x3CA, __OSIsThreadActive(thread) != 0, "OSJoinThread(): thread %p is not active.", thread);
@@ -545,7 +547,7 @@ int OSJoinThread(struct OSThread * thread, void * val) {
     return 0;
 }
 
-void OSDetachThread(struct OSThread * thread) {
+void OSDetachThread(OSThread *thread) {
     int enabled = OSDisableInterrupts();
 
     ASSERTMSG1LINE(0x3FC, __OSIsThreadActive(thread) != 0, "OSDetachThread(): thread %p is not active.", thread);
@@ -559,7 +561,7 @@ void OSDetachThread(struct OSThread * thread) {
     OSRestoreInterrupts(enabled);
 }
 
-long OSResumeThread(struct OSThread * thread) {
+s32 OSResumeThread(OSThread *thread) {
     int enabled = OSDisableInterrupts();
     long suspendCount;
 
@@ -590,7 +592,7 @@ long OSResumeThread(struct OSThread * thread) {
     return suspendCount;
 }
 
-long OSSuspendThread(struct OSThread * thread) {
+s32 OSSuspendThread(OSThread *thread) {
     int enabled = OSDisableInterrupts();
     long suspendCount;
 
@@ -623,7 +625,7 @@ long OSSuspendThread(struct OSThread * thread) {
     return suspendCount;
 }
 
-void OSSleepThread(struct OSThreadQueue * queue) {
+void OSSleepThread(OSThreadQueue *queue) {
     int enabled = OSDisableInterrupts();
     struct OSThread * currentThread = OSGetCurrentThread();
 
@@ -640,7 +642,7 @@ void OSSleepThread(struct OSThreadQueue * queue) {
     OSRestoreInterrupts(enabled);
 }
 
-void OSWakeupThread(struct OSThreadQueue * queue) {
+void OSWakeupThread(OSThreadQueue *queue) {
     int enabled = OSDisableInterrupts();
 
     while (queue->head) {
@@ -660,7 +662,7 @@ void OSWakeupThread(struct OSThreadQueue * queue) {
     OSRestoreInterrupts(enabled);
 }
 
-int OSSetThreadPriority(struct OSThread * thread, long priority) {
+BOOL OSSetThreadPriority(OSThread *thread, OSPriority priority) {
     int enabled;
 
     ASSERTMSGLINE(0x4C3, (priority >= 0) && (priority <= 0x1F), "OSSetThreadPriority(): priority out of range (0 <= priority <= 31).");
@@ -682,11 +684,11 @@ int OSSetThreadPriority(struct OSThread * thread, long priority) {
     return 1;
 }
 
-long OSGetThreadPriority(struct OSThread * thread) {
+OSPriority OSGetThreadPriority(OSThread *thread) {
     return thread->base;
 }
 
-struct OSThread * OSSetIdleFunction(void (* idleFunction)(void *), void * param, void * stack, unsigned long stackSize) {
+OSThread *OSSetIdleFunction(OSIdleFunction idleFunction, void *param, void *stack, u32 stackSize) {
     if(idleFunction) {
         if (IdleThread.state == 0) {
             OSCreateThread(&IdleThread, (void*)idleFunction, param, stack, stackSize, 0x1F, 1);
@@ -699,7 +701,7 @@ struct OSThread * OSSetIdleFunction(void (* idleFunction)(void *), void * param,
     return NULL;
 }
 
-struct OSThread * OSGetIdleFunction() {
+OSThread *OSGetIdleFunction(void) {
     if (IdleThread.state != 0) {
         return &IdleThread;
     }
@@ -747,7 +749,7 @@ static int IsMember(struct OSThreadQueue * queue, struct OSThread * thread) {
         OSPanic(__FILE__, line, ""); \
     }
 
-long OSCheckActiveThreads() {
+long OSCheckActiveThreads(void) {
     struct OSThread * thread;
     long prio;
     long cThread;

@@ -2,43 +2,28 @@
 #include <dolphin/base/PPCArch.h>
 #include <dolphin/gx.h>
 #include <dolphin/os.h>
+#include <macros.h>
 
 #include "__gx.h"
 
-struct __GXFifoObj {
-    // total size: 0x24
-    unsigned char * base; // offset 0x0, size 0x4
-    unsigned char * top; // offset 0x4, size 0x4
-    unsigned long size; // offset 0x8, size 0x4
-    unsigned long hiWatermark; // offset 0xC, size 0x4
-    unsigned long loWatermark; // offset 0x10, size 0x4
-    void * rdPtr; // offset 0x14, size 0x4
-    void * wrPtr; // offset 0x18, size 0x4
-    long count; // offset 0x1C, size 0x4
-    unsigned char bind_cpu; // offset 0x20, size 0x1
-    unsigned char bind_gp; // offset 0x21, size 0x1
-};
-
-static struct OSThread * __GXCurrentThread; // size: 0x4, address: 0x0
-static unsigned char CPGPLinked; // size: 0x1, address: 0x4
-static int GXOverflowSuspendInProgress; // size: 0x4, address: 0x8
-static void (* BreakPointCB)(); // size: 0x4, address: 0xC
-static unsigned long __GXOverflowCount; // size: 0x4, address: 0x10
+static OSThread *__GXCurrentThread;
+static GXBool CPGPLinked;
+static BOOL GXOverflowSuspendInProgress;
+static GXBreakPtCallback BreakPointCB;
+static u32 __GXOverflowCount;
 #if DEBUG
-static int IsWGPipeRedirected; // size: 0x4, address: 0x14
+static int IsWGPipeRedirected;
 #endif
 
-struct __GXFifoObj * CPUFifo; // size: 0x4, address: 0x20
-struct __GXFifoObj * GPFifo; // size: 0x4, address: 0x1C
-void * __GXCurrentBP; // size: 0x4, address: 0x18
+struct __GXFifoObj *CPUFifo;
+struct __GXFifoObj *GPFifo;
+void *__GXCurrentBP;
 
 static void __GXFifoReadEnable(void);
 static void __GXFifoReadDisable(void);
 static void __GXFifoLink(u8 arg0);
 static void __GXWriteFifoIntEnable(u8 arg0, u8 arg1);
 static void __GXWriteFifoIntReset(u8 arg0, u8 arg1);
-
-void __GXSaveCPUFifoAux(struct __GXFifoObj *realFifo);
 
 #if DEBUG
 static char __data_0[] = "[GXOverflowHandler]";
@@ -56,7 +41,7 @@ static void GXOverflowHandler(s16 interrupt, OSContext *context)
     __GXOverflowCount++;
     __GXWriteFifoIntEnable(0, 1);
     __GXWriteFifoIntReset(1, 0);
-    GXOverflowSuspendInProgress = 1;
+    GXOverflowSuspendInProgress = TRUE;
 
 #if DEBUG
     if (__gxVerif->verifyLevel > 1) {
@@ -76,7 +61,7 @@ static void GXUnderflowHandler(s16 interrupt, OSContext *context)
     ASSERTLINE(0x184, GXOverflowSuspendInProgress);
 
     OSResumeThread(__GXCurrentThread);
-    GXOverflowSuspendInProgress = 0;
+    GXOverflowSuspendInProgress = FALSE;
     __GXWriteFifoIntReset(1U, 1U);
     __GXWriteFifoIntEnable(1U, 0U);
 }
@@ -196,7 +181,7 @@ void GXSetCPUFifo(GXFifoObj *fifo)
         SET_REG_FIELD(0x294, reg, 21, 5, ((u32)realFifo->wrPtr & 0x3FFFFFFF) >> 5);
         SET_REG_FIELD(0x295, reg, 1, 26, 0);
         __piReg[5] = reg;
-        CPGPLinked = TRUE;
+        CPGPLinked = GX_TRUE;
         __GXWriteFifoIntReset(1, 1);
         __GXWriteFifoIntEnable(1, 0);
         __GXFifoLink(1);
@@ -208,7 +193,7 @@ void GXSetCPUFifo(GXFifoObj *fifo)
         if (CPGPLinked)
         {
             __GXFifoLink(0);
-            CPGPLinked = FALSE;
+            CPGPLinked = GX_FALSE;
         }
         __GXWriteFifoIntEnable(0, 0);
         reg = 0;
@@ -252,12 +237,12 @@ void GXSetGPFifo(GXFifoObj *fifo)
     __sync();
 
     if (CPUFifo == GPFifo) {
-        CPGPLinked = TRUE;
+        CPGPLinked = GX_TRUE;
         __GXWriteFifoIntEnable(1, 0);
         __GXFifoLink(1);
     }
     else {
-        CPGPLinked = FALSE;
+        CPGPLinked = GX_FALSE;
         __GXWriteFifoIntEnable(0, 0);
         __GXFifoLink(0);
     }
@@ -322,7 +307,7 @@ void GXSaveGPFifo(GXFifoObj *fifo)
     SOME_MACRO2(realFifo);
 }
 
-void GXGetGPStatus(u8 *overhi, u8 *underlow, u8 *readIdle, u8 *cmdIdle, u8 *brkpt)
+void GXGetGPStatus(GXBool *overhi, GXBool *underlow, GXBool *readIdle, GXBool *cmdIdle, GXBool *brkpt)
 {
     gx->cpStatus = __cpReg[0];
     *overhi   = GET_REG_FIELD(gx->cpStatus, 1, 0);
@@ -332,14 +317,14 @@ void GXGetGPStatus(u8 *overhi, u8 *underlow, u8 *readIdle, u8 *cmdIdle, u8 *brkp
     *brkpt    = (int)GET_REG_FIELD(gx->cpStatus, 1, 4);
 }
 
-void GXGetFifoStatus(GXFifoObj *fifo, u8 *overhi, u8 *underflow, u32 *fifoCount, u8 *cpuWrite, u8 *gpRead, u8 *fifowrap)
+void GXGetFifoStatus(GXFifoObj *fifo, GXBool *overhi, GXBool *underflow, u32 *fifoCount, GXBool *cpuWrite, GXBool *gpRead, GXBool *fifowrap)
 {
     struct __GXFifoObj *realFifo = (struct __GXFifoObj *)fifo;
 
-    *underflow = 0;
-    *overhi    = 0;
+    *underflow = GX_FALSE;
+    *overhi    = GX_FALSE;
     *fifoCount = 0;
-    *fifowrap  = 0;
+    *fifowrap  = GX_FALSE;
     if (realFifo == GPFifo) {
         SOME_MACRO1(realFifo);
         SOME_MACRO2(realFifo);
@@ -408,7 +393,7 @@ GXBreakPtCallback GXSetBreakPtCallback(GXBreakPtCallback cb)
     return oldcb;
 }
 
-void * __GXCurrentBP; // size: 0x4, address: 0x18
+void *__GXCurrentBP;
 
 void GXEnableBreakPt(void *break_pt)
 {
@@ -442,7 +427,7 @@ void __GXFifoInit(void)
     __OSSetInterruptHandler(0x11, GXCPInterruptHandler);
     __OSUnmaskInterrupts(0x4000);
     __GXCurrentThread = OSGetCurrentThread();
-    GXOverflowSuspendInProgress = 0;
+    GXOverflowSuspendInProgress = FALSE;
 }
 
 static void __GXFifoReadEnable(void)
@@ -509,7 +494,7 @@ void __GXCleanGPFifo(void)
 OSThread *GXSetCurrentGXThread(void)
 {
     BOOL enabled;
-    struct OSThread * prev;
+    struct OSThread *prev;
 
     enabled = OSDisableInterrupts();
     prev = __GXCurrentThread;
@@ -559,14 +544,14 @@ static char str_GXRedirectWriteGatherPipe_gxbegin[] = "'GXRedirectWriteGatherPip
 static char str_failed_assertion_offset[] = "Failed assertion OFFSET(ptr, 32) == 0";
 static char str_failed_assertion_pipenotredirected[] = "Failed assertion !IsWGPipeRedirected";
 static char str_failed_assertion_piperedirected[] = "Failed assertion IsWGPipeRedirected";
-asm void *GXRedirectWriteGatherPipe(void *ptr)
+asm volatile void *GXRedirectWriteGatherPipe(void *ptr)
 {
     nofralloc
 #include "../../nonmatchings/GXRedirectWriteGatherPipe.s"
 }
 #pragma peephole on
 #else
-void *GXRedirectWriteGatherPipe(void *ptr)
+volatile void *GXRedirectWriteGatherPipe(void *ptr)
 {
     u32 reg = 0;
     BOOL enabled = OSDisableInterrupts();
@@ -598,7 +583,7 @@ void *GXRedirectWriteGatherPipe(void *ptr)
     __piReg[5] = reg;
     __sync();
     OSRestoreInterrupts(enabled);
-    return (void *)GXFIFO_ADDR;
+    return (volatile void *)GXFIFO_ADDR;
 }
 #endif
 

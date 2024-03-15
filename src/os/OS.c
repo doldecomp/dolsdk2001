@@ -1,6 +1,10 @@
 #include <dolphin.h>
+#include <dolphin/exi.h>
 #include <dolphin/os.h>
 #include <dolphin/db.h>
+#include <macros.h>
+
+void EnableMetroTRKInterrupts(void);
 
 // internal headers
 #include "__os.h"
@@ -9,8 +13,6 @@
 #define DEBUGFLAG_ADDR 0x800030E8
 #define OS_DEBUG_ADDRESS_2 0x800030E9
 #define OS_CURRENTCONTEXT_PADDR 0x00C0
-
-extern int __DBIsExceptionMarked(u8);
 
 #define OS_EXCEPTIONTABLE_ADDR 0x3000
 #define OS_DBJUMPPOINT_ADDR 0x60
@@ -464,7 +466,7 @@ void __OSPSInit(void)
 }
 
 #if DOLPHIN_REVISION >= 37
-u8 __OSGetDIConfig(void) {
-    return UNK_REG_CC006000[9];
+u32 __OSGetDIConfig(void) {
+    return (u8)UNK_REG_CC006000[9];
 }
 #endif

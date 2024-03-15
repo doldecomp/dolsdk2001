@@ -70,12 +70,29 @@ enum OS_THREAD_STATE
 
 #define OS_THREAD_STACK_MAGIC 0xDEADBABE
 
+typedef void (*OSIdleFunction)(void *param);
+
 void OSInitThreadQueue(OSThreadQueue *queue);
+OSThread *OSGetCurrentThread(void);
+BOOL OSIsThreadSuspended(OSThread *thread);
+BOOL OSIsThreadTerminated(OSThread *thread);
+s32 OSDisableScheduler(void);
+s32 OSEnableScheduler(void);
+void OSYieldThread(void);
+BOOL OSCreateThread(OSThread *thread, void *(*func)(void *), void *param, void *stack, u32 stackSize, OSPriority priority, u16 attr);
+void OSExitThread(void *val);
+void OSCancelThread(OSThread *thread);
+BOOL OSJoinThread(OSThread *thread, void *val);
+void OSDetachThread(OSThread *thread);
+s32 OSResumeThread(OSThread *thread);
+s32 OSSuspendThread(OSThread *thread);
 void OSSleepThread(OSThreadQueue *queue);
 void OSWakeupThread(OSThreadQueue *queue);
-s32 OSSuspendThread(OSThread *thread);
-s32 OSResumeThread(OSThread* thread);
-OSThread* OSGetCurrentThread(void);
+BOOL OSSetThreadPriority(OSThread *thread, OSPriority priority);
+OSPriority OSGetThreadPriority(OSThread *thread);
+OSThread *OSSetIdleFunction(OSIdleFunction idleFunction, void *param, void *stack, u32 stackSize);
+OSThread *OSGetIdleFunction(void);
+long OSCheckActiveThreads(void);
 
 #define IsSuspended(suspend) (suspend > 0)
 
