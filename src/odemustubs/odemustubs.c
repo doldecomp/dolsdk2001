@@ -1,5 +1,13 @@
 #include <dolphin.h>
 
+int Hu_IsStub();
+void DBInitInterrupts();
+long DBQueryData();
+unsigned long DBRead();
+unsigned long DBWrite();
+void DBOpen();
+void DBClose();
+
 int Hu_IsStub() {
     return 1;
 }

@@ -1,5 +1,7 @@
 #include <math.h>
 #include <dolphin/gx.h>
+#include <dolphin/os.h>
+#include <macros.h>
 
 #include "__gx.h"
 
@@ -92,7 +94,7 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
     gx->bpSent = 1;
 }
 
-void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, f32 (*projmtx)[4])
+void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, f32 projmtx[4][4])
 {
     f32 xi;
     f32 iw;
@@ -123,7 +125,7 @@ void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, f32 (*projmtx)[4])
     }
 }
 
-void GXSetFogRangeAdj(u8 enable, u16 center, GXFogAdjTable *table)
+void GXSetFogRangeAdj(GXBool enable, u16 center, GXFogAdjTable *table)
 {
     u32 i;
     u32 range_adj;
@@ -164,7 +166,7 @@ void GXSetBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor ds
     gx->bpSent = 1;
 }
 
-void GXSetColorUpdate(u8 update_enable)
+void GXSetColorUpdate(GXBool update_enable)
 {
     CHECK_GXBEGIN(0x14F, "GXSetColorUpdate");
     SET_REG_FIELD(0x150, gx->cmode0, 1, 3, update_enable);
@@ -172,7 +174,7 @@ void GXSetColorUpdate(u8 update_enable)
     gx->bpSent = 1;
 }
 
-void GXSetAlphaUpdate(u8 update_enable)
+void GXSetAlphaUpdate(GXBool update_enable)
 {
     CHECK_GXBEGIN(0x158, "GXSetAlphaUpdate");
     SET_REG_FIELD(0x159, gx->cmode0, 1, 4, update_enable);
@@ -180,7 +182,7 @@ void GXSetAlphaUpdate(u8 update_enable)
     gx->bpSent = 1;
 }
 
-void GXSetZMode(u8 compare_enable, GXCompare func, u8 update_enable)
+void GXSetZMode(GXBool compare_enable, GXCompare func, GXBool update_enable)
 {
     CHECK_GXBEGIN(0x170, "GXSetZMode");
     SET_REG_FIELD(0x171, gx->zmode, 1, 0, compare_enable);
@@ -190,7 +192,7 @@ void GXSetZMode(u8 compare_enable, GXCompare func, u8 update_enable)
     gx->bpSent = 1;
 }
 
-void GXSetZCompLoc(u8 before_tex)
+void GXSetZCompLoc(GXBool before_tex)
 {
     CHECK_GXBEGIN(0x17C, "GXSetZCompLoc");
     SET_REG_FIELD(0x17D, gx->peCtrl, 1, 6, before_tex);
@@ -234,7 +236,7 @@ void GXSetDither(GXBool dither)
     gx->bpSent = 1;
 }
 
-void GXSetDstAlpha(u8 enable, u8 alpha)
+void GXSetDstAlpha(GXBool enable, u8 alpha)
 {
     CHECK_GXBEGIN(0x1E1, "GXSetDstAlpha");
     SET_REG_FIELD(0x1E2, gx->cmode1, 8, 0, alpha);
@@ -243,7 +245,7 @@ void GXSetDstAlpha(u8 enable, u8 alpha)
     gx->bpSent = 1;
 }
 
-void GXSetFieldMask(u8 odd_mask, u8 even_mask)
+void GXSetFieldMask(GXBool odd_mask, GXBool even_mask)
 {
     u32 reg;
 
@@ -256,7 +258,7 @@ void GXSetFieldMask(u8 odd_mask, u8 even_mask)
     gx->bpSent = 1;
 }
 
-void GXSetFieldMode(u8 field_mode, u8 half_aspect_ratio)
+void GXSetFieldMode(GXBool field_mode, GXBool half_aspect_ratio)
 {
     u32 reg;
 

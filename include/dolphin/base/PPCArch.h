@@ -501,6 +501,9 @@ void PPCMtpmc3(u32 newPmc1);
 void PPCMtpmc4(u32 newPmc1);
 void PPCMtmmcr0(u32 newMmcr0);
 void PPCMtmmcr1(u32 newMmcr0);
+void PPCMtdmaU(u32 newdmau);
+void PPCMtdmaL(u32 newdmal);
+u32 PPCMfdec(void);
 
 #ifdef __cplusplus
 }

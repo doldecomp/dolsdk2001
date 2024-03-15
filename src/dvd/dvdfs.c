@@ -393,7 +393,7 @@ int DVDSeekAsyncPrio(struct DVDFileInfo * fileInfo, long offset, void (* callbac
     }
 
     fileInfo->callback = callback;
-    DVDSeekAbsAsyncPrio(fileInfo, (char*)fileInfo->startAddr + offset, cbForSeekAsync, prio);
+    DVDSeekAbsAsyncPrio(&fileInfo->cb, (u32)(char*)fileInfo->startAddr + offset, cbForSeekAsync, prio);
     return 1;
 }
 
@@ -419,7 +419,7 @@ long DVDSeekPrio(struct DVDFileInfo * fileInfo, long offset, long prio) {
     ASSERTMSGLINE(0x3A9, (offset >= 0) && ((u32) offset < (u32) fileInfo->length), "DVDSeek(): offset is out of the file  ");
 
     block = &fileInfo->cb;
-    result = DVDSeekAbsAsyncPrio(block, (char*)fileInfo->startAddr + offset, cbForSeekSync, prio);
+    result = DVDSeekAbsAsyncPrio(block, (u32)(char*)fileInfo->startAddr + offset, cbForSeekSync, prio);
     if (!result) {
         return -1;
     }

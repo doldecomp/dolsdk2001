@@ -7,8 +7,6 @@
 extern char * __OSExceptionNames[15]; // D ONLY
 
 unsigned long __OSIsDebuggerPresent(void);
-__OSExceptionHandler __OSSetExceptionHandler(__OSException exception, __OSExceptionHandler handler);
-__OSExceptionHandler __OSGetExceptionHandler(__OSException exception);
 void __OSPSInit(void);
 
 // OSAlloc.c
@@ -43,6 +41,11 @@ OSInterruptMask __OSUnmaskInterrupts(OSInterruptMask global);
 void __OSDispatchInterrupt(__OSException exception, OSContext* context);
 void __OSModuleInit(void);
 
+// OSMutex.c
+void __OSUnlockAllMutex(struct OSThread *thread);
+int __OSCheckDeadLock(struct OSThread *thread);
+int __OSCheckMutexes(struct OSThread *thread);
+
 // OSResetSW.c
 void __OSResetSWInterruptHandler(short exception, struct OSContext *context);
 
@@ -57,6 +60,7 @@ int __OSUnlockSramEx(int commit);
 int __OSSyncSram(void);
 int __OSCheckSram(void);
 int __OSReadROM(void * buffer, long length, long offset);
+int __OSReadROMAsync(void * buffer, long length, long offset, void (* callback)());
 unsigned char __OSGetBootMode(void);
 void __OSSetBootMode(unsigned char ntd);
 

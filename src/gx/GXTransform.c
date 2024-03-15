@@ -1,11 +1,11 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include <dolphin/os.h>
+#include <macros.h>
 
 #include "__gx.h"
 
-void __GXSetMatrixIndex(GXAttr matIdxAttr);
-
-void GXProject(f32 x, f32 y, f32 z, f32 (*mtx)[4], f32 *pm, f32 *vp, f32 *sx, f32 *sy, f32 *sz)
+void GXProject(f32 x, f32 y, f32 z, f32 mtx[3][4], f32 *pm, f32 *vp, f32 *sx, f32 *sy, f32 *sz)
 {
     Vec peye;
     f32 xc;

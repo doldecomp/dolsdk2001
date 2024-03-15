@@ -1,12 +1,14 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
-static void (* ResetCallback)();
+#include "__os.h"
+
+static OSResetCallback ResetCallback;
 static int Down;
 static long long Hold;
 
 void __OSResetSWInterruptHandler(short exception, struct OSContext *context) {
-    void (* callback)();
+    OSResetCallback callback;
 
     Down = 1;
     __PIRegs[0] = 2;
@@ -19,9 +21,9 @@ void __OSResetSWInterruptHandler(short exception, struct OSContext *context) {
     }
 }
 
-void (* OSSetResetCallback(void (* callback)()))() {
+OSResetCallback OSSetResetCallback(OSResetCallback callback) {
     int enabled;
-    void (* prevCallback)();
+    OSResetCallback prevCallback;
 
     enabled = OSDisableInterrupts();
     prevCallback = ResetCallback;

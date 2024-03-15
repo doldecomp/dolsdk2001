@@ -1,5 +1,7 @@
 #include <math.h>
 #include <dolphin/gx.h>
+#include <dolphin/os.h>
+#include <macros.h>
 
 #include "__gx.h"
 
@@ -40,7 +42,7 @@ void GXInitLightAttnA(GXLightObj *lt_obj, f32 a0, f32 a1, f32 a2)
     obj->a[2] = a2;
 }
 
-void GXGetLightAttnA(struct _GXLightObj *lt_obj, f32 *a0, f32 *a1, f32 *a2)
+void GXGetLightAttnA(GXLightObj *lt_obj, f32 *a0, f32 *a1, f32 *a2)
 {
     struct __GXLightObjInt_struct *obj;
 
@@ -365,7 +367,7 @@ void GXLoadLightObjImm(GXLightObj *lt_obj, GXLightID light)
     gx->bpSent = 0;
 }
 
-void GXLoadLightObjIndx(u32 lt_obj_indx, enum _GXLightID light)
+void GXLoadLightObjIndx(u32 lt_obj_indx, GXLightID light)
 {
     unsigned long reg;
     unsigned long addr;

@@ -3,6 +3,10 @@
 
 #include <dolphin/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define OS_FONT_ENCODE_ANSI 0u
 #define OS_FONT_ENCODE_SJIS 1u
 #define OS_FONT_SIZE_ANSI (288 + 131072)    // 9 sheets
@@ -10,7 +14,7 @@
 #define OS_FONT_ROM_SIZE_ANSI 0x03000
 #define OS_FONT_ROM_SIZE_SJIS 0x4D000
 
-typedef struct
+typedef struct OSFontHeader
 {
     /*0x00*/ u16 fontType;
              u16 firstChar;
@@ -43,5 +47,9 @@ u32 OSLoadFont(OSFontHeader *fontData, void *temp);
 char *OSGetFontTexture(char *string, void **image, s32 *x, s32 *y, s32 *width);
 char *OSGetFontWidth(char *string, s32 *width);
 char *OSGetFontTexel(char *string, void *image, s32 pos, s32 stride, s32 *width);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

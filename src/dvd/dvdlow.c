@@ -2,6 +2,7 @@
 #include <dolphin/dvd.h>
 
 #include "__dvd.h"
+#include "__os.h"
 
 // .sbss
 static void (* Callback)(unsigned long); // size: 0x4, address: 0x0

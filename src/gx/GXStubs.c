@@ -2,6 +2,6 @@
 
 #include "__gx.h"
 
-void __GXSetRange(void)
+void __GXSetRange(float nearz, float fgSideX)
 {
 }

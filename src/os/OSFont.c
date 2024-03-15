@@ -1,6 +1,8 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+#include "__os.h"
+
 static OSFontHeader* FontData; // type unsure
 static u8* SheetImage;         // type unsure
 static u8* WidthTable;         // type unsure

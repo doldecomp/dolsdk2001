@@ -20,7 +20,7 @@ static void DecrementerExceptionHandler(__OSException exception, OSContext* cont
 #define ASSERTREPORT(line, cond) \
     if (!(cond)) { OSReport("OSCheckAlarmQueue: Failed " #cond " in %d", line); return 0; }
 
-int OSCheckAlarmQueue() {
+BOOL OSCheckAlarmQueue(void) {
     struct OSAlarm * alarm;
 
     ASSERTREPORT(0x70, AlarmQueue.head == NULL && AlarmQueue.tail == NULL || AlarmQueue.head != NULL && AlarmQueue.tail != NULL);
@@ -31,7 +31,7 @@ int OSCheckAlarmQueue() {
         ASSERTREPORT(0x75, alarm->next == NULL || alarm->next->prev == alarm);
         ASSERTREPORT(0x76, alarm->next != NULL || AlarmQueue.tail == alarm);
     }
-    return 1;
+    return TRUE;
 }
 
 static void SetTimer(struct OSAlarm * alarm) {

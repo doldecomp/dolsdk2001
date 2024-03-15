@@ -1,4 +1,6 @@
 #include <dolphin/gx.h>
+#include <dolphin/os.h>
+#include <macros.h>
 
 #include "__gx.h"
 
@@ -130,7 +132,7 @@ void GXSetDispCopyDst(u16 wd, u16 ht)
     SET_REG_FIELD(0x3FB, gx->cpDispStride,  8, 24, 0x4D);
 }
 
-void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, u8 mipmap)
+void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, GXBool mipmap)
 {
     u32 rowTiles;
     u32 colTiles;
@@ -253,7 +255,7 @@ void GXSetCopyClear(GXColor clear_clr, u32 clear_z)
 #if DEBUG  // currently doesn't match
 static char str_GXSetCopyFilter_gxbegin[] = "'GXSetCopyFilter' is not allowed between GXBegin/GXEnd";
 #define ___data_0 GXNtsc240Ds
-asm void GXSetCopyFilter(u8 aa, u8 (*sample_pattern)[2], u8 vf, u8 *vfilter)
+asm void GXSetCopyFilter(GXBool aa, const u8 sample_pattern[12][2], GXBool vf, const u8 vfilter[7])
 {
     nofralloc
 #include "../../nonmatchings/GXSetCopyFilter.s"
@@ -261,7 +263,7 @@ asm void GXSetCopyFilter(u8 aa, u8 (*sample_pattern)[2], u8 vf, u8 *vfilter)
 #undef ___data_0
 #pragma peephole on
 #else
-void GXSetCopyFilter(u8 aa, u8 (*sample_pattern)[2], u8 vf, u8 *vfilter)
+void GXSetCopyFilter(GXBool aa, const u8 sample_pattern[12][2], GXBool vf, const u8 vfilter[7])
 {
     u32 msLoc[4];
     u32 coeff0;
@@ -387,7 +389,7 @@ static void __GXVerifCopy(void *dest, u8 clear)
 }
 #endif
 
-void GXCopyDisp(void *dest, u8 clear)
+void GXCopyDisp(void *dest, GXBool clear)
 {
     u32 reg;
     u32 tempPeCtrl;
@@ -443,7 +445,7 @@ void GXCopyDisp(void *dest, u8 clear)
     gx->bpSent = 1;
 }
 
-void GXCopyTex(void *dest, u8 clear)
+void GXCopyTex(void *dest, GXBool clear)
 {
     u32 reg;
     u32 tempPeCtrl;

@@ -1,7 +1,10 @@
 #include <string.h>
 
+#include <dolphin/base/PPCArch.h>
 #include <dolphin/gx.h>
+#include <dolphin/os.h>
 #include <dolphin/vi.h>
+#include <macros.h>
 
 #include "__gx.h"
 
@@ -13,10 +16,10 @@ u16 *__peReg;
 u16 *__cpReg;
 u32 *__piReg;
 #if DEBUG
-u8 __GXinBegin; // size: 0x1, address: 0x0
+GXBool __GXinBegin;
 #endif
 
-asm int IsWriteGatherBufferEmpty(void)
+asm BOOL IsWriteGatherBufferEmpty(void)
 {
     sync
     mfspr r3, WPAR
@@ -67,8 +70,6 @@ static void __GXDefaultVerifyCallback(GXWarningLevel level, u32 id, char *msg)
 #endif
 
 GXFifoObj FifoObj;
-
-void __GXPEInit(void);
 
 GXFifoObj *GXInit(void *base, u32 size)
 {
