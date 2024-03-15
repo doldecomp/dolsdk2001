@@ -186,10 +186,12 @@ check-dtk: $(TOOLS_DIR)
 $(DTK): check-dtk
 
 build/debug/src/%.o: src/%.c
-	$(CC) -c -opt level=0 -inline off -schedule off -sym on $(CFLAGS) -I- $(INCLUDES) -DDEBUG $< -o $@
+	@echo 'Compiling $< (debug)'
+	$(QUIET)$(CC) -c -opt level=0 -inline off -schedule off -sym on $(CFLAGS) -I- $(INCLUDES) -DDEBUG $< -o $@
 
 build/release/src/%.o: src/%.c
-	$(CC) -c -O4,p -inline auto -sym on $(CFLAGS) -I- $(INCLUDES) -DRELEASE $< -o $@
+	@echo 'Compiling $< (release)'
+	$(QUIET)$(CC) -c -O4,p -inline auto -sym on $(CFLAGS) -I- $(INCLUDES) -DRELEASE $< -o $@
 
 ################################ Build AR Files ###############################
 
@@ -334,12 +336,13 @@ build/debug/test.elf:      build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l
 	$(OBJCOPY) -O binary $< $@
 
 %.elf:
-	@echo Linking $@
-	$(LD) -T gcn.ld --whole-archive $(filter %.o,$^) $(filter %.a,$^) -o $@ -Map $(@:.elf=.map)
+	@echo Linking ELF $@
+	$(QUIET)$(LD) -T gcn.ld --whole-archive $(filter %.o,$^) $(filter %.a,$^) -o $@ -Map $(@:.elf=.map)
 
 %.a:
 	@ test ! -z '$?' || { echo 'no object files for $@'; return 1; }
-	$(AR) -v -r $@ $(filter %.o,$?)
+	@echo 'Creating static library $@'
+	$(QUIET)$(AR) -v -r $@ $(filter %.o,$?)
 
 # generate baserom hashes
 build/verify.sha1: build/release/baserom.bin build/debug/baserom.bin
