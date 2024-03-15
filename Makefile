@@ -143,10 +143,10 @@ TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a gx.a gxD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a
+all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a db.a dbD.a dsp.a dspD.a gx.a gxD.a hio.a hioD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a vi.a viD.a
 
-verify: test-release.bin test-debug.bin verify.sha1
-	@sha1sum -c verify.sha1
+verify: build/release/test.bin build/debug/test.bin build/verify.sha1
+	@sha1sum -c build/verify.sha1
 
 extract: $(DTK)
 	$(info Extracting files...)
@@ -293,6 +293,18 @@ card_c_files := \
 card.a  : $(addprefix $(BUILD_DIR)/release/,$(card_c_files:.c=.o))
 cardD.a : $(addprefix $(BUILD_DIR)/debug/,$(card_c_files:.c=.o))
 
+db_c_files := $(wildcard src/db/*.c)
+db.a  : $(addprefix $(BUILD_DIR)/release/,$(db_c_files:.c=.o))
+dbD.a : $(addprefix $(BUILD_DIR)/debug/,$(db_c_files:.c=.o))
+
+dsp_c_files := $(wildcard src/dsp/*.c)
+dsp.a  : $(addprefix $(BUILD_DIR)/release/,$(dsp_c_files:.c=.o))
+dspD.a : $(addprefix $(BUILD_DIR)/debug/,$(dsp_c_files:.c=.o))
+
+hio_c_files := $(wildcard src/hio/*.c)
+hio.a  : $(addprefix $(BUILD_DIR)/release/,$(hio_c_files:.c=.o))
+hioD.a : $(addprefix $(BUILD_DIR)/debug/,$(hio_c_files:.c=.o))
+
 pad_c_files := src/pad/Padclamp.c src/pad/Pad.c
 pad.a  : $(addprefix $(BUILD_DIR)/release/,$(pad_c_files:.c=.o))
 padD.a : $(addprefix $(BUILD_DIR)/debug/,$(pad_c_files:.c=.o))
@@ -305,13 +317,21 @@ dvd_c_files := $(wildcard src/dvd/*.c)
 dvd.a  : $(addprefix $(BUILD_DIR)/release/,$(dvd_c_files:.c=.o))
 dvdD.a : $(addprefix $(BUILD_DIR)/debug/,$(dvd_c_files:.c=.o))
 
-# either the stub or non-stub version of some libraries can be linked, but not both
-TEST_LIBS := amcnotstub odenotstub card gx os pad perf
+vi_c_files := \
+	src/vi/vi.c \
+	src/vi/i2c.c \
+	src/vi/initphilips.c \
+	src/vi/gpioexi.c
+vi.a  : $(addprefix $(BUILD_DIR)/release/,$(vi_c_files:.c=.o))
+viD.a : $(addprefix $(BUILD_DIR)/debug/,$(vi_c_files:.c=.o))
 
-baserom-release.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
-test-release.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)
-baserom-debug.elf:   build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l)D.a)
-test-debug.elf:      build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l)D.a)
+# either the stub or non-stub version of some libraries can be linked, but not both
+TEST_LIBS := amcnotstub db hio odenotstub card gx os pad perf vi
+
+build/release/baserom.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
+build/release/test.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)
+build/debug/baserom.elf:   build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l)D.a)
+build/debug/test.elf:      build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l)D.a)
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
@@ -325,7 +345,7 @@ test-debug.elf:      build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l)D.a)
 	$(AR) -v -r $@ $(filter %.o,$?)
 
 # generate baserom hashes
-verify.sha1: baserom-release.bin baserom-debug.bin
+build/verify.sha1: build/release/baserom.bin build/debug/baserom.bin
 	sha1sum $^ | sed 's/baserom/test/' > $@
 
 # ------------------------------------------------------------------------------

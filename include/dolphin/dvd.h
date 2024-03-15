@@ -80,6 +80,22 @@ s32 DVDGetDriveStatus(void);
 BOOL DVDOpenDir(char *dirName, DVDDir *dir);
 BOOL DVDCloseDir(DVDDir *dir);
 BOOL DVDReadDir(DVDDir *dir, DVDDirEntry *dirent);
+void DVDDumpWaitingQueue(void);
+int DVDLowRead(void * addr, unsigned long length, unsigned long offset, void (* callback)(unsigned long));
+int DVDLowSeek(unsigned long offset, void (* callback)(unsigned long));
+int DVDLowWaitCoverClose(void (* callback)(unsigned long));
+int DVDLowReadDiskID(struct DVDDiskID * diskID, void (* callback)(unsigned long));
+int DVDLowStopMotor(void (* callback)(unsigned long));
+int DVDLowRequestError(void (* callback)(unsigned long));
+int DVDLowInquiry(struct DVDDriveInfo * info, void (* callback)(unsigned long));
+int DVDLowAudioStream(unsigned long subcmd, unsigned long length, unsigned long offset, void (* callback)(unsigned long));
+int DVDLowRequestAudioStatus(unsigned long subcmd, void (* callback)(unsigned long));
+int DVDLowAudioBufferConfig(int enable, unsigned long size, void (* callback)(unsigned long));
+void DVDLowReset();
+void (* DVDLowSetResetCoverCallback(void (* callback)(unsigned long)))(unsigned long);
+int DVDLowBreak();
+void (* DVDLowClearCallback())(unsigned long);
+unsigned long DVDLowGetCoverStatus();
 
 #define DVDReadAsync(fileInfo, addr, length, offset, callback) \
     DVDReadAsyncPrio((fileInfo), (addr), (length), (offset), (callback), 2)

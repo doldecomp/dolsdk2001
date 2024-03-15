@@ -20,16 +20,16 @@ Currently this repository supports building the following libraries:
 | axfx         | :x: |
 | base         | :x: |
 | card         | :heavy_check_mark: |
-| db           | :x: |
+| db           | :heavy_check_mark: |
 | demo         | :x: |
 | dolformat    | :x: |
-| dsp          | :x: |
+| dsp          | :heavy_check_mark: |
 | dtk          | :x: |
 | dvd          | :warning: |
 | fileCache    | :x: |
 | G2D          | :x: |
-| gx           | :x: |
-| hio          | :x: |
+| gx           | :heavy_check_mark: |
+| hio          | :heavy_check_mark: |
 | mcc          | :x: |
 | mix          | :x: |
 | mtx          | :x: |
@@ -42,7 +42,7 @@ Currently this repository supports building the following libraries:
 | support      | :x: |
 | syn          | :x: |
 | texPalette   | :x: |
-| vi           | :x: |
+| vi           | :heavy_check_mark: |
 
 ## Preparation
 

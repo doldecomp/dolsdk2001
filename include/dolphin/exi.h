@@ -1,6 +1,8 @@
 #ifndef _DOLPHIN_EXI_H_
 #define _DOLPHIN_EXI_H_
 
+#include <dolphin/os/OSContext.h>
+
 typedef void (*EXICallback)(s32 chan, OSContext *context);
 
 EXICallback EXISetExiCallback(s32 channel, EXICallback callback);
