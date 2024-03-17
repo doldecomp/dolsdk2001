@@ -25,7 +25,7 @@ Currently this repository supports building the following libraries:
 | dolformat    | :x: |
 | dsp          | :heavy_check_mark: |
 | dtk          | :x: |
-| dvd          | :warning: |
+| dvd          | :heavy_check_mark: |
 | fileCache    | :x: |
 | G2D          | :x: |
 | gx           | :heavy_check_mark: |
