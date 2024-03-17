@@ -82,6 +82,5 @@ TEXT_STUB(sprintf)
 TEXT_STUB(srand)
 TEXT_STUB(strlen)
 TEXT_STUB(strncpy)
+TEXT_STUB(tolower)
 TEXT_STUB(vprintf)
-
-DATA_STUB(__DVDLongFileNameFlag)
