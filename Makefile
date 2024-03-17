@@ -314,7 +314,12 @@ perf_c_files := $(wildcard src/perf/*.c)
 perf.a  : $(addprefix $(BUILD_DIR)/release/,$(perf_c_files:.c=.o))
 perfD.a : $(addprefix $(BUILD_DIR)/debug/,$(perf_c_files:.c=.o))
 
-dvd_c_files := $(wildcard src/dvd/*.c)
+dvd_c_files := \
+	src/dvd/dvdlow.c \
+	src/dvd/dvdfs.c \
+	src/dvd/dvd.c \
+	src/dvd/dvdqueue.c \
+	src/dvd/fstload.c
 dvd.a  : $(addprefix $(BUILD_DIR)/release/,$(dvd_c_files:.c=.o))
 dvdD.a : $(addprefix $(BUILD_DIR)/debug/,$(dvd_c_files:.c=.o))
 
@@ -327,7 +332,7 @@ vi.a  : $(addprefix $(BUILD_DIR)/release/,$(vi_c_files:.c=.o))
 viD.a : $(addprefix $(BUILD_DIR)/debug/,$(vi_c_files:.c=.o))
 
 # either the stub or non-stub version of some libraries can be linked, but not both
-TEST_LIBS := amcnotstub db hio odenotstub card gx os pad perf vi
+TEST_LIBS := amcnotstub db hio odenotstub card dvd gx os pad perf vi
 
 build/release/baserom.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
 build/release/test.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)
