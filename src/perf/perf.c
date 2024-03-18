@@ -6,10 +6,6 @@
 #include "__perf.h"
 #include "../gx/__gx.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define TOKEN_MAX 0xFFFF
 
 // .bss
@@ -24,13 +20,13 @@ static volatile unsigned char magic; // size: 0x1, address: 0x0
 static void * (* PerfAlloc)(unsigned long); // size: 0x4, address: 0x4
 static void (* PerfFree)(void *); // size: 0x4, address: 0x8
 static void (* DSCB)(unsigned short); // size: 0x4, address: 0xC
-volatile long PERFCurrSample; // size: 0x4, address: 0x10
-unsigned long PERFCurrFrame; // size: 0x4, address: 0x14
-struct PerfEvent * PERFEvents; // size: 0x4, address: 0x18
-struct Frame * PERFFrames; // size: 0x4, address: 0x1C
-unsigned long PERFNumSamples; // size: 0x4, address: 0x20
-unsigned long PERFNumEvents; // size: 0x4, address: 0x24
 unsigned long PERFNumFrames; // size: 0x4, address: 0x28
+unsigned long PERFNumEvents; // size: 0x4, address: 0x24
+unsigned long PERFNumSamples; // size: 0x4, address: 0x20
+struct Frame * PERFFrames; // size: 0x4, address: 0x1C
+struct PerfEvent * PERFEvents; // size: 0x4, address: 0x18
+unsigned long PERFCurrFrame; // size: 0x4, address: 0x14
+volatile long PERFCurrSample; // size: 0x4, address: 0x10
 
 // functions
 static void PERFResetAllMemMetrics();
@@ -40,7 +36,7 @@ static void PERFTokenCallback(unsigned short token);
 unsigned long PERFInit(unsigned long numSamples, unsigned long numFramesHistory, unsigned long numTypes, void * (* allocator)(unsigned long), 
         void (* deallocator)(void *), void (* initDraw)());
 void PERFSetEvent(unsigned char id, char * name, PerfType type);
-void PERFSetEventColor(unsigned char id, GXColor & color);
+void PERFSetEventColor(unsigned char id, GXColor color);
 void PERFStartFrame();
 void PERFEndFrame();
 void PERFEventStart(unsigned char id);
@@ -202,13 +198,13 @@ unsigned long PERFInit(unsigned long numSamples, unsigned long numFramesHistory,
     size += (numFramesHistory * (numSamples * 0xB0));
     size += (numTypes * 0x10);
     
-    PERFFrames = (Frame*)PerfAlloc(numFramesHistory * 0x10);
+    PERFFrames = (struct Frame*)PerfAlloc(numFramesHistory * 0x10);
 
     for(i = 0; i < PERFNumFrames; i++) {
         PERFFrames[i].samples = (PerfSample *)PerfAlloc(numSamples * 0xB0);
         PERFFrames[i].lastSample = 0;
     }
-    PERFEvents = (PerfEvent *)PerfAlloc(numTypes * 0x10);
+    PERFEvents = (struct PerfEvent *)PerfAlloc(numTypes * 0x10);
     for(i = 0; i < numTypes; i++) {
         PERFEvents[i].name = 0;
         PERFEvents[i].currSample = -1;
@@ -229,7 +225,7 @@ void PERFSetEvent(unsigned char id, char * name, PerfType type) {
     PERFEvents[id].color = def;
 }
 
-void PERFSetEventColor(unsigned char id, GXColor & color) {
+void PERFSetEventColor(unsigned char id, GXColor color) {
     PERFEvents[id].color = color; 
 }
 
@@ -429,7 +425,3 @@ void PERFStopAutoSampling() {
     OSCancelAlarm(&PERFAlarm);
     OSRestoreInterrupts(enabled);
 }
-
-#ifdef __cplusplus
-}
-#endif

@@ -12,7 +12,7 @@ static volatile unsigned long ResetOccurred; // size: 0x4, address: 0x10
 static int WaitingCoverClose; // size: 0x4, address: 0x14
 static volatile int Breaking; // size: 0x4, address: 0x18
 
-void __DVDInterruptHandler(int unused, struct OSContext * context) {
+void __DVDInterruptHandler(short unused, struct OSContext * context) {
     struct OSContext exceptionContext;
     unsigned long cause;
     unsigned long reg;
