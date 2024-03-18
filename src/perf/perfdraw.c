@@ -5,10 +5,6 @@
 
 #include "__perf.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 __declspec(weak) float HEIGHT(unsigned long a, float f);
 __declspec(weak) float COORD(unsigned long a /* r3 */);
 
@@ -674,7 +670,3 @@ void PERFToggleDrawXFBars() {
 void PERFToggleDrawRASBar() {
     bDrawRASBar = (bDrawRASBar) ? 0 : 1; 
 }
-
-#ifdef __cplusplus
-}
-#endif

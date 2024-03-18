@@ -124,11 +124,6 @@ build/debug/src/card/CARDRename.o: CHARFLAGS := -char signed
 build/release/src/card/CARDRename.o: CHARFLAGS := -char signed
 build/debug/src/card/CARDOpen.o: CHARFLAGS := -char signed
 build/release/src/card/CARDOpen.o: CHARFLAGS := -char signed
-
-# this lib is compiled as C++
-build/debug/src/perf/%.o: CFLAGS += -lang=c++
-build/release/src/perf/%.o: CFLAGS += -lang=c++
-
 build/debug/src/dvd/%.o: CFLAGS += -char signed
 build/release/src/dvd/%.o: CFLAGS += -char signed
 
