@@ -59,6 +59,9 @@ struct DVDCommandBlock * __DVDPopWaitingQueue(void) {
     for(i = 0; i < 4; i++) {
         q = (struct DVDCommandBlock *)&WaitingQueue[i];
         if (q->next != q) {
+#if DOLPHIN_REVISION >= 37
+            OSRestoreInterrupts(enabled);
+#endif
             return PopWaitingQueuePrio(i);
         }
     }
@@ -75,6 +78,9 @@ int __DVDCheckWaitingQueue(void) {
     for(i = 0; i < 4; i++) {
         q = (struct DVDCommandBlock *)&WaitingQueue[i];
         if (q->next != q) {
+#if DOLPHIN_REVISION >= 37
+            OSRestoreInterrupts(enabled);
+#endif
             return 1;
         }
     }

@@ -125,8 +125,10 @@ build/debug/src/card/CARDRename.o: CHARFLAGS := -char signed
 build/release/src/card/CARDRename.o: CHARFLAGS := -char signed
 build/debug/src/card/CARDOpen.o: CHARFLAGS := -char signed
 build/release/src/card/CARDOpen.o: CHARFLAGS := -char signed
+ifneq ($(DOLPHIN_REVISION),37)
 build/debug/src/dvd/%.o: CFLAGS += -char signed
 build/release/src/dvd/%.o: CFLAGS += -char signed
+endif
 
 %/stub.o: CFLAGS += -warn off
 
@@ -316,6 +318,7 @@ dvd_c_files := \
 	src/dvd/dvdfs.c \
 	src/dvd/dvd.c \
 	src/dvd/dvdqueue.c \
+	src/dvd/dvderror.c \
 	src/dvd/fstload.c
 dvd.a  : $(addprefix $(BUILD_DIR)/release/,$(dvd_c_files:.c=.o))
 dvdD.a : $(addprefix $(BUILD_DIR)/debug/,$(dvd_c_files:.c=.o))
