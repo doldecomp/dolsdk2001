@@ -5,6 +5,9 @@
 
 #include "__perf.h"
 
+__declspec(weak) float HEIGHT(unsigned long a, float f);
+__declspec(weak) float COORD(unsigned long a /* r3 */);
+
 extern Mtx mID;
 
 // internal macro for Perfdraw.
