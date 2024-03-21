@@ -1,5 +1,5 @@
-#ifndef _CHARPIPELINE_HTABLE_H_
-#define _CHARPIPELINE_HTABLE_H_
+#ifndef _CHARPIPELINE_STRUCTURES_HTABLE_H_
+#define _CHARPIPELINE_STRUCTURES_HTABLE_H_
 
 #include <charPipeline/structures/List.h>
 
