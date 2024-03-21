@@ -5,7 +5,7 @@
 build/
 
 # Local binary executables
-dtk
+tools/dtk
 objdiff
 *.exe
 
