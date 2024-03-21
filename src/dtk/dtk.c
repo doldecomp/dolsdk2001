@@ -239,12 +239,6 @@ u32 DTKQueueTrack(char *fileName, DTKTrack *track, u32 eventMask, DTKCallback ca
     u32 startTrack;
     BOOL old;
 
-    // needed to match
-    &eventMask;
-    &callback;
-
-    eventMask = eventMask;
-    callback = callback;
     startTrack = 0;
     if (!DVDOpen(fileName, &track->dvdFileInfo)) {
         return 1;
