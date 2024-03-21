@@ -22,7 +22,7 @@ Currently this repository supports building the following libraries:
 | card         | :heavy_check_mark: |
 | db           | :heavy_check_mark: |
 | demo         | :x: |
-| dolformat    | :x: |
+| dolformat    | :heavy_check_mark: |
 | dsp          | :heavy_check_mark: |
 | dtk          | :heavy_check_mark: |
 | dvd          | :heavy_check_mark: |
