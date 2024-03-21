@@ -12,7 +12,7 @@ Currently this repository supports building the following libraries:
 
 | Library Name | Progress |
 | ------------ | ---------- |
-| ai           | :x: |
+| ai           | :heavy_check_mark: |
 | amcnotstub   | :heavy_check_mark: |
 | amcstubs     | :heavy_check_mark: |
 | ar           | :x: |
