@@ -1,4 +1,4 @@
-#include <charPipeline/structures.h>
+#include <charPipeline/structures/List.h>
 
 void DSInitList(DSListPtr list, Ptr obj, DSLinkPtr link)
 {
