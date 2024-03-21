@@ -19,30 +19,30 @@ Currently this repository supports building the following libraries:
 | ax           | :x: |
 | axfx         | :x: |
 | base         | :x: |
-| card         | :warning: |
-| db           | :x: |
+| card         | :heavy_check_mark: |
+| db           | :heavy_check_mark: |
 | demo         | :x: |
-| dolformat    | :x: |
-| dsp          | :x: |
-| dtk          | :x: |
-| dvd          | :x: |
+| dolformat    | :heavy_check_mark: |
+| dsp          | :heavy_check_mark: |
+| dtk          | :heavy_check_mark: |
+| dvd          | :heavy_check_mark: |
 | fileCache    | :x: |
 | G2D          | :x: |
-| gx           | :x: |
-| hio          | :x: |
+| gx           | :heavy_check_mark: |
+| hio          | :heavy_check_mark: |
 | mcc          | :x: |
 | mix          | :x: |
 | mtx          | :x: |
 | odemustubs   | :heavy_check_mark: |
 | odenotstub   | :heavy_check_mark: |
 | os           | :heavy_check_mark: |
-| pad          | :x: |
-| perf         | :x: |
+| pad          | :heavy_check_mark: |
+| perf         | :heavy_check_mark: |
 | seq          | :x: |
-| support      | :x: |
+| support      | :heavy_check_mark: |
 | syn          | :x: |
 | texPalette   | :x: |
-| vi           | :x: |
+| vi           | :heavy_check_mark: |
 
 ## Preparation
 

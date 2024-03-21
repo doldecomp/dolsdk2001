@@ -1,6 +1,8 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+#include "__os.h"
+
 #define HID2 920
 
 volatile OSContext* __OSCurrentContext : (OS_BASE_CACHED | 0x00D4);

@@ -13,6 +13,8 @@ typedef unsigned long long int u64;
 typedef float  f32;
 typedef double f64;
 
+typedef char *Ptr;
+
 typedef int BOOL;
 
 #define FALSE 0
@@ -31,8 +33,12 @@ typedef int BOOL;
 
 #define INT_MAX 2147483647
 
-#define NULL (void*)0
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
 
 #include "libc/stdarg.h"
+#include "libc/string.h"
+#include "libc/ctype.h"
 
 #endif

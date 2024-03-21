@@ -21,5 +21,20 @@
 #include <dolphin/gx/GXDraw.h>
 #include <dolphin/gx/GXPerf.h>
 #include <dolphin/gx/GXCpu2Efb.h>
+#include <dolphin/gx/GXVerify.h>
+
+// unsorted GX externs
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// GXMisc
+void (* GXSetDrawSyncCallback(void (* cb)(unsigned short)))(unsigned short);
+void GXSetDrawSync(unsigned short token);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

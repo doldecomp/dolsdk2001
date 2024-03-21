@@ -31,6 +31,4 @@
 
 #define BIAS 0xB2575
 
-long long __OSGetSystemTime();
-
 #endif // _DOLPHIN_OSTIME_H_

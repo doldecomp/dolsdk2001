@@ -492,6 +492,18 @@ void PPCEnableSpeculation();
 void PPCDisableSpeculation();
 void PPCSetFpIEEEMode();
 void PPCSetFpNonIEEEMode();
+u32 PPCMfpmc4();
+u32 PPCMfpmc3();
+u32 PPCMfpmc1();
+void PPCMtpmc1(u32 newPmc1);
+void PPCMtpmc2(u32 newPmc1);
+void PPCMtpmc3(u32 newPmc1);
+void PPCMtpmc4(u32 newPmc1);
+void PPCMtmmcr0(u32 newMmcr0);
+void PPCMtmmcr1(u32 newMmcr0);
+void PPCMtdmaU(u32 newdmau);
+void PPCMtdmaL(u32 newdmal);
+u32 PPCMfdec(void);
 
 #ifdef __cplusplus
 }

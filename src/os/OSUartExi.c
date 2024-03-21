@@ -1,7 +1,12 @@
-#include <dolphin.h>
+#include <dolphin/exi.h>
 #include <dolphin/os.h>
 
-static unsigned long serEnabled; // .bss
+static unsigned long serEnabled;
+
+// None of the functions in this file were ever used or made public
+int InitializeUART();
+int ReadUARTN();
+int WriteUARTN(void *buf, u32 len);
 
 int InitializeUART() {
     if (!(OSGetConsoleType() & 0x10000000)) {

@@ -1,5 +1,8 @@
-#include <dolphin.h>
+#include <dolphin/exi.h>
 #include <dolphin/os.h>
+#include <macros.h>
+
+#include "__os.h"
 
 // End of each month in standard year
 static int YearDays[MONTH_MAX] = {0,   31,  59,  90,  120, 151,
@@ -90,7 +93,7 @@ static int GetYearDays(int year, int mon) {
 }
 
 static int GetLeapDays(int year) {
-    ASSERTLINE("OSTime.c", 260, 0 <= year);
+    ASSERTLINE(260, 0 <= year);
     
     if (year < 1) {
         return 0;
@@ -104,7 +107,7 @@ static void GetDates(int days, OSCalendarTime* td) {
     int month;
     int * md;
 
-    ASSERTLINE("OSTime.c", 285, 0 <= days);
+    ASSERTLINE(285, 0 <= days);
 
     td->wday = (days + 6) % WEEK_DAY_MAX;
 
@@ -133,26 +136,26 @@ void OSTicksToCalendarTime(long long ticks, OSCalendarTime* td) {
     d = ticks % OS_SEC_TO_TICKS(1);    
     if (d < 0) {
         d += OS_SEC_TO_TICKS(1);
-        ASSERTLINE("OSTime.c", 330, 0 <= d);
+        ASSERTLINE(330, 0 <= d);
     }
 
     td->usec = OS_TICKS_TO_USEC(d) % USEC_MAX;
     td->msec = OS_TICKS_TO_MSEC(d) % MSEC_MAX;
 
-    ASSERTLINE("OSTime.c", 334, 0 <= td->usec);
-    ASSERTLINE("OSTime.c", 335, 0 <= td->msec);
+    ASSERTLINE(334, 0 <= td->usec);
+    ASSERTLINE(335, 0 <= td->msec);
 
     ticks -= d;
 
-    ASSERTLINE("OSTime.c", 338, ticks % OSSecondsToTicks(1) == 0);
-    ASSERTLINE("OSTime.c", 342, 0 <= OSTicksToSeconds(ticks) / 86400 + BIAS && OSTicksToSeconds(ticks) / 86400 + BIAS <= INT_MAX);
+    ASSERTLINE(338, ticks % OSSecondsToTicks(1) == 0);
+    ASSERTLINE(342, 0 <= OSTicksToSeconds(ticks) / 86400 + BIAS && OSTicksToSeconds(ticks) / 86400 + BIAS <= INT_MAX);
 
     days = (OS_TICKS_TO_SEC(ticks) / SECS_IN_DAY) + BIAS;    
     secs = OS_TICKS_TO_SEC(ticks) % SECS_IN_DAY;
     if (secs < 0) {
         days -= 1;
         secs += SECS_IN_DAY;
-        ASSERTLINE("OSTime.c", 349, 0 <= secs);
+        ASSERTLINE(349, 0 <= secs);
     }
 
     GetDates(days, td);
@@ -161,7 +164,7 @@ void OSTicksToCalendarTime(long long ticks, OSCalendarTime* td) {
     td->sec = secs % 60;
 }
 
-long long OSCalendarTimeToTicks(struct OSCalendarTime* td) {
+OSTime OSCalendarTimeToTicks(OSCalendarTime* td) {
     long long secs;
     int ov_mon;
     int mon;
@@ -175,7 +178,7 @@ long long OSCalendarTimeToTicks(struct OSCalendarTime* td) {
         ov_mon--;
     }
 
-    ASSERTLINE("OSTime.c", 0x182, (ov_mon <= 0 && 0 <= td->year + ov_mon) || (0 < ov_mon && td->year <= INT_MAX - ov_mon));
+    ASSERTLINE(0x182, (ov_mon <= 0 && 0 <= td->year + ov_mon) || (0 < ov_mon && td->year <= INT_MAX - ov_mon));
     
     year = td->year + ov_mon;
 

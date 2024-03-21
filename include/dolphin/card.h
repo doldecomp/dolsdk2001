@@ -5,6 +5,10 @@
 #include <dolphin/dsp.h>
 #include <dolphin/dvd.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CARD_FILENAME_MAX 32
 #define CARD_MAX_FILE 127
 #define CARD_ICON_MAX 8
@@ -97,7 +101,17 @@ typedef struct CARDID {
     /* 0x1FE */ u16 checkSumInv;
 } CARDID;
 
+#include <dolphin/card/CARDBios.h>
+#include <dolphin/card/CARDCheck.h>
+#include <dolphin/card/CARDCreate.h>
+#include <dolphin/card/CARDDelete.h>
+#include <dolphin/card/CARDDir.h>
+#include <dolphin/card/CARDFormat.h>
+#include <dolphin/card/CARDMount.h>
+#include <dolphin/card/CARDOpen.h>
+#include <dolphin/card/CARDRdwr.h>
 #include <dolphin/card/CARDRead.h>
+#include <dolphin/card/CARDRename.h>
 #include <dolphin/card/CARDStat.h>
 #include <dolphin/card/CARDWrite.h>
 
@@ -116,8 +130,9 @@ typedef struct CARDID {
 
 #define CARD_WORKAREA_SIZE (5 * 8 * 1024)
 
-#define CARD_SEG_SIZE 0x200
-#define CARD_PAGE_SIZE 0x80
+#define CARD_SEG_SIZE 0x200u
+#define CARD_PAGE_SIZE 0x80u
+#define CARD_MAX_SIZE 0x01000000U
 
 #define CARD_NUM_SYSTEM_BLOCK 5
 #define CARD_SYSTEM_BLOCK_SIZE (8 * 1024u)
@@ -148,27 +163,39 @@ typedef struct CARDID {
 #define CARD_RESULT_CANCELED     -14
 #define CARD_RESULT_FATAL_ERROR -128
 
+#define CARDIsValidBlockNo(card, blockNo) ((blockNo) >= CARD_NUM_SYSTEM_BLOCK && (blockNo) < (card)->cBlock)
+
+#define CARD_READ_SIZE 512
+#define CARD_COMMENT_SIZE 64
+
+#define CARD_ICON_WIDTH 32
+#define CARD_ICON_HEIGHT 32
+
+#define CARD_BANNER_WIDTH 96
+#define CARD_BANNER_HEIGHT 32
+
+#define CARD_STAT_ICON_NONE 0
+#define CARD_STAT_ICON_C8 1
+#define CARD_STAT_ICON_RGB5A3 2
+#define CARD_STAT_ICON_MASK 3
+
+#define CARD_STAT_BANNER_NONE 0
+#define CARD_STAT_BANNER_C8 1
+#define CARD_STAT_BANNER_RGB5A3 2
+#define CARD_STAT_BANNER_MASK 3
+
+#define CARDGetBannerFormat(stat) (((stat)->bannerFormat) & CARD_STAT_BANNER_MASK)
+#define CARDGetIconFormat(stat, n) (((stat)->iconFormat >> (2 * (n))) & CARD_STAT_ICON_MASK)
+#define CARDGetDirCheck(dir) ((CARDDirCheck *)&(dir)[CARD_MAX_FILE])
+
 void CARDInit(void);
-s32 CARDUnmount(s32 chan);
-s32 CARDCancel(CARDFileInfo *fileInfo);
-s32 CARDOpen(s32 chan, char *fileName, CARDFileInfo *fileInfo);
-s32 CARDClose(CARDFileInfo *fileInfo);
-s32 CARDProbeEx(s32 chan, s32 *memSize, s32 *sectorSize);
-s32 CARDMountAsync(s32 chan, void *workArea, CARDCallback detachCallback,
-    CARDCallback attachCallback);
 s32 CARDGetResultCode(s32 chan);
 s32 CARDCheckAsync(s32 chan, CARDCallback callback);
 s32 CARDFreeBlocks(s32 chan, s32 *byteNotUsed, s32 *filesNotUsed);
-s32 CARDCreateAsync(s32 chan, char *fileName, u32 size, CARDFileInfo *fileInfo, CARDCallback callback);
-s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat *stat, CARDCallback callback);
-s32 CARDReadAsync(CARDFileInfo* fileInfo, void *addr, s32 length, s32 offset, CARDCallback callback);
-s32 CARDGetStatus(s32 chan, s32 fileNo, CARDStat *stat);
-s32 CARDFastOpen(s32 chan, s32 fileNo, CARDFileInfo *fileInfo);
-s32 CARDFastDeleteAsync(s32 chan, s32 fileNo, CARDCallback callback);
-s32 CARDDeleteAsync(s32 chan, char *fileName, CARDCallback callback);
-s32 CARDRenameAsync(s32 chan, char *oldName, char *newName, CARDCallback callback);
-s32 CARDMount(s32 chan, void *workArea, CARDCallback detachCallback);
-s32 CARDDelete(s32 chan, char *fileName);
-s32 CARDRename(s32 chan, char *oldName, char *newName);
+s32 CARDRenameAsync(s32 chan, const char *oldName, const char *newName, CARDCallback callback);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

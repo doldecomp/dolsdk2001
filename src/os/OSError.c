@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <dolphin.h>
 #include <dolphin/os.h>
 
@@ -35,7 +36,7 @@ void OSPanic(char* file, int line, char* msg, ...) {
 OSErrorHandler OSSetErrorHandler(OSError error, OSErrorHandler handler) {
     OSErrorHandler oldHandler;
 
-    ASSERTMSGLINE("OSError.c", 0x8F, error < __OS_EXCEPTION_MAX, "OSSetErrorHandler(): unknown error.");
+    ASSERTMSGLINE(0x8F, error < __OS_EXCEPTION_MAX, "OSSetErrorHandler(): unknown error.");
     oldHandler = OSErrorTable[error];
     OSErrorTable[error] = handler;
     return oldHandler;

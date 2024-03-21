@@ -1,6 +1,8 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+#include "__os.h"
+
 static OSFontHeader* FontData; // type unsure
 static u8* SheetImage;         // type unsure
 static u8* WidthTable;         // type unsure
@@ -377,7 +379,7 @@ char * OSGetFontTexel(char * string, void * image, long pos, long stride , long 
     unsigned char * colorIndex;
     unsigned char * imageSrc;
 
-    ASSERTLINE("OSFont.c", 0x1F6, FontData && !SheetImage);
+    ASSERTLINE(0x1F6, FontData && !SheetImage);
     
     code = *string;
     if (code == '\0') {
@@ -392,7 +394,7 @@ char * OSGetFontTexel(char * string, void * image, long pos, long stride , long 
     }
     colorIndex = &FontData->c0;
 
-    ASSERTLINE("OSFont.c", 0x209, FontData->sheetFormat == GX_TF_I4);
+    ASSERTLINE(0x209, FontData->sheetFormat == GX_TF_I4);
 
     fontCode = GetFontCode(code);
 
@@ -480,8 +482,8 @@ char * OSGetFontTexture(char * string, void ** image, long * x, long * y, long *
     int row;
     int column;
 
-    ASSERTLINE("OSFont.c", 0x291, SheetImage);
-    ASSERTLINE("OSFont.c", 0x292, WidthTable);
+    ASSERTLINE(0x291, SheetImage);
+    ASSERTLINE(0x292, WidthTable);
 
     code = *string;
     if (code == 0) {
@@ -515,7 +517,7 @@ char * OSGetFontTexture(char * string, void ** image, long * x, long * y, long *
 char * OSGetFontWidth(char * string, long * width) {
     unsigned short code;
 
-    ASSERTLINE("OSFont.c", 0x2C2, WidthTable);
+    ASSERTLINE(0x2C2, WidthTable);
 
     code = *string;
     if (code == 0) {

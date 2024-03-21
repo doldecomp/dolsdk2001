@@ -4,41 +4,8 @@
 
 #include "__card.h"
 
-#define CARD_SYSTEM_BLOCK_SIZE (8 * 1024u)
-
-#define CARD_STAT_SPEED_END 0
-#define CARD_STAT_SPEED_FAST 1
-#define CARD_STAT_SPEED_MIDDLE 2
-#define CARD_STAT_SPEED_SLOW 3
-#define CARD_STAT_SPEED_MASK 3
-
-#define CARD_READ_SIZE 512
-#define CARD_COMMENT_SIZE 64
-
-#define CARD_ICON_WIDTH 32
-#define CARD_ICON_HEIGHT 32
-
-#define CARD_BANNER_WIDTH 96
-#define CARD_BANNER_HEIGHT 32
-
-#define CARD_STAT_ICON_NONE 0
-#define CARD_STAT_ICON_C8 1
-#define CARD_STAT_ICON_RGB5A3 2
-#define CARD_STAT_ICON_MASK 3
-
-#define CARD_STAT_BANNER_NONE 0
-#define CARD_STAT_BANNER_C8 1
-#define CARD_STAT_BANNER_RGB5A3 2
-#define CARD_STAT_BANNER_MASK 3
-
-#define CARDGetBannerFormat(stat) (((stat)->bannerFormat) & CARD_STAT_BANNER_MASK)
-#define CARDGetIconFormat(stat, n) (((stat)->iconFormat >> (2 * (n))) & CARD_STAT_ICON_MASK)
-
 // functions
 static void UpdateIconOffsets(CARDDir *ent, CARDStat *stat);
-s32 CARDGetStatus(s32 chan, s32 fileNo, CARDStat *stat);
-s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat *stat, CARDCallback callback);
-long CARDSetStatus(long chan, long fileNo, struct CARDStat * stat);
 
 static void UpdateIconOffsets(CARDDir *ent, CARDStat *stat) {
     u32 offset;
@@ -108,8 +75,8 @@ s32 CARDGetStatus(s32 chan, s32 fileNo, CARDStat *stat) {
     CARDDir *ent;
     s32 result;
 
-    ASSERTLINE("CARDStat.c", 0x97, 0 <= chan && chan < 2);
-    ASSERTLINE("CARDStat.c", 0x98, 0 <= fileNo && fileNo < CARD_MAX_FILE);
+    ASSERTLINE(0x97, 0 <= chan && chan < 2);
+    ASSERTLINE(0x98, 0 <= fileNo && fileNo < CARD_MAX_FILE);
 
     if (fileNo < 0 || CARD_MAX_FILE <= fileNo)
         return CARD_RESULT_FATAL_ERROR;
@@ -149,8 +116,8 @@ s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat *stat, CARDCallback callba
     CARDDir *ent;
     s32 result;
 
-    ASSERTLINE("CARDStat.c", 0xD5, 0 <= fileNo && fileNo < CARD_MAX_FILE);
-    ASSERTLINE("CARDStat.c", 0xD6, 0 <= chan && chan < 2);
+    ASSERTLINE(0xD5, 0 <= fileNo && fileNo < CARD_MAX_FILE);
+    ASSERTLINE(0xD6, 0 <= chan && chan < 2);
 
     if (fileNo < 0 || CARD_MAX_FILE <= fileNo)
         return CARD_RESULT_FATAL_ERROR;

@@ -37,6 +37,10 @@ extern void exit(int);
 __declspec(section ".init") extern void __init_hardware(void);
 __declspec(section ".init") extern void __flush_cache(void* address, unsigned int size);
 
+static void __init_registers(void);
+static void __init_data(void);
+
+__declspec(section ".init")
 __declspec(weak) asm void __start(void) {
   // clang-format off
 	nofralloc
@@ -145,7 +149,7 @@ asm static void __init_registers(void) {
   // clang-format on
 }
 
-void __init_data(void) {
+static void __init_data(void) {
   __rom_copy_info* dci;
   __bss_init_info* bii;
 

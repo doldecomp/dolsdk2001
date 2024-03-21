@@ -1,6 +1,8 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+#include "__os.h"
+
 #define SHN_UNDEF 0
 #define SHN_LORESERVE 0xff00
 #define SHN_LOPROC 0xff00
@@ -215,7 +217,7 @@ BOOL OSLink(OSModuleInfo* newModule, void* bss) {
   OSModuleInfo* moduleInfo;
   OSImportInfo* imp;
 
-  ASSERTLINE("OSLink.c", 0xEB, newModule->version == OS_MODULE_VERSION);
+  ASSERTLINE(0xEB, newModule->version == OS_MODULE_VERSION);
 
   moduleHeader = (OSModuleHeader*)newModule;
 
@@ -279,9 +281,9 @@ static BOOL Undo(OSModuleHeader* newModule, OSModuleHeader* module) {
   u32 offset;
   u32 x;
 
-  ASSERTLINE("OSLink.c", 0x147, newModule);
+  ASSERTLINE(0x147, newModule);
   idNew = newModule->info.id;
-  ASSERTLINE("OSLink.c", 0x149, idNew);
+  ASSERTLINE(0x149, idNew);
   
   for (imp = (OSImportInfo*)module->impOffset;
        imp < (OSImportInfo*)(module->impOffset + module->impSize); imp++) {
@@ -356,7 +358,7 @@ BOOL OSUnlink(OSModuleInfo* oldModule) {
   OSModuleHeader* moduleHeader;
   OSModuleInfo* moduleInfo;
 
-  ASSERTLINE("OSLink.c", 0x1AA, oldModule->version == OS_MODULE_VERSION);
+  ASSERTLINE(0x1AA, oldModule->version == OS_MODULE_VERSION);
   moduleHeader = (OSModuleHeader*)oldModule;
 
   DEQUEUE_INFO(oldModule, &__OSModuleInfoList, link);

@@ -1,6 +1,15 @@
 #ifndef _DOLPHIN_OS_H_
 #define _DOLPHIN_OS_H_
 
+#include <dolphin/types.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef s64 OSTime;
+typedef u32 OSTick;
+
 #include <dolphin/os/OSAlloc.h>
 #include <dolphin/os/OSCache.h>
 #include <dolphin/os/OSContext.h>
@@ -17,15 +26,18 @@
 #include <dolphin/os/OSSerial.h>
 #include <dolphin/os/OSRtc.h>
 #include <dolphin/os/OSMessage.h>
-#include <dolphin/os/OSMemory.h>
 #include <dolphin/os/OSException.h>
 #include <dolphin/os/OSAlarm.h>
+#include <dolphin/os/OSDC.h>
+#include <dolphin/os/OSIC.h>
+#include <dolphin/os/OSLC.h>
+#include <dolphin/os/OSL2.h>
 
 // private macro, maybe shouldn't be defined here?
 #define OFFSET(addr, align) (((u32)(addr) & ((align)-1)))
 
-typedef s64 OSTime;
-typedef u32 OSTick;
+u32 OSGetPhysicalMemSize(void);
+u32 OSGetConsoleSimulatedMemSize(void);
 
 // Upper words of the masks, since UIMM is only 16 bits
 #define OS_CACHED_REGION_PREFIX 0x8000
@@ -59,6 +71,7 @@ unsigned int __gUnknown800030C0[2] : (OS_BASE_CACHED | 0x30C0);
 #define OSSecondsToTicks(sec) ((sec) * (OS_TIMER_CLOCK))
 #define OSMillisecondsToTicks(msec) ((msec) * (OS_TIMER_CLOCK / 1000))
 #define OSNanosecondsToTicks(nsec) (((nsec) * (OS_TIMER_CLOCK / 125000)) / 8000)
+#define OSMicrosecondsToTicks(usec) (((usec) * (OS_TIMER_CLOCK / 125000)) / 8)
 
 unsigned long OSGetConsoleType(void);
 void OSInit(void);
@@ -67,6 +80,8 @@ void *OSGetArenaHi(void);
 void *OSGetArenaLo(void);
 void OSSetArenaHi(void *);
 void OSSetArenaLo(void *);
+void *OSAllocFromArenaLo(u32 size, u32 align);
+void *OSAllocFromArenaHi(u32 size, u32 align);
 
 u32 OSGetPhysicalMemSize(void);
 
@@ -104,6 +119,7 @@ typedef struct OSBootInfo_s {
 OSTick OSGetTick(void);
 OSTime OSGetTime(void);
 void OSTicksToCalendarTime(OSTime ticks, OSCalendarTime *td);
+OSTime OSCalendarTimeToTicks(OSCalendarTime *td);
 BOOL OSEnableInterrupts(void);
 BOOL OSDisableInterrupts(void);
 BOOL OSRestoreInterrupts(BOOL level);
@@ -142,9 +158,23 @@ void OSPanic(char *file, int line, char *msg, ...);
 #define OSRoundUp32B(x)   (((u32)(x) + 32 - 1) & ~(32 - 1))
 #define OSRoundDown32B(x) (((u32)(x)) & ~(32 - 1))
 
-#ifndef DEBUG
-#define OSPhysicalToCached(offset) ((void*)((u32)(OS_BASE_CACHED + (u32)offset)))
-#define OSCachedToPhysical(offset) ((void*)((u32)((u32)offset - OS_BASE_CACHED)))
+void *OSPhysicalToCached(u32 paddr);
+void *OSPhysicalToUncached(u32 paddr);
+u32 OSCachedToPhysical(void *caddr);
+u32 OSUncachedToPhysical(void *ucaddr);
+void *OSCachedToUncached(void *caddr);
+void *OSUncachedToCached(void *ucaddr);
+#if !DEBUG
+#define OSPhysicalToCached(paddr)    ((void*) ((u32)(OS_BASE_CACHED   + (u32)(paddr))))
+#define OSPhysicalToUncached(paddr)  ((void*) ((u32)(OS_BASE_UNCACHED + (u32)(paddr))))
+#define OSCachedToPhysical(caddr)    ((u32)   ((u32)(caddr)  - OS_BASE_CACHED))
+#define OSUncachedToPhysical(ucaddr) ((u32)   ((u32)(ucaddr) - OS_BASE_UNCACHED))
+#define OSCachedToUncached(caddr)    ((void*) ((u8*)(caddr)  + (OS_BASE_UNCACHED - OS_BASE_CACHED)))
+#define OSUncachedToCached(ucaddr)   ((void*) ((u8*)(ucaddr) - (OS_BASE_UNCACHED - OS_BASE_CACHED)))
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

@@ -4,11 +4,11 @@
 #include "__card.h"
 
 long __CARDGetStatusEx(long chan, long fileNo, struct CARDDir * dirent) {
-    ASSERTLINE("CARDStatEx.c", 0x45, 0 <= chan && chan < 2);
-    ASSERTLINE("CARDStatEx.c", 0x46, 0 <= fileNo && fileNo < CARD_MAX_FILE);
+    ASSERTLINE(0x45, 0 <= chan && chan < 2);
+    ASSERTLINE(0x46, 0 <= fileNo && fileNo < CARD_MAX_FILE);
 
     if ((fileNo < 0) || (fileNo >= CARD_MAX_FILE)) {
-        return -0x80;
+        return CARD_RESULT_FATAL_ERROR;
     }
 
     {
@@ -24,7 +24,7 @@ long __CARDGetStatusEx(long chan, long fileNo, struct CARDDir * dirent) {
         dir = __CARDGetDirBlock(card);
         ent = &dir[fileNo];
         result = __CARDAccess(ent);
-        if (result == -0xA) {
+        if (result == CARD_RESULT_NOPERM) {
             result = __CARDIsPublic(ent);
         }
         if (result >= 0) {
@@ -42,12 +42,12 @@ long __CARDSetStatusExAsync(long chan, long fileNo, struct CARDDir * dirent, voi
     unsigned char * p;
     long i;
 
-    ASSERTLINE("CARDStatEx.c", 0x81, 0 <= fileNo && fileNo < CARD_MAX_FILE);
-    ASSERTLINE("CARDStatEx.c", 0x82, 0 <= chan && chan < 2);
-    ASSERTLINE("CARDStatEx.c", 0x83, *dirent->fileName != 0xff && *dirent->fileName != 0x00);
+    ASSERTLINE(0x81, 0 <= fileNo && fileNo < CARD_MAX_FILE);
+    ASSERTLINE(0x82, 0 <= chan && chan < 2);
+    ASSERTLINE(0x83, *dirent->fileName != 0xff && *dirent->fileName != 0x00);
 
     if ((fileNo < 0) || (fileNo >= CARD_MAX_FILE) || ((u8) dirent->fileName[0] == 0xFF) || ((u8) dirent->fileName[0] == 0)) {
-        return -0x80;
+        return CARD_RESULT_FATAL_ERROR;
     }
 
     result = __CARDGetControlBlock(chan, &card);
