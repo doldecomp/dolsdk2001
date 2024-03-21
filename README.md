@@ -39,7 +39,7 @@ Currently this repository supports building the following libraries:
 | pad          | :heavy_check_mark: |
 | perf         | :heavy_check_mark: |
 | seq          | :x: |
-| support      | :x: |
+| support      | :heavy_check_mark: |
 | syn          | :x: |
 | texPalette   | :x: |
 | vi           | :heavy_check_mark: |
