@@ -5,7 +5,7 @@
 ifneq (,$(findstring Windows,$(OS)))
   EXE := .exe
 else
-  WINE ?= 
+  WINE ?=
 endif
 
 # If 0, tells the console to chill out. (Quiets the make process.)
@@ -134,14 +134,14 @@ endif
 
 ######################## Build #############################
 
-A_FILES := $(foreach dir,$(BASEROM_DIR),$(wildcard $(dir)/*.a)) 
+A_FILES := $(foreach dir,$(BASEROM_DIR),$(wildcard $(dir)/*.a))
 
 TARGET_LIBS := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS)))
 TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a db.a dbD.a dsp.a dspD.a dtk.a dtkD.a gx.a gxD.a hio.a hioD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a vi.a viD.a
+all: $(DTK) ai.a aiD.a amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a db.a dbD.a dolformat.a dolformatD.a dsp.a dspD.a dtk.a dtkD.a gx.a gxD.a hio.a hioD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a support.a supportD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a vi.a viD.a
 
 verify: build/release/test.bin build/debug/test.bin build/verify.sha1
 	@sha1sum -c build/verify.sha1
@@ -195,6 +195,10 @@ build/release/src/%.o: src/%.c
 
 ################################ Build AR Files ###############################
 
+ai_c_files := $(wildcard src/ai/*.c)
+ai.a  : $(addprefix $(BUILD_DIR)/release/,$(ai_c_files:.c=.o))
+aiD.a : $(addprefix $(BUILD_DIR)/debug/,$(ai_c_files:.c=.o))
+
 amcnotstub_c_files := $(wildcard src/amcnotstub/*.c)
 amcnotstub.a  : $(addprefix $(BUILD_DIR)/release/,$(amcnotstub_c_files:.c=.o))
 amcnotstubD.a : $(addprefix $(BUILD_DIR)/debug/,$(amcnotstub_c_files:.c=.o))
@@ -236,7 +240,6 @@ odenotstub_c_files := $(wildcard src/odenotstub/*.c)
 odenotstub.a  : $(addprefix $(BUILD_DIR)/release/,$(odenotstub_c_files:.c=.o))
 odenotstubD.a : $(addprefix $(BUILD_DIR)/debug/,$(odenotstub_c_files:.c=.o))
 
-#os_c_files := $(wildcard src/os/OS*.c) src/os/time.dolphin.c src/os/__start.c src/os/__ppc_eabi_init.c
 os_c_files := \
 	src/os/OS.c \
 	src/os/OSAddress.c \
@@ -297,6 +300,10 @@ db_c_files := $(wildcard src/db/*.c)
 db.a  : $(addprefix $(BUILD_DIR)/release/,$(db_c_files:.c=.o))
 dbD.a : $(addprefix $(BUILD_DIR)/debug/,$(db_c_files:.c=.o))
 
+dolformat_c_files := $(wildcard src/dolformat/*.c)
+dolformat.a  : $(addprefix $(BUILD_DIR)/release/,$(dolformat_c_files:.c=.o))
+dolformatD.a : $(addprefix $(BUILD_DIR)/debug/,$(dolformat_c_files:.c=.o))
+
 dsp_c_files := $(wildcard src/dsp/*.c)
 dsp.a  : $(addprefix $(BUILD_DIR)/release/,$(dsp_c_files:.c=.o))
 dspD.a : $(addprefix $(BUILD_DIR)/debug/,$(dsp_c_files:.c=.o))
@@ -317,6 +324,14 @@ perf_c_files := $(wildcard src/perf/*.c)
 perf.a  : $(addprefix $(BUILD_DIR)/release/,$(perf_c_files:.c=.o))
 perfD.a : $(addprefix $(BUILD_DIR)/debug/,$(perf_c_files:.c=.o))
 
+support_c_files := \
+	src/support/List.c \
+	src/support/string.c \
+	src/support/Tree.c \
+	src/support/HTable.c
+support.a  : $(addprefix $(BUILD_DIR)/release/,$(support_c_files:.c=.o))
+supportD.a : $(addprefix $(BUILD_DIR)/debug/,$(support_c_files:.c=.o))
+
 dvd_c_files := \
 	src/dvd/dvdlow.c \
 	src/dvd/dvdfs.c \
@@ -336,7 +351,7 @@ vi.a  : $(addprefix $(BUILD_DIR)/release/,$(vi_c_files:.c=.o))
 viD.a : $(addprefix $(BUILD_DIR)/debug/,$(vi_c_files:.c=.o))
 
 # either the stub or non-stub version of some libraries can be linked, but not both
-TEST_LIBS := amcnotstub db dtk hio odenotstub card dvd gx os pad perf vi
+TEST_LIBS := ai amcnotstub db dolformat dtk hio odenotstub card dvd gx os pad perf support vi
 
 build/release/baserom.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
 build/release/test.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)
