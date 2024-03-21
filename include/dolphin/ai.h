@@ -28,5 +28,6 @@ u8 AIGetStreamVolLeft(void);
 void AISetStreamVolRight(u8 volume);
 u8 AIGetStreamVolRight(void);
 void AIInit(u8 *stack);
+void AISetStreamTrigger(u32 trigger);
 
 #endif
