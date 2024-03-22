@@ -1,7 +1,9 @@
 #include <dolphin/os.h>
 #include <charPipeline/fileCache.h>
 
-static DSCache DODisplayCache;
+#include "__fileCache.h"
+
+DSCache DODisplayCache;
 u8 DOCacheInitialized;
 
 static u8 AllocCacheNode(DSCacheNodePtr *cacheNode, char *name);
@@ -148,5 +150,5 @@ void DSSetCachePurgeFlag(DSCachePtr cache, u8 purgeFlag)
 void CSHInitDisplayCache(void)
 {
     DSInitCache(&DODisplayCache);
-    DOCacheInitialized = 1;
+    DOCacheInitialized = TRUE;
 }

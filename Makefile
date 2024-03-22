@@ -141,7 +141,7 @@ TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) ai.a aiD.a amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a db.a dbD.a demo.a demoD.a dolformat.a dolformatD.a dsp.a dspD.a dtk.a dtkD.a fileCache.a fileCacheD.a gx.a gxD.a hio.a hioD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a support.a supportD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a vi.a viD.a
+all: $(DTK) ai.a aiD.a amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a db.a dbD.a demo.a demoD.a dolformat.a dolformatD.a dsp.a dspD.a dtk.a dtkD.a fileCache.a fileCacheD.a gx.a gxD.a hio.a hioD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a support.a supportD.a texPalette.a texPaletteD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a vi.a viD.a
 
 verify: build/release/test.bin build/debug/test.bin build/verify.sha1
 	@sha1sum -c build/verify.sha1
@@ -335,6 +335,10 @@ support_c_files := \
 support.a  : $(addprefix $(BUILD_DIR)/release/,$(support_c_files:.c=.o))
 supportD.a : $(addprefix $(BUILD_DIR)/debug/,$(support_c_files:.c=.o))
 
+texPalette_c_files := $(wildcard src/texPalette/*.c)
+texPalette.a  : $(addprefix $(BUILD_DIR)/release/,$(texPalette_c_files:.c=.o))
+texPaletteD.a : $(addprefix $(BUILD_DIR)/debug/,$(texPalette_c_files:.c=.o))
+
 dvd_c_files := \
 	src/dvd/dvdlow.c \
 	src/dvd/dvdfs.c \
@@ -357,7 +361,7 @@ demo.a  : $(addprefix $(BUILD_DIR)/release/,$(demo_c_files:.c=.o))
 demoD.a : $(addprefix $(BUILD_DIR)/debug/,$(demo_c_files:.c=.o))
 
 # either the stub or non-stub version of some libraries can be linked, but not both
-TEST_LIBS := ai amcnotstub db dolformat dtk fileCache hio odenotstub card dvd gx os pad perf support vi
+TEST_LIBS := ai amcnotstub db dolformat dtk fileCache hio odenotstub card dvd gx os pad perf support texPalette vi
 
 build/release/baserom.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
 build/release/test.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)
