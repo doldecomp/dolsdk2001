@@ -9,8 +9,8 @@ extern "C" {
 
 typedef struct
 {
-	Ptr Prev;
-	Ptr Next;
+    Ptr Prev;
+    Ptr Next;
 } DSLink, *DSLinkPtr;
 
 typedef struct
