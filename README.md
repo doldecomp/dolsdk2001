@@ -21,7 +21,7 @@ Currently this repository supports building the following libraries:
 | base         | :x: |
 | card         | :heavy_check_mark: |
 | db           | :heavy_check_mark: |
-| demo         | :x: |
+| demo         | :warning: |
 | dolformat    | :heavy_check_mark: |
 | dsp          | :heavy_check_mark: |
 | dtk          | :heavy_check_mark: |
