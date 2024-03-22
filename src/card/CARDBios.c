@@ -5,7 +5,7 @@
 #include "os/__os.h"
 #include "__card.h"
 
-struct CARDControl __CARDBlock[2] ATTRIBUTE_ALIGN(32);
+struct CARDControl __CARDBlock[2];
 
 DVDDiskID * __CARDDiskID;
 DVDDiskID __CARDDiskNone;

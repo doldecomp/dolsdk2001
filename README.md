@@ -12,7 +12,7 @@ Currently this repository supports building the following libraries:
 
 | Library Name | Progress |
 | ------------ | ---------- |
-| ai           | :x: |
+| ai           | :heavy_check_mark: |
 | amcnotstub   | :heavy_check_mark: |
 | amcstubs     | :heavy_check_mark: |
 | ar           | :x: |
@@ -22,11 +22,11 @@ Currently this repository supports building the following libraries:
 | card         | :heavy_check_mark: |
 | db           | :heavy_check_mark: |
 | demo         | :warning: |
-| dolformat    | :x: |
+| dolformat    | :heavy_check_mark: |
 | dsp          | :heavy_check_mark: |
-| dtk          | :x: |
+| dtk          | :heavy_check_mark: |
 | dvd          | :heavy_check_mark: |
-| fileCache    | :x: |
+| fileCache    | :heavy_check_mark: |
 | G2D          | :x: |
 | gx           | :heavy_check_mark: |
 | hio          | :heavy_check_mark: |
@@ -39,7 +39,7 @@ Currently this repository supports building the following libraries:
 | pad          | :heavy_check_mark: |
 | perf         | :heavy_check_mark: |
 | seq          | :x: |
-| support      | :x: |
+| support      | :heavy_check_mark: |
 | syn          | :x: |
 | texPalette   | :x: |
 | vi           | :heavy_check_mark: |

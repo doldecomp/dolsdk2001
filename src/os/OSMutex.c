@@ -43,10 +43,6 @@
         (queue)->head = __next;                     \
     } while(0);
 
-struct OSCond {
-    struct OSThreadQueue queue;
-};
-
 static int IsMember(struct OSMutexQueue * queue, struct OSMutex * mutex);
 int __OSCheckMutex(struct OSMutex * mutex);
 int __OSCheckDeadLock(struct OSThread * thread);

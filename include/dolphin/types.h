@@ -13,6 +13,8 @@ typedef unsigned long long int u64;
 typedef float  f32;
 typedef double f64;
 
+typedef char *Ptr;
+
 typedef int BOOL;
 
 #define FALSE 0
