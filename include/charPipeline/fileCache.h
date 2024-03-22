@@ -3,6 +3,10 @@
 
 #include <charPipeline/structures.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define	DS_AUTO_PURGE 0
 #define	DS_NO_PURGE 1
 
@@ -29,5 +33,9 @@ void DSPurgeCache(DSCachePtr cache);
 void DSReleaseCacheObj(DSCachePtr cache, Ptr data);
 void DSSetCachePurgeFlag(DSCachePtr cache, u8 purgeFlag);
 void CSHInitDisplayCache(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

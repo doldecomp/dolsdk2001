@@ -41,7 +41,7 @@ Currently this repository supports building the following libraries:
 | seq          | :x: |
 | support      | :heavy_check_mark: |
 | syn          | :x: |
-| texPalette   | :x: |
+| texPalette   | :heavy_check_mark: |
 | vi           | :heavy_check_mark: |
 
 ## Preparation
