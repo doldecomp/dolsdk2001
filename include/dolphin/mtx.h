@@ -25,20 +25,23 @@ typedef struct
 typedef f32 Mtx[3][4];
 typedef f32 Mtx44[4][4];
 
+void MTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
+void MTXOrtho(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f);
+
 void C_MTXFrustum(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f);
-void C_MTXOrtho(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f);
 void C_MTXPerspective(Mtx44 m, f32 fovY, f32 aspect, f32 n, f32 f);
-void C_MTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
 void C_MTXLookAt(Mtx m, Point3dPtr camPos, VecPtr camUp, Point3dPtr target);
 void C_MTXIdentity(Mtx m);
 
 void PSMTXIdentity(Mtx m);
 
 #define MTXFrustum     C_MTXFrustum
-#define MTXOrtho       C_MTXOrtho
 #define MTXPerspective C_MTXPerspective 
-#define MTXScale       C_MTXScale
 #define MTXLookAt      C_MTXLookAt
+
+#ifdef DEBUG
+#define PSMTXIdentity  C_MTXIdentity
+#endif
 
 #ifdef __cplusplus
 }
