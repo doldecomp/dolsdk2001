@@ -57,6 +57,7 @@ struct STRUCT_LISTBOX {
 };
 
 #include <dolphin/demo/DEMOPuts.h>
+#include <dolphin/demo/DEMOStats.h>
 #include <dolphin/demo/DEMOWin.h>
 
 // unsorted externs
