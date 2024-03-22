@@ -553,7 +553,6 @@ void DEMOWinDestroyMenuWindow(struct STRUCT_MENU * menu) {
     }
 }
 
-// nonmatch: dumb regswaps probably due to redundant casting
 u32 DEMOWinMenuChild(struct STRUCT_MENU * menu, int child_flag) {
     DEMOWinPadInfo pad;
     struct STRUCT_DEMOWIN * handle;
