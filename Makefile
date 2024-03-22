@@ -138,7 +138,7 @@ TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) ai.a aiD.a amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a db.a dbD.a dolformat.a dolformatD.a dsp.a dspD.a dtk.a dtkD.a gx.a gxD.a hio.a hioD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a support.a supportD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a vi.a viD.a
+all: $(DTK) ai.a aiD.a amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a db.a dbD.a dolformat.a dolformatD.a dsp.a dspD.a dtk.a dtkD.a fileCache.a fileCacheD.a gx.a gxD.a hio.a hioD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a support.a supportD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a vi.a viD.a
 
 verify: build/release/test.bin build/debug/test.bin build/verify.sha1
 	@sha1sum -c build/verify.sha1
@@ -308,6 +308,10 @@ dtk_c_files := $(wildcard src/dtk/*.c)
 dtk.a  : $(addprefix $(BUILD_DIR)/release/,$(dtk_c_files:.c=.o))
 dtkD.a : $(addprefix $(BUILD_DIR)/debug/,$(dtk_c_files:.c=.o))
 
+fileCache_c_files := $(wildcard src/fileCache/*.c)
+fileCache.a  : $(addprefix $(BUILD_DIR)/release/,$(fileCache_c_files:.c=.o))
+fileCacheD.a : $(addprefix $(BUILD_DIR)/debug/,$(fileCache_c_files:.c=.o))
+
 hio_c_files := $(wildcard src/hio/*.c)
 hio.a  : $(addprefix $(BUILD_DIR)/release/,$(hio_c_files:.c=.o))
 hioD.a : $(addprefix $(BUILD_DIR)/debug/,$(hio_c_files:.c=.o))
@@ -346,7 +350,7 @@ vi.a  : $(addprefix $(BUILD_DIR)/release/,$(vi_c_files:.c=.o))
 viD.a : $(addprefix $(BUILD_DIR)/debug/,$(vi_c_files:.c=.o))
 
 # either the stub or non-stub version of some libraries can be linked, but not both
-TEST_LIBS := ai amcnotstub db dolformat dtk hio odenotstub card dvd gx os pad perf support vi
+TEST_LIBS := ai amcnotstub db dolformat dtk fileCache hio odenotstub card dvd gx os pad perf support vi
 
 build/release/baserom.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
 build/release/test.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)

@@ -26,7 +26,7 @@ Currently this repository supports building the following libraries:
 | dsp          | :heavy_check_mark: |
 | dtk          | :heavy_check_mark: |
 | dvd          | :heavy_check_mark: |
-| fileCache    | :x: |
+| fileCache    | :heavy_check_mark: |
 | G2D          | :x: |
 | gx           | :heavy_check_mark: |
 | hio          | :heavy_check_mark: |
