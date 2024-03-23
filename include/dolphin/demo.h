@@ -56,7 +56,7 @@ struct STRUCT_LISTBOX {
     /* 0x28 */ int cursor_state; // offset 0x28, size 0x4
 };
 
-extern unsigned long DEMOFontBitmap[];
+extern unsigned long DEMOFontBitmap[768];
 
 #include <dolphin/demo/DEMOInit.h>
 #include <dolphin/demo/DEMOPad.h>

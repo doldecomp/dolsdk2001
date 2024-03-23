@@ -1,7 +1,7 @@
 #include <dolphin.h>
 #include <dolphin/demo.h>
 
-unsigned long DEMOFontBitmap[] = {
+unsigned long DEMOFontBitmap[768] = {
     0x00000000,
     0x00000000,
     0x00000000,
