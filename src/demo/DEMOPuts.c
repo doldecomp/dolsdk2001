@@ -7,19 +7,6 @@
 
 extern unsigned long DEMOFontBitmap[]; // size: 0x0, address: 0x0
 
-typedef enum
-{
-    DMTF_POINTSAMPLE,
-    DMTF_BILERP,
-} DMTexFlt; 
-
-typedef enum
-{
-    DM_FT_OPQ,
-    DM_FT_RVS,
-    DM_FT_XLU
-} DMFontType;
-
 // .bss
 static struct _GXTexObj fontTexObj; // size: 0x20, address: 0x0
 
@@ -31,21 +18,8 @@ static s16 FontSize; // size: 0x2, address: 0xC
 static s16 FontSpace; // size: 0x2, address: 0xE
 
 // functions
-void DEMOSetFontType(DMFontType attr);
-void DEMOLoadFont(enum _GXTexMapID texMap, enum _GXTexMtx texMtx, DMTexFlt texFlt);
-void DEMOSetupScrnSpc(long width, long height, float depth);
-void DEMOInitCaption(long font_type, long width, long height);
-void DEMOPuts(s16 x, s16 y, s16 z, char * string);
-void DEMOPrintf(s16 x, s16 y, s16 z, char * fmt, ...);
-struct OSFontHeader * DEMOInitROMFont();
-void DEMOSetROMFontSize(s16 size, s16 space);
 static void DrawFontChar(int x, int y, int z, int xChar, int yChar);
 static void LoadSheet(void * image, enum _GXTexMapID texMapID);
-int DEMORFPuts(s16 x, s16 y, s16 z, char * string);
-int DEMORFPutsEx(s16 x, s16 y, s16 z, char * string, s16 maxWidth, int length);
-int DEMORFPrintf(s16 x, s16 y, s16 z, char * fmt, ...);
-char * DEMODumpROMFont(char * string);
-int DEMOGetRFTextWidth(char * string);
 
 void DEMOSetFontType(DMFontType attr) {
     switch(attr) {

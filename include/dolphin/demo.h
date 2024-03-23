@@ -56,14 +56,13 @@ struct STRUCT_LISTBOX {
     /* 0x28 */ int cursor_state; // offset 0x28, size 0x4
 };
 
+#include <dolphin/demo/DEMOInit.h>
 #include <dolphin/demo/DEMOPad.h>
 #include <dolphin/demo/DEMOPuts.h>
 #include <dolphin/demo/DEMOStats.h>
 #include <dolphin/demo/DEMOWin.h>
 
 // unsorted externs
-extern void DEMOBeforeRender();
-extern void DEMODoneRender();
 extern void DEMOPrintf(s16 x, s16 y, s16 priority, char *str, ...);
 
 extern struct _GXRenderModeObj *DEMOGetRenderModeObj();

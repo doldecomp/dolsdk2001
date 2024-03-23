@@ -569,7 +569,8 @@ typedef enum _GXTevColorArg
     GX_CC_ONE,
     GX_CC_HALF,
     GX_CC_KONST,
-    GX_CC_ZERO
+    GX_CC_ZERO,
+    GX_CC_TEXRRR
 } GXTevColorArg;
 
 typedef enum _GXTevAlphaArg
