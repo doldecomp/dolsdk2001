@@ -368,6 +368,9 @@ static void DoneCallback(void *_task)
     {
         EXIUnlock(chan);
         __CARDMountCallback(chan, CARD_RESULT_NOCARD);
+#if DOLPHIN_REVISION >= 37
+        return;
+#endif
     }
 
     rshift = (u32)((dummy + 4 + card->latency) * 8 + 1);
@@ -382,12 +385,18 @@ static void DoneCallback(void *_task)
     {
         EXIUnlock(chan);
         __CARDMountCallback(chan, CARD_RESULT_NOCARD);
+#if DOLPHIN_REVISION >= 37
+        return;
+#endif
     }
     result = __CARDReadStatus(chan, &unk);
     if (!EXIProbe(chan))
     {
         EXIUnlock(chan);
         __CARDMountCallback(chan, CARD_RESULT_NOCARD);
+#if DOLPHIN_REVISION >= 37
+        return;
+#endif
     }
     if (result == CARD_RESULT_READY && !(unk & 0x40))
     {

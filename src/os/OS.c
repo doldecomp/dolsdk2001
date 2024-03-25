@@ -26,6 +26,7 @@ void EnableMetroTRKInterrupts(void);
 #define OS_DEBUG_ADDRESS_2 0x800030E9
 #define DB_EXCEPTIONRET_OFFSET 0xC
 #define DB_EXCEPTIONDEST_OFFSET 0x8
+extern u32 UNK_REG_CC006000[] : 0xCC006000;
 
 extern unsigned long __DVDLongFileNameFlag;
 extern unsigned long __PADSpec;
@@ -108,6 +109,23 @@ unsigned long OSGetConsoleType() {
     return BootInfo->consoleType;
 }
 
+#if DOLPHIN_REVISION == 37
+#   define BUILD_DATE      "Jul 19 2001"
+#   define BUILD_TIMESTAMP "05:43:42"
+#elif DOLPHIN_REVISION == 36
+#   define BUILD_DATE      "May 22 2001"
+#   if DEBUG
+#   define BUILD_TIMESTAMP "01:47:06"
+#   else
+#   define BUILD_TIMESTAMP "02:04:48"
+#   endif
+#else
+#   error Build date and timestamp unknown
+#endif
+
+#define _STRINGIFY(x) #x
+#define STRINGIFY(x) _STRINGIFY(x)
+
 void OSInit() {
     unsigned long consoleType;
     void * bi2StartAddr;
@@ -148,12 +166,8 @@ void OSInit() {
             BootInfo->consoleType = OS_CONSOLE_RETAIL1;
         }
         BootInfo->consoleType += (__PIRegs[11] & 0xF0000000) >> 28;
-        OSReport("\nDolphin OS $Revision: 36 $.\n");
-#if DEBUG
-        OSReport("Kernel built : %s %s\n", "May 22 2001", "01:47:06");
-#else
-        OSReport("Kernel built : %s %s\n", "May 22 2001", "02:04:48");
-#endif
+        OSReport("\nDolphin OS $Revision: " STRINGIFY(DOLPHIN_REVISION) " $.\n");
+        OSReport("Kernel built : %s %s\n", BUILD_DATE, BUILD_TIMESTAMP);
         OSReport("Console Type : ");
 
         // work out what console type this corresponds to and report it
@@ -450,3 +464,9 @@ void __OSPSInit(void)
     }
   // clang-format on
 }
+
+#if DOLPHIN_REVISION >= 37
+u32 __OSGetDIConfig(void) {
+    return (u8)UNK_REG_CC006000[9];
+}
+#endif

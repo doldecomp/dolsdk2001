@@ -10,23 +10,6 @@
     (PAD_BUTTON_LEFT | PAD_BUTTON_RIGHT | PAD_BUTTON_DOWN | PAD_BUTTON_UP | PAD_TRIGGER_Z | PAD_TRIGGER_R              \
      | PAD_TRIGGER_L | PAD_BUTTON_A | PAD_BUTTON_B | PAD_BUTTON_X | PAD_BUTTON_Y | PAD_BUTTON_MENU | 0x2000 | 0x0080)
 
-u16 __OSWirelessPadFixMode : 0x800030E0;
-
-static long ResettingChan = 0x00000020; // size: 0x4, address: 0x0
-static unsigned long AnalogMode = 0x00000300; // size: 0x4, address: 0x4
-static unsigned long Spec = 0x00000005; // size: 0x4, address: 0x8
-
-static int Initialized; // size: 0x4, address: 0x0
-static unsigned long EnabledBits; // size: 0x4, address: 0x4
-static unsigned long ResettingBits; // size: 0x4, address: 0x8
-static unsigned long ProbingBits; // size: 0x4, address: 0xC
-static unsigned long RecalibrateBits; // size: 0x4, address: 0x10
-static unsigned long WaitingBits; // size: 0x4, address: 0x14
-static unsigned long CheckingBits; // size: 0x4, address: 0x18
-
-static unsigned long Type[4]; // size: 0x10, address: 0x0
-static struct PADStatus Origin[4]; // size: 0x30, address: 0x10
-
 // functions
 static u16 GetWirelessID(long chan);
 static void SetWirelessID(long chan, u16 id);
@@ -43,7 +26,6 @@ int PADReset(unsigned long mask);
 BOOL PADRecalibrate(u32 mask);
 BOOL PADInit();
 static void PADReceiveCheckCallback(s32 chan, unsigned long error, OSContext *arg2);
-void PADRead(struct PADStatus * status);
 void PADSetSamplingRate(unsigned long msec);
 void __PADTestSamplingRate(unsigned long tvmode);
 void PADControlAllMotors(const u32 *commandArray);
@@ -60,7 +42,36 @@ BOOL PADSync(void);
 void PADSetAnalogMode(u32 mode);
 static BOOL OnReset(BOOL f);
 
+u16 __OSWirelessPadFixMode : 0x800030E0;
+
+static long ResettingChan = 0x00000020; // size: 0x4, address: 0x0
+#if DOLPHIN_REVISION >= 37
+static u32 XPatchBits = 0xF0000000;
+#endif
+static unsigned long AnalogMode = 0x00000300; // size: 0x4, address: 0x4
+static unsigned long Spec = 0x00000005; // size: 0x4, address: 0x8
+
+static int Initialized; // size: 0x4, address: 0x0
+static unsigned long EnabledBits; // size: 0x4, address: 0x4
+static unsigned long ResettingBits; // size: 0x4, address: 0x8
+static unsigned long ProbingBits; // size: 0x4, address: 0xC
+static unsigned long RecalibrateBits; // size: 0x4, address: 0x10
+static unsigned long WaitingBits; // size: 0x4, address: 0x14
+static unsigned long CheckingBits; // size: 0x4, address: 0x18
+#if DOLPHIN_REVISION >= 37
+static int cmdTypeAndStatus;
+static u32 PADType[4];
+#endif
+static unsigned long Type[4]; // size: 0x10, address: 0x0
+static struct PADStatus Origin[4]; // size: 0x30, address: 0x10
+#if DOLPHIN_REVISION >= 37
+u32 CmdProbeDevice[4];
+#endif
 static void (* MakeStatus)(long, struct PADStatus *, unsigned long *) = SPEC2_MakeStatus; // size: 0x4, address: 0xC
+#if DOLPHIN_REVISION >= 37
+static u32 cmdReadOrigin = 0x41000000;
+static u32 cmdCalibrate = 0x42000000;
+#endif
 
 static OSResetFunctionInfo ResetFunctionInfo = {
     OnReset,
@@ -90,6 +101,38 @@ static void SetWirelessID(long chan, u16 id) {
     __OSUnlockSramEx(0);
 }
 
+#if DOLPHIN_REVISION >= 37  // got moved
+static void PADEnable(long chan) {
+    unsigned long cmd;
+    unsigned long chanBit;
+    unsigned long data[2];
+    u8 unused[4];
+
+    chanBit = 0x80000000 >> chan;
+    EnabledBits |= chanBit;
+    SIGetResponse(chan, &data);
+    ASSERTLINE(0x1C4, !(Type[chan] & RES_WIRELESS_LITE));
+    cmd = (AnalogMode | 0x400000);
+    SISetCommand(chan, cmd);
+    SIEnablePolling(EnabledBits);
+}
+
+static void PADDisable(long chan) {
+    int enabled;
+    unsigned long chanBit;
+
+    enabled = OSDisableInterrupts();
+    chanBit = 0x80000000 >> chan;
+    SIDisablePolling(chanBit);
+    EnabledBits &= ~chanBit;
+    WaitingBits &= ~chanBit;
+    CheckingBits &= ~chanBit;
+    ProbingBits &= ~chanBit;
+    SetWirelessID(chan, 0);
+    OSRestoreInterrupts(enabled);
+}
+#endif
+
 static int DoReset() {
     int rc;
     unsigned long frame;
@@ -98,10 +141,17 @@ static int DoReset() {
     rc = 1;
     ResettingChan = __cntlzw(ResettingBits);
     if ((ResettingChan >= 0) && (ResettingChan < 4)) {
+#if DOLPHIN_REVISION >= 37
+        memset(&Origin[ResettingChan], 0, 0xC);
+        Type[ResettingChan] = 0;
+        PADType[ResettingChan] = 0;
+        rc = SITransfer(ResettingChan, &cmdTypeAndStatus, 1, &Type[ResettingChan], 3, PADResetCallback, 0);
+#else
         frame = 0;
         memset(&Origin[ResettingChan], 0, 0xC);
         Type[ResettingChan] = 0;
         rc = SITransfer(ResettingChan, &frame, 1, &Type[ResettingChan], 3, PADResetCallback, 0);
+#endif
         chanBit = (0x80000000 >> ResettingChan);
         ResettingBits &= ~chanBit;
         if (rc == 0) {
@@ -112,6 +162,7 @@ static int DoReset() {
     return rc;
 }
 
+#if DOLPHIN_REVISION < 37  // got moved
 static void PADEnable(long chan) {
     unsigned long cmd;
     unsigned long chanBit;
@@ -125,12 +176,16 @@ static void PADEnable(long chan) {
     SISetCommand(chan, cmd);
     SIEnablePolling(EnabledBits);
 }
+#endif
 
 static void ProbeWireless(long chan) {
     unsigned long cmd;
     unsigned long chanBit;
     unsigned long data[2];
     unsigned long type;
+#if DOLPHIN_REVISION >= 37
+    u8 unused[4];
+#endif
 
     chanBit = 0x80000000 >> chan;
     EnabledBits |= chanBit;
@@ -166,6 +221,7 @@ static void PADProbeCallback(s32 chan, u32 error, OSContext *context) {
     DoReset();
 }
 
+#if DOLPHIN_REVISION < 37  // got moved
 static void PADDisable(long chan) {
     int enabled;
     unsigned long chanBit;
@@ -180,11 +236,14 @@ static void PADDisable(long chan) {
     SetWirelessID(chan, 0);
     OSRestoreInterrupts(enabled);
 }
+#endif
 
 static void UpdateOrigin(s32 chan) {
-    PADStatus *origin;
+#if DOLPHIN_REVISION >= 37
+    u32 chanBit = PAD_CHAN0_BIT >> chan;
+#endif
+    PADStatus *origin = &Origin[chan];
 
-    origin = &Origin[chan];
     switch (AnalogMode & 0x00000700u)
     {
     case 0x00000000u:
@@ -216,6 +275,13 @@ static void UpdateOrigin(s32 chan) {
     origin->stickY -= 128;
     origin->substickX -= 128;
     origin->substickY -= 128;
+#if DOLPHIN_REVISION >= 37
+    if (XPatchBits & chanBit)
+    {
+        if (64 < origin->stickX && (Type[chan] & 0xffff0000) == SI_GC_CONTROLLER)
+            origin->stickX = 0;
+    }
+#endif
 }
 
 static void PADOriginCallback(s32 chan, u32 error, OSContext *context) {
@@ -253,18 +319,29 @@ static void PADFixCallback(long unused, unsigned long error, struct OSContext *c
             return;
         }
         if ((type & 0x40000000) && !(type & 0x80000) && !(type & 0x40000)) {
+#if DOLPHIN_REVISION >= 37
+            SITransfer(ResettingChan, &cmdReadOrigin, 1, &Origin[ResettingChan], 10, PADOriginCallback, 0);
+#else
             frame = 0x41000000;
             SITransfer(ResettingChan, &frame, 1, &Origin[ResettingChan], 0xA, PADOriginCallback, 0);
+#endif
             return;
         }
+#if DOLPHIN_REVISION >= 37
+        SITransfer(ResettingChan, &CmdProbeDevice[ResettingChan], 3, &Origin[ResettingChan], 8, PADProbeCallback, 0);
+#else
         frame = (ResettingChan << 0x16) | 0x4D000000 | (__OSWirelessPadFixMode << 8) & 0x3FFF00u;
         SITransfer(ResettingChan, &frame, 3, &Origin[ResettingChan], 8, PADProbeCallback, 0);
+#endif
         return;
     }
     DoReset();
 }
 
 unsigned long __PADFixBits; // size: 0x4, address: 0x24
+#if DOLPHIN_REVISION >= 37
+u32 bss_60[4];
+#endif
 
 static void PADResetCallback(long unused, unsigned long error, struct OSContext *context) {
     unsigned long type;
@@ -272,12 +349,25 @@ static void PADResetCallback(long unused, unsigned long error, struct OSContext 
     unsigned long recalibrate;
     unsigned long chanBit;
     int fix;
+#if DOLPHIN_REVISION < 37
     unsigned long frame;
+#endif
 
     ASSERTLINE(0x2E9, 0 <= ResettingChan && ResettingChan < SI_MAX_CHAN);
 
+#if DOLPHIN_REVISION >= 37
+    if ((error & 0xF) != 0) {
+        Type[ResettingChan] = 0;
+    }
+#endif
+
+#if DOLPHIN_REVISION >= 37
+    chanBit = 0x80000000 >> ResettingChan;
+    PADType[ResettingChan] = (type = Type[ResettingChan]);
+#else
     type = Type[ResettingChan];
     chanBit = 0x80000000 >> ResettingChan;
+#endif
     recalibrate = RecalibrateBits & chanBit;
     RecalibrateBits &= ~chanBit;
     fix = __PADFixBits & chanBit;
@@ -298,6 +388,14 @@ static void PADResetCallback(long unused, unsigned long error, struct OSContext 
             DoReset();
             return;
         }
+#if DOLPHIN_REVISION >= 37
+        if (recalibrate != 0) {
+            SITransfer(ResettingChan, &cmdCalibrate, 3, &Origin[ResettingChan], 0xA, PADOriginCallback, 0);
+            return;
+        }
+        SITransfer(ResettingChan, &cmdReadOrigin, 1, &Origin[ResettingChan], 0xA, PADOriginCallback, 0);
+        return;
+#else
         if (recalibrate != 0) {
             frame = 0x42000000;
             SITransfer(ResettingChan, &frame, 3, &Origin[ResettingChan], 0xA, PADOriginCallback, 0);
@@ -306,11 +404,17 @@ static void PADResetCallback(long unused, unsigned long error, struct OSContext 
         frame = 0x41000000;
         SITransfer(ResettingChan, &frame, 1, &Origin[ResettingChan], 0xA, PADOriginCallback, 0);
         return;
+#endif
     }
     id = (GetWirelessID(ResettingChan) << 8);
     if ((fix != 0) && (id & 0x100000)) {
+#if DOLPHIN_REVISION >= 37
+        bss_60[ResettingChan] = (id & 0xCFFF00) | 0x4E100000;
+        SITransfer(ResettingChan, &bss_60[ResettingChan], 3, &Type[ResettingChan], 3, PADFixCallback, 0);
+#else
         frame = (id & 0xCFFF00) | 0x4E000000 | 0x100000;
         SITransfer(ResettingChan, &frame, 3, &Type[ResettingChan], 3, PADFixCallback, 0);
+#endif
         return;
     }
     if (type & 0x100000) {
@@ -320,27 +424,46 @@ static void PADResetCallback(long unused, unsigned long error, struct OSContext 
                 id |= 0x100000;
                 SetWirelessID(ResettingChan, (u16)(id >> 8) & 0xFFFFFF);
             }
+#if DOLPHIN_REVISION >= 37
+            bss_60[ResettingChan] = id | 0x4E000000;
+            SITransfer(ResettingChan, &bss_60[ResettingChan], 3, &Type[ResettingChan], 3, PADFixCallback, 0);
+#else
             frame = id | 0x4E000000;
             SITransfer(ResettingChan, &frame, 3, &Type[ResettingChan], 3, PADFixCallback, 0);
+#endif
             return;
         }
         if ((type & 0x40000000) && !(type & 0x80000) && !(type & 0x40000)) {
+#if DOLPHIN_REVISION >= 37
+            SITransfer(ResettingChan, &cmdReadOrigin, 1, &Origin[ResettingChan], 10, PADOriginCallback, 0);
+#else
             frame = 0x41000000;
             SITransfer(ResettingChan, &frame, 1, &Origin[ResettingChan], 0xA, PADOriginCallback, 0);
+#endif
             return;
         }
+#if DOLPHIN_REVISION >= 37
+        SITransfer(ResettingChan, &CmdProbeDevice[ResettingChan], 3, &Origin[ResettingChan], 8, PADProbeCallback, 0);
+#else
         frame = (ResettingChan << 0x16) | 0x4D000000 | ((__OSWirelessPadFixMode << 8) & 0x3FFF00u);
         SITransfer(ResettingChan, &frame, 3, &Origin[ResettingChan], 8, PADProbeCallback, 0);
+#endif
         return;
     }
     if (type & 0x40000000) {
         unsigned long id = (type & 0xCFFF00);
         id |= 0x100000;
         SetWirelessID(ResettingChan, (u16)(id >> 8) & 0xFFFFFF);
+#if DOLPHIN_REVISION >= 37
+        bss_60[ResettingChan] = id | 0x4E000000;
+        SITransfer(ResettingChan, &bss_60[ResettingChan], 3, &Type[ResettingChan], 3, PADFixCallback, 0);
+#else
         frame = id | 0x4E000000;
         SITransfer(ResettingChan, &frame, 3, &Type[ResettingChan], 3, PADFixCallback, 0);
+#endif
         return;
     }
+
     SetWirelessID(ResettingChan, 0);
     ProbeWireless(ResettingChan);
     DoReset();
@@ -389,6 +512,9 @@ BOOL PADRecalibrate(u32 mask) {
 unsigned long __PADSpec; // size: 0x4, address: 0x20
 
 BOOL PADInit() {
+#if DOLPHIN_REVISION >= 37
+    s32 chan;
+#endif
     if (!Initialized)
     {
         if (__PADSpec)
@@ -401,7 +527,10 @@ BOOL PADInit() {
                 = (u16)((((time)&0xffff) + ((time >> 16) & 0xffff) + ((time >> 32) & 0xffff) + ((time >> 48) & 0xffff))
                         & 0x3fffu);
         }
-
+#if DOLPHIN_REVISION >= 37
+        for (chan = 0; chan < SI_MAX_CHAN; ++chan)
+            CmdProbeDevice[chan] = (0x4D << 24) | (chan << 22) | ((__OSWirelessPadFixMode & 0x3fffu) << 8);
+#endif
         Initialized = TRUE;
 
         PADSetSamplingRate(0);
@@ -421,21 +550,34 @@ static void PADReceiveCheckCallback(s32 chan, unsigned long error, OSContext *ar
     CheckingBits &= ~chanBit;
     if (EnabledBits & chanBit) {
         if (!(error & 0xF) && (type & 0x80000000) && (type & 0x02000000) && (type & 0x40000000) && !(type & 0x04000000)) {
+#if DOLPHIN_REVISION >= 37
+            SITransfer(chan, &cmdReadOrigin, 1, &Origin[chan], 0xA, PADOriginUpdateCallback, 0);
+#else
             frame = 0x41000000;
             SITransfer(chan, &frame, 1, &Origin[chan], 0xA, PADOriginUpdateCallback, 0);
+#endif
             return;
         }
         PADDisable(chan);
     }
 }
 
-void PADRead(struct PADStatus * status) {
+#if DOLPHIN_REVISION >= 37
+u32
+#else
+void
+#endif
+PADRead(struct PADStatus * status) {
     long chan;
     unsigned long data[2];
     unsigned long chanBit;
     unsigned long sr;
     int chanShift;
+#if DOLPHIN_REVISION >= 37
+    u32 motor = 0;
+#else
     unsigned long frame;
+#endif
     int enabled;
 
     for(chan = 0; chan < 4; chan++, status++) {
@@ -455,10 +597,16 @@ void PADRead(struct PADStatus * status) {
                     memset(status, 0, 0xA);
                     if (!(CheckingBits & chanBit)) {
                         enabled = OSDisableInterrupts();
+#if DOLPHIN_REVISION >= 37
+                        if (SITransfer(chan, &cmdTypeAndStatus, 1, &Type[chan], 3, PADReceiveCheckCallback, 0) != 0) {
+                            CheckingBits |= chanBit;
+                        }
+#else
                         frame = 0;
                         if (SITransfer(chan, &frame, 1, &Type[chan], 3, PADReceiveCheckCallback, 0) != 0) {
                             CheckingBits |= chanBit;
                         }
+#endif
                         OSRestoreInterrupts(enabled);
                     }
                 } else {
@@ -466,30 +614,50 @@ void PADRead(struct PADStatus * status) {
                     status->err = -1;
                     memset(status, 0, 0xA);
                 }
-            } else if (!(sr & (0x20 << chanShift))) {
-                status->err = -3;
-                memset(status, 0, 0xA);
             } else {
-                SIGetResponse(chan, &data);
-                if (data[0] & 0x80000000) {
+#if DOLPHIN_REVISION >= 37
+                if (!(ProbingBits & chanBit) && !(Type[chan] & 0x20000000))
+                    motor |= chanBit;
+#endif
+                if (!(sr & (0x20 << chanShift))) {
                     status->err = -3;
                     memset(status, 0, 0xA);
-                } else if (ProbingBits & chanBit) {
-                    status->err = -1;
-                    memset(status, 0, 0xA);
-                } else if (status->button & 0x2000) {
-                    status->err = -3;
-                    memset(status, 0, 0xA);
-                    frame = 0x41000000;
-                    SITransfer(chan, &frame, 1, &Origin[chan], 0xA, PADOriginUpdateCallback, 0);
                 } else {
-                    status->err = 0;
-                    MakeStatus(chan, status, data);
-                    status->button &= 0xFFFFFF7F;
+                    SIGetResponse(chan, &data);
+                    if (data[0] & 0x80000000) {
+                        status->err = -3;
+                        memset(status, 0, 0xA);
+                    } else if (ProbingBits & chanBit) {
+                            status->err = -1;
+                            memset(status, 0, 0xA);
+                    } else {
+#if DOLPHIN_REVISION >= 37
+                        MakeStatus(chan, status, data);
+#endif
+                        if (status->button & 0x2000) {
+                            status->err = -3;
+                            memset(status, 0, 0xA);
+#if DOLPHIN_REVISION >= 37
+                            SITransfer(chan, &cmdReadOrigin, 1, &Origin[chan], 0xA, PADOriginUpdateCallback, 0);
+#else
+                            frame = 0x41000000;
+                            SITransfer(chan, &frame, 1, &Origin[chan], 0xA, PADOriginUpdateCallback, 0);
+#endif
+                        } else {
+                            status->err = 0;
+#if DOLPHIN_REVISION < 37
+                            MakeStatus(chan, status, data);
+#endif
+                            status->button &= 0xFFFFFF7F;
+                        }
+                    }
                 }
             }
         }
     }
+#if DOLPHIN_REVISION >= 37
+    return motor;
+#endif
 }
 
 typedef struct XY {
@@ -545,7 +713,13 @@ void PADSetSamplingRate(unsigned long msec) {
             xy = XYPAL;
             break;
         default:
-            OSPanic("Pad.c", 0x4DF, "PADSetSamplingRate: unknown TV format");
+            OSPanic("Pad.c",
+#if DOLPHIN_REVISION >= 37
+                0x510,
+#else
+                0x4DF,
+#endif
+                "PADSetSamplingRate: unknown TV format");
     }
     SISetXY(xy[msec].line, xy[msec].count);
     SIEnablePolling(EnabledBits);
@@ -565,9 +739,9 @@ void __PADTestSamplingRate(unsigned long tvmode) {
             for(msec = 0; msec <= 0xB; msec++) {
                 line = xy[msec].line;
                 count = xy[msec].count;
-                OSReport("%2d[msec]: count %3d, line %3d, last %3d, diff0 %2d.%03d, diff1 %2d.%03d\n", msec, count, line, (line * (count - 1)) + LATENCY, 
+                OSReport("%2d[msec]: count %3d, line %3d, last %3d, diff0 %2d.%03d, diff1 %2d.%03d\n", msec, count, line, (line * (count - 1)) + LATENCY,
                     (line * 636) / 10000,
-                    (line * 636) % 10000, 
+                    (line * 636) % 10000,
                     636 * (263 - line * (count - 1)) / 10000,
                     636 * (263 - line * (count - 1)) % 10000);
                 ASSERTLINE(0x505, line * (count - 1) + LATENCY < 263);
@@ -582,9 +756,9 @@ void __PADTestSamplingRate(unsigned long tvmode) {
             for(msec = 0; msec <= 0xB; msec++) {
                 line = xy[msec].line;
                 count = xy[msec].count;
-                OSReport("%2d[msec]: count %3d, line %3d, last %3d, diff0 %2d.%03d, diff1 %2d.%03d\n", msec, count, line, (line * (count - 1)) + LATENCY, 
+                OSReport("%2d[msec]: count %3d, line %3d, last %3d, diff0 %2d.%03d, diff1 %2d.%03d\n", msec, count, line, (line * (count - 1)) + LATENCY,
                     (line * 640) / 10000,
-                    (line * 640) % 10000, 
+                    (line * 640) % 10000,
                     640 * (313 - line * (count - 1)) / 10000,
                     640 * (313 - line * (count - 1)) % 10000);
                 ASSERTLINE(0x51D, line * (count - 1) + LATENCY < 313);

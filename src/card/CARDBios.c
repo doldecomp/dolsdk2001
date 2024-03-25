@@ -41,6 +41,9 @@ void __CARDExtHandler(s32 chan, OSContext *context) {
         card->attached = FALSE;
         card->result = CARD_RESULT_NOCARD;
         EXISetExiCallback(chan, 0);
+#if DOLPHIN_REVISION >= 37
+        OSCancelAlarm(&card->alarm);
+#endif
         callback = card->exiCallback;
 
         if (callback)
@@ -113,17 +116,28 @@ fatal:
 void __CARDTxHandler(s32 chan, OSContext *context) {
     CARDControl *card;
     CARDCallback callback;
+#if DOLPHIN_REVISION >= 37
+    BOOL r31;
+#endif
 
     ASSERTLINE(0x12D, 0 <= chan && chan < 2);
     
     card = &__CARDBlock[chan];
+#if DOLPHIN_REVISION >= 37
+    r31 = !EXIDeselect(chan);
+#else
     !EXIDeselect(chan);
+#endif
     !EXIUnlock(chan);
     callback = card->txCallback;
     if (callback)
     {
         card->txCallback = NULL;
+#if DOLPHIN_REVISION >= 37
+        callback(chan, (!r31 && EXIProbe(chan)) ? CARD_RESULT_READY : CARD_RESULT_NOCARD);
+#else
         callback(chan, (EXIProbe(chan)) ? CARD_RESULT_READY : CARD_RESULT_NOCARD);
+#endif
     }
 }
 
@@ -280,6 +294,12 @@ static void TimeoutHandler(OSAlarm *alarm, OSContext *context) {
         }
     }
 
+#if DOLPHIN_REVISION >= 37
+    if (!card->attached) {
+        return;
+    }
+#endif
+
     ASSERTLINE(0x20E, 0 <= chan && chan < 2);
 
     EXISetExiCallback(chan, NULL);
@@ -297,9 +317,13 @@ static void SetupTimeoutAlarm(CARDControl *card) {
     {
     case 0xF3: 
         break;
+    case 0xF2:
+#if DOLPHIN_REVISION >= 37
+        OSSetAlarm(&card->alarm, OSMillisecondsToTicks(100), TimeoutHandler);
+        break;
+#endif
     case 0xF4:
     case 0xF1:
-    case 0xF2: 
         OSSetAlarm(&card->alarm, OSSecondsToTicks((OSTime)2) * (card->sectorSize / 0x2000),
                    TimeoutHandler);
         break;
@@ -709,15 +733,19 @@ s32 CARDFreeBlocks(s32 chan, s32 *byteNotUsed, s32 *filesNotUsed) {
         return __CARDPutControlBlock(card, CARD_RESULT_BROKEN);
     }
 
-    *byteNotUsed = (s32)(card->sectorSize * fat[CARD_FAT_FREEBLOCKS]);
+    if (DOLPHIN_REVISION < 37 || byteNotUsed != NULL) {
+        *byteNotUsed = (s32)(card->sectorSize * fat[CARD_FAT_FREEBLOCKS]);
+    }
 
-    *filesNotUsed = 0;
-    for (fileNo = 0; fileNo < CARD_MAX_FILE; fileNo++)
-    {
-        ent = &dir[fileNo];
-        if (ent->fileName[0] == 0xff)
+    if (DOLPHIN_REVISION < 37 || filesNotUsed != NULL) {
+        *filesNotUsed = 0;
+        for (fileNo = 0; fileNo < CARD_MAX_FILE; fileNo++)
         {
-            ++*filesNotUsed;
+            ent = &dir[fileNo];
+            if (ent->fileName[0] == 0xff)
+            {
+                ++*filesNotUsed;
+            }
         }
     }
 
@@ -753,6 +781,10 @@ long CARDGetMemSize(long chan, unsigned short * size) {
 s32 CARDGetSectorSize(s32 chan, u32 *size) {
     struct CARDControl *card;
     long result;
+#if DOLPHIN_REVISION >= 37
+    BOOL enabled;
+    CARDControl *tmp;
+#endif
 
     result = __CARDGetControlBlock(chan, &card);
     if (result < 0)
@@ -760,7 +792,19 @@ s32 CARDGetSectorSize(s32 chan, u32 *size) {
         return result;
     }
     *size = card->sectorSize;
+#if DOLPHIN_REVISION >= 37
+    tmp = card;
+    enabled = OSDisableInterrupts();
+    if (tmp->attached) {
+        tmp->result = 0;
+    } else if (tmp->result == -1) {
+        tmp->result = 0;
+    }
+    OSRestoreInterrupts(enabled);
+    return 0;
+#else
     return __CARDPutControlBlock(card, 0);
+#endif
 }
 
 s32 __CARDSync(s32 chan) {

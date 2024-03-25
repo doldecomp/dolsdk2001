@@ -163,6 +163,7 @@ typedef struct CARDID {
 #define CARD_RESULT_CANCELED     -14
 #define CARD_RESULT_FATAL_ERROR -128
 
+// TODO: This should be private
 #define CARDIsValidBlockNo(card, blockNo) ((blockNo) >= CARD_NUM_SYSTEM_BLOCK && (blockNo) < (card)->cBlock)
 
 #define CARD_READ_SIZE 512

@@ -79,10 +79,14 @@ static void ReadCallback(s32 chan, s32 result) {
         goto error;
     }
 
+#if DOLPHIN_REVISION >= 37
+    length = TRUNC(fileInfo->offset + card->sectorSize, card->sectorSize) - fileInfo->offset;
+#else
     // something funky is going on here; these conflicting casts are needed to match both debug
     // and retail regalloc and codegen. Perhaps the macro is different, but for the life of me
     // i cant figure this one out. Fake for now. Maybe? Unless the macro is just weird.
     length = TRUNC((int)fileInfo->offset + (long)card->sectorSize + card->sectorSize - 1, card->sectorSize) - fileInfo->offset;
+#endif
     fileInfo->length -= length;
     if (fileInfo->length <= 0)
         goto error;

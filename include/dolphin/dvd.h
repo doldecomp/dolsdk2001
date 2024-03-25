@@ -90,6 +90,7 @@ void (* DVDLowSetResetCoverCallback(void (* callback)(unsigned long)))(unsigned 
 int DVDLowBreak();
 void (* DVDLowClearCallback())(unsigned long);
 unsigned long DVDLowGetCoverStatus();
+BOOL DVDCheckDisk(void);
 
 // dvd.c
 void DVDInit();

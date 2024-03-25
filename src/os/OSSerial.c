@@ -220,14 +220,20 @@ unsigned long SIEnablePolling(unsigned long poll) {
     }
     
     enabled = OSDisableInterrupts();
+#if DOLPHIN_REVISION >= 37
+    poll >>= 24;
+    Si.poll &= ~((poll >> 4) & 0xF);
+    poll &= 0x03FFFFF0 | ((poll >> 4) & 0xF);
+    poll &= 0xFC0000FF;
+#else
     __SIRegs[0x30/4] = 0;
     poll = poll >> 24;
     en = poll & 0xF0;
     ASSERTLINE(0x202, en);
     poll &= ((en >> 4) | 0x03FFFFF0);
     poll &= 0xFC0000FF;
-    
     Si.poll &= ~(en >> 4);
+#endif
     Si.poll |= poll;
     poll = Si.poll;
     __SIRegs[0x38/4] = 0x80000000;

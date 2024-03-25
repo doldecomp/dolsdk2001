@@ -92,7 +92,11 @@ static VITiming timing[7] =
     { 5, 287, 35, 35, 2, 2, 13, 11, 13, 11, 619, 621, 619, 621, 626, 432, 64, 75, 106, 172, 380, 133, 420 },
     { 6, 240, 24, 25, 3, 2, 16, 15, 14, 13, 518, 517, 516, 519, 525, 429, 64, 78, 112, 162, 373, 122, 412 },
     { 6, 240, 24, 24, 4, 4, 16, 14, 16, 14, 518, 520, 518, 520, 526, 429, 64, 78, 112, 162, 373, 122, 412 },
+#if DOLPHIN_REVISION >= 37
+    { 12, 480, 48, 48, 6, 6, 24, 24, 24, 24, 1038, 1038, 1038, 1038, 1050, 429, 64, 71, 105, 162, 373, 122, 412 },
+#else
     { 12, 480, 44, 44, 10, 10, 24, 24, 24, 24, 1038, 1038, 1038, 1038, 1050, 429, 64, 71, 105, 162, 373, 122, 412 },
+#endif
 };
 static u16 taps[25] = {
     0x01F0, 0x01DC,
@@ -626,9 +630,17 @@ static void setVerticalRegs(u16 dispPosY, u16 dispSizeY, u8 equ, u16 acv, u16 pr
     }
     actualAcv = dispSizeY / c;
     if (black) {
+#if DOLPHIN_REVISION >= 37
+        actualPrbOdd += (actualAcv * 2) - 2;
+#else
         actualPrbOdd += dispSizeY - 2;
+#endif
         actualPsbOdd += 2;
+#if DOLPHIN_REVISION >= 37
+        actualPrbEven += (actualAcv * 2) - 2;
+#else
         actualPrbEven += dispSizeY - 2;
+#endif
         actualPsbEven += 2;
         actualAcv = 0;
     }
@@ -671,6 +683,9 @@ void VIConfigure(GXRenderModeObj *rm)
     enabled = OSDisableInterrupts();
     if (rm->viTVmode == VI_TVMODE_NTSC_PROG) {
         HorVer.nonInter = 2;
+#if DOLPHIN_REVISION >= 37
+        changeMode = 1;
+#endif
     } else {
         newNonInter = rm->viTVmode & 1;
         if (HorVer.nonInter != newNonInter) {
@@ -714,10 +729,23 @@ void VIConfigure(GXRenderModeObj *rm)
     }
     setInterruptRegs(tm);
     reg = regs[1];
+#if DOLPHIN_REVISION >= 37
+    if (HorVer.nonInter == 2) {
+        SET_REG_FIELD(0x66A, reg, 1, 2, 1);
+    } else {
+        SET_REG_FIELD(0x66A, reg, 1, 2, (HorVer.nonInter & 1));
+    }
+#else
     SET_REG_FIELD(0x66A, reg, 1, 2, (HorVer.nonInter & 1));
+#endif
     SET_REG_FIELD(0x66B, reg, 2, 8, HorVer.tv);
     regs[1] = reg;
     MARK_CHANGED(1);
+#if DOLPHIN_REVISION >= 37
+    reg = regs[54];
+    regs[54] = (rm->viTVmode != 2) ? (reg & ~1) : ((reg & ~1) | 1);
+    MARK_CHANGED(54);
+#endif
     setScalingRegs(HorVer.PanSizeX, HorVer.DispSizeX, HorVer.threeD);
     setHorizontalRegs(tm, HorVer.AdjustedDispPosX, HorVer.DispSizeX);
     setBBIntervalRegs(tm);
