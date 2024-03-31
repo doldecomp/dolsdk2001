@@ -9,6 +9,10 @@ extern void __SYNRunLfo(struct SYNVOICE * voice);
 extern void __SYNRunPitchEnvelope(struct SYNVOICE * voice);
 extern void __SYNUpdateMix(struct SYNVOICE * voice);
 extern void __SYNUpdateSrc(struct SYNVOICE * voice);
+extern unsigned long __SYNGetNibbleAddress(unsigned long count);
+
+// synsample.c
+void __SYNSetupSample(struct SYNVOICE * voice);
 
 // synvoice.c
 void __SYNClearVoiceReferences(void * p);

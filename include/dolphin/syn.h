@@ -136,4 +136,9 @@ struct SYNVOICE {
     /* 0x90 */ long pePitch;
 };
 
+// sample formats
+#define SYN_SAMPLE_FORMAT_ADPCM 0
+#define SYN_SAMPLE_FORMAT_PCM16 1
+#define SYN_SAMPLE_FORMAT_PCM8  2
+
 #endif // _DOLPHIN_SYN_H_
