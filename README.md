@@ -40,7 +40,7 @@ Currently this repository supports building the following libraries:
 | perf         | :heavy_check_mark: |
 | seq          | :x: |
 | support      | :heavy_check_mark: |
-| syn          | :x: |
+| syn          | :warning: |
 | texPalette   | :heavy_check_mark: |
 | vi           | :heavy_check_mark: |
 
