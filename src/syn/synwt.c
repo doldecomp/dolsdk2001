@@ -2,11 +2,10 @@
 #include <dolphin/syn.h>
 #include "fake_tgmath.h"
 
-// functions
-int __SYNGetWavetableData(struct SYNVOICE * voice);
+#include "__syn.h"
 
 int __SYNGetWavetableData(struct SYNVOICE * voice) {
-    unsigned long regionIndex;
+    u32 regionIndex;
     struct SYNSYNTH * synth;
 
     synth = voice->synth;
