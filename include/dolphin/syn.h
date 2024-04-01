@@ -141,4 +141,7 @@ struct SYNVOICE {
 #define SYN_SAMPLE_FORMAT_PCM16 1
 #define SYN_SAMPLE_FORMAT_PCM8  2
 
+// unsorted externs
+extern float __SYNn128[]; // size: 0x0, address: 0x0
+
 #endif // _DOLPHIN_SYN_H_

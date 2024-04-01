@@ -5,9 +5,12 @@
 
 // unsorted externs
 extern void __SYNRunVolumeEnvelope(struct SYNVOICE * voice);
-extern void __SYNRunLfo(struct SYNVOICE * voice);
 extern void __SYNRunPitchEnvelope(struct SYNVOICE * voice);
 extern unsigned long __SYNGetNibbleAddress(unsigned long count);
+
+// synlfo.c
+void __SYNSetupLfo(struct SYNVOICE * voice);
+void __SYNRunLfo(struct SYNVOICE * voice);
 
 // synmix.c
 void __SYNSetupVolume(struct SYNVOICE * voice);
