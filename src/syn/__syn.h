@@ -7,8 +7,14 @@
 extern void __SYNRunVolumeEnvelope(struct SYNVOICE * voice);
 extern void __SYNRunLfo(struct SYNVOICE * voice);
 extern void __SYNRunPitchEnvelope(struct SYNVOICE * voice);
-extern void __SYNUpdateMix(struct SYNVOICE * voice);
 extern unsigned long __SYNGetNibbleAddress(unsigned long count);
+
+// synmix.c
+void __SYNSetupVolume(struct SYNVOICE * voice);
+void __SYNSetupPan(struct SYNVOICE * voice);
+long __SYNGetVoiceInput(struct SYNVOICE * voice);
+long __SYNGetVoiceFader(struct SYNVOICE * voice);
+void __SYNUpdateMix(struct SYNVOICE * voice);
 
 // synpitch.c
 float __SYNGetRelativePitch(struct SYNVOICE * voice);
