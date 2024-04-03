@@ -4,9 +4,17 @@
 #include <dolphin/syn.h>
 
 // unsorted externs
-extern void __SYNRunVolumeEnvelope(struct SYNVOICE * voice);
-extern void __SYNRunPitchEnvelope(struct SYNVOICE * voice);
+extern float __SYNn128[];
+extern long __SYNAttackAttnTable[];
+
 extern unsigned long __SYNGetNibbleAddress(unsigned long count);
+
+// synenv.c
+s32 __SYNGetEnvelopeTime(s32 scale, s32 mod, u8 key);
+void __SYNSetupVolumeEnvelope(struct SYNVOICE * voice);
+void __SYNSetupPitchEnvelope(struct SYNVOICE * voice);
+void __SYNRunVolumeEnvelope(struct SYNVOICE * voice);
+void __SYNRunPitchEnvelope(struct SYNVOICE * voice);
 
 // synlfo.c
 void __SYNSetupLfo(struct SYNVOICE * voice);
