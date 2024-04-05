@@ -141,7 +141,7 @@ struct SYNVOICE {
 #define SYN_SAMPLE_FORMAT_PCM16 1
 #define SYN_SAMPLE_FORMAT_PCM8  2
 
-// unsorted externs
-extern float __SYNn128[]; // size: 0x0, address: 0x0
+// synctrl.c
+u8 SYNGetMidiController(struct SYNSYNTH * synth, u8 midiChannel, u8 function);
 
 #endif // _DOLPHIN_SYN_H_

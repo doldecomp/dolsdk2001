@@ -4,10 +4,17 @@
 #include <dolphin/syn.h>
 
 // unsorted externs
-extern float __SYNn128[];
-extern long __SYNAttackAttnTable[];
-
 extern unsigned long __SYNGetNibbleAddress(unsigned long count);
+
+// synctrl.c
+extern float __SYNn128[128];
+
+void __SYNClearAllNotes(struct SYNSYNTH * synth);
+void __SYNSetController(struct SYNSYNTH * synth, u8 midiChannel, u8 function, u8 value);
+void __SYNResetController0(struct SYNSYNTH * synth, u8 midiChannel);
+void __SYNResetController(struct SYNSYNTH * synth, u8 midiChannel);
+void __SYNResetAllControllers(struct SYNSYNTH * synth);
+void __SYNRunInputBufferEvents(struct SYNSYNTH * synth);
 
 // synenv.c
 s32 __SYNGetEnvelopeTime(s32 scale, s32 mod, u8 key);
@@ -21,6 +28,9 @@ void __SYNSetupLfo(struct SYNVOICE * voice);
 void __SYNRunLfo(struct SYNVOICE * voice);
 
 // synmix.c
+extern long __SYNVolumeAttenuation[128];
+extern long __SYNAttackAttnTable[100];
+
 void __SYNSetupVolume(struct SYNVOICE * voice);
 void __SYNSetupPan(struct SYNVOICE * voice);
 long __SYNGetVoiceInput(struct SYNVOICE * voice);
@@ -37,6 +47,8 @@ void __SYNUpdateSrc(struct SYNVOICE * voice);
 void __SYNSetupSample(struct SYNVOICE * voice);
 
 // synvoice.c
+extern struct SYNVOICE __SYNVoice[64];
+
 void __SYNClearVoiceReferences(void * p);
 void __SYNSetVoiceToRelease(struct SYNVOICE * voice, unsigned long priority);
 void __SYNServiceVoice(int i);

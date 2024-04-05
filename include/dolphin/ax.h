@@ -138,5 +138,6 @@ typedef struct _AXVPB {
 // unsorted externs
 extern void AXSetVoicePriority(struct _AXVPB * p /* r29 */, unsigned long priority /* r30 */);
 extern void AXFreeVoice(struct _AXVPB * p /* r30 */);
+extern AXVPB *AXAcquireVoice(u32, void *, struct SYNSYNTH *);
 
 #endif // _DOLPHIN_AX_H_
