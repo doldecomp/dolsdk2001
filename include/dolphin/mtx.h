@@ -53,6 +53,10 @@ void PSMTXIdentity(Mtx m);
 #define VECSquareDistance C_VECSquareDistance
 #define MTXMultVec C_MTXMultVec
 #define MTXMultVecArray C_MTXMultVecArray
+#define MTXCopy C_MTXCopy
+#define MTXConcat C_MTXConcat
+#define MTXInverse C_MTXInverse
+#define MTXTranspose C_MTXTranspose
 #else
 #define VECSquareMag PSVECSquareMag
 #define VECNormalize PSVECNormalize
@@ -61,6 +65,10 @@ void PSMTXIdentity(Mtx m);
 #define VECSquareDistance PSVECSquareDistance
 #define MTXMultVec PSMTXMultVec
 #define MTXMultVecArray PSMTXMultVecArray
+#define MTXCopy PSMTXCopy
+#define MTXConcat PSMTXConcat
+#define MTXInverse PSMTXInverse
+#define MTXTranspose PSMTXTranspose
 #endif
 
 // asm only
@@ -69,6 +77,77 @@ void PSMTXIdentity(Mtx m);
 #define MTXROSkin2VecArray PSMTXROSkin2VecArray
 #define MTXROMultS16VecArray PSMTXROMultS16VecArray
 #define MTXMultS16VecArray PSMTXMultS16VecArray
+
+// mtxstack.c
+typedef struct {
+    u32 numMtx;
+    Mtx *stackBase;
+    Mtx *stackPtr;
+} MTXStack;
+
+void MTXInitStack(MTXStack *sPtr, u32 numMtx);
+Mtx *MTXPush(MTXStack *sPtr, Mtx* m);
+Mtx *MTXPushFwd(MTXStack *sPtr, Mtx *m);
+Mtx *MTXPushInv(MTXStack *sPtr, Mtx *m);
+Mtx *MTXPushInvXpose(MTXStack *sPtr, Mtx *m);
+Mtx *MTXPop(MTXStack *sPtr);
+Mtx *MTXGetStackPtr(MTXStack *sPtr);
+
+// mtxvec.c
+void MTXMultVecSR(Mtx44 m, Vec *src, Vec *dst);
+void MTXMultVecArraySR(Mtx44 m, Vec *srcBase, Vec *dstBase, u32 count); 
+
+// C functions
+void C_MTXMultVec(Mtx44 m, Vec *src, Vec *dst);
+void C_MTXMultVecArray(Mtx m, Vec *srcBase, Vec *dstBase, u32 count);
+
+// asm functions
+void PSMTXMultVec(Mtx44 m, Vec *src, Vec *dst);
+void PSMTXMultVecArray(Mtx m, Vec *srcBase, Vec *dstBase, u32 count);
+
+// psmtx.c
+void PSMTXReorder(Mtx44 *src, ROMtx *dest);
+void PSMTXROMultVecArray(ROMtx *m, Vec *srcBase, Vec *dstBase, u32 count);
+void PSMTXROSkin2VecArray(ROMtx *m0, ROMtx *m1, f32 * wtBase, Vec *srcBase, Vec *dstBase, u32 count);
+void PSMTXROMultS16VecArray(ROMtx *m, S16Vec *srcBase, Vec *dstBase, u32 count);
+void PSMTXMultS16VecArray(Mtx44 *m, S16Vec *srcBase, Vec *dstBase, u32 count);
+
+// vec.c
+f32 VECMag(Vec *v);
+void VECHalfAngle(Vec *a, Vec *b, Vec *half);
+void VECReflect(Vec *src, Vec *normal, Vec *dst);
+f32 VECDistance(Vec *a, Vec *b);
+
+// C functions
+void C_VECAdd(Vec *a, Vec *b, Vec *c);
+void C_VECSubtract(Vec *a, Vec *b, Vec *c);
+void C_VECScale(Vec *src, Vec *dst, f32 scale);
+void C_VECNormalize(Vec *src, Vec *unit);
+f32 C_VECSquareMag(Vec *v);
+f32 C_VECDotProduct(Vec *a, Vec *b);
+void C_VECCrossProduct(Vec *a, Vec *b, Vec *axb);
+f32 C_VECSquareDistance(Vec *a, Vec *b);
+
+// Asm functions
+void PSVECAdd(Vec *a, Vec *b, Vec *c); 
+void PSVECSubtract(Vec *a, Vec *b, Vec *c);
+void PSVECScale(Vec *src, Vec *dst, f32 scale);
+void PSVECNormalize(Vec *vec1, Vec *dst);
+f32 PSVECSquareMag(Vec *vec1);
+f32 PSVECDotProduct(Vec *vec1, Vec *vec2);
+void PSVECCrossProduct(Vec *vec1, Vec *vec2, Vec *dst);
+f32 PSVECSquareDistance(Vec *vec1, Vec *vec2);
+
+// unsorted externs
+extern void C_MTXCopy(Mtx *, Mtx *);
+extern void C_MTXConcat(Mtx *, Mtx *, Mtx *);
+extern void C_MTXInverse(Mtx *, Mtx *);
+extern void C_MTXTranspose(Mtx *, Mtx *);
+
+extern void PSMTXCopy(Mtx *, Mtx *);
+extern void PSMTXConcat(Mtx *, Mtx *, Mtx *);
+extern void PSMTXInverse(Mtx *, Mtx *);
+extern void PSMTXTranspose(Mtx *, Mtx *);
 
 #ifdef __cplusplus
 }

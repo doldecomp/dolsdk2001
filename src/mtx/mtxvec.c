@@ -4,18 +4,6 @@
 
 #define qr0 0
 
-// functions
-void MTXMultVecSR(Mtx44 m, Vec *src, Vec *dst);
-void MTXMultVecArraySR(Mtx44 m, Vec *srcBase, Vec *dstBase, u32 count); 
-
-// C functions
-void C_MTXMultVec(Mtx44 m, Vec *src, Vec *dst);
-void C_MTXMultVecArray(Mtx m, Vec *srcBase, Vec *dstBase, u32 count);
-
-// asm functions
-void PSMTXMultVec(Mtx44 m, Vec *src, Vec *dst);
-void PSMTXMultVecArray(Mtx m, Vec *srcBase, Vec *dstBase, u32 count);
-
 void C_MTXMultVec(Mtx44 m, Vec *src, Vec *dst) {
     Vec vTmp;
 

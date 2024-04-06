@@ -5,32 +5,6 @@
 // defines to make asm work
 #define qr0 0
 
-// functions
-f32 VECMag(Vec *v);
-void VECHalfAngle(Vec *a, Vec *b, Vec *half);
-void VECReflect(Vec *src, Vec *normal, Vec *dst);
-f32 VECDistance(Vec *a, Vec *b);
-
-// C functions
-void C_VECAdd(Vec *a, Vec *b, Vec *c);
-void C_VECSubtract(Vec *a, Vec *b, Vec *c);
-void C_VECScale(Vec *src, Vec *dst, f32 scale);
-void C_VECNormalize(Vec *src, Vec *unit);
-f32 C_VECSquareMag(Vec *v);
-f32 C_VECDotProduct(Vec *a, Vec *b);
-void C_VECCrossProduct(Vec *a, Vec *b, Vec *axb);
-f32 C_VECSquareDistance(Vec *a, Vec *b);
-
-// Asm functions
-void PSVECAdd(Vec *a, Vec *b, Vec *c); 
-void PSVECSubtract(Vec *a, Vec *b, Vec *c);
-void PSVECScale(Vec *src, Vec *dst, f32 scale);
-void PSVECNormalize(Vec *vec1, Vec *dst);
-f32 PSVECSquareMag(Vec *vec1);
-f32 PSVECDotProduct(Vec *vec1, Vec *vec2);
-void PSVECCrossProduct(Vec *vec1, Vec *vec2, Vec *dst);
-f32 PSVECSquareDistance(Vec *vec1, Vec *vec2);
-
 void C_VECAdd(Vec *a, Vec *b, Vec *c) {
     ASSERTMSGLINE(0x57, a, "VECAdd():  NULL VecPtr 'a' ");
     ASSERTMSGLINE(0x58, b, "VECAdd():  NULL VecPtr 'b' ");

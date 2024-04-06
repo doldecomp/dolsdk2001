@@ -6,13 +6,6 @@
 #define qr1 1
 #define qr6 6
 
-// functions
-void PSMTXReorder(Mtx44 *src, ROMtx *dest);
-void PSMTXROMultVecArray(ROMtx *m, Vec *srcBase, Vec *dstBase, u32 count);
-void PSMTXROSkin2VecArray(ROMtx *m0, ROMtx *m1, f32 * wtBase, Vec *srcBase, Vec *dstBase, u32 count);
-void PSMTXROMultS16VecArray(ROMtx *m, S16Vec *srcBase, Vec *dstBase, u32 count);
-void PSMTXMultS16VecArray(Mtx44 *m, S16Vec *srcBase, Vec *dstBase, u32 count);
-
 asm void PSMTXReorder(register Mtx44 *src, register ROMtx *dest) {
     psq_l f0, 0(src), 0, qr0
     psq_l f2, 16(src), 0, qr0
