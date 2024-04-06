@@ -51,12 +51,16 @@ void PSMTXIdentity(Mtx m);
 #define VECAdd C_VECAdd
 #define VECDotProduct C_VECDotProduct
 #define VECSquareDistance C_VECSquareDistance
+#define MTXMultVec C_MTXMultVec
+#define MTXMultVecArray C_MTXMultVecArray
 #else
 #define VECSquareMag PSVECSquareMag
 #define VECNormalize PSVECNormalize
 #define VECAdd PSVECAdd
 #define VECDotProduct PSVECDotProduct
 #define VECSquareDistance PSVECSquareDistance
+#define MTXMultVec PSMTXMultVec
+#define MTXMultVecArray PSMTXMultVecArray
 #endif
 
 // asm only
