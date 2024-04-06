@@ -3,6 +3,8 @@
 
 #include <dolphin/ax.h>
 
+#define SYN_INPUT_BUFFER_SIZE 0x100
+
 struct WTINST {
     /* 0x00 */ u16 keyRegion[128];
 };
@@ -85,7 +87,7 @@ struct SYNSYNTH {
     /* 0x0968 */ long expAttn[16];
     /* 0x09A8 */ long auxAAttn[16];
     /* 0x09E8 */ long auxBAttn[16];
-    /* 0x0A28 */ u8 input[256][3];
+    /* 0x0A28 */ u8 input[SYN_INPUT_BUFFER_SIZE][3];
     /* 0x0D28 */ u8 * inputPosition;
     /* 0x0D2C */ u32 inputCounter;
     /* 0x0D30 */ u32 notes;
@@ -140,6 +142,17 @@ struct SYNVOICE {
 #define SYN_SAMPLE_FORMAT_ADPCM 0
 #define SYN_SAMPLE_FORMAT_PCM16 1
 #define SYN_SAMPLE_FORMAT_PCM8  2
+
+// syn.c
+void SYNInit();
+void SYNQuit();
+void SYNRunAudioFrame();
+void SYNInitSynth(struct SYNSYNTH * synth, void * wavetable, u32 aramBase, u32 priorityVoiceAlloc, u32 priorityNoteOn, u32 priorityNoteRelease);
+void SYNQuitSynth(struct SYNSYNTH * synth);
+void SYNMidiInput(struct SYNSYNTH * synth, u8 * input);
+void SYNSetMasterVolume(struct SYNSYNTH * synth, long dB);
+long SYNGetMasterVolume(struct SYNSYNTH * synth);
+u32 SYNGetActiveNotes(struct SYNSYNTH * synth);
 
 // synctrl.c
 u8 SYNGetMidiController(struct SYNSYNTH * synth, u8 midiChannel, u8 function);

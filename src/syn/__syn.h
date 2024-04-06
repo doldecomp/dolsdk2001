@@ -3,8 +3,8 @@
 
 #include <dolphin/syn.h>
 
-// unsorted externs
-extern unsigned long __SYNGetNibbleAddress(unsigned long count);
+// syn.c
+extern struct SYNSYNTH * __SYNSynthList;
 
 // synctrl.c
 extern float __SYNn128[128];
