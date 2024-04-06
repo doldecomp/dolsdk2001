@@ -18,7 +18,7 @@ Currently this repository supports building the following libraries:
 | ar           | :x: |
 | ax           | :x: |
 | axfx         | :x: |
-| base         | :x: |
+| base         | :heavy_check_mark: |
 | card         | :heavy_check_mark: |
 | db           | :heavy_check_mark: |
 | demo         | :heavy_check_mark: |

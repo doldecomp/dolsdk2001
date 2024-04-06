@@ -472,6 +472,7 @@ typedef union
 #define FPSCR_NI_BIT        29          // Non-IEEE mode
 #endif
 
+// PPCArch.c
 u32 PPCMfmsr();
 void PPCMtmsr(u32 newMSR);
 u32 PPCOrMsr(u32 value);
@@ -504,6 +505,27 @@ void PPCMtmmcr1(u32 newMmcr0);
 void PPCMtdmaU(u32 newdmau);
 void PPCMtdmaL(u32 newdmal);
 u32 PPCMfdec(void);
+u32 PPCMfpmc2(void);
+u32 PPCAndMsr(u32 value);
+u32 PPCAndCMsr(u32 value);
+u32 PPCMfhid1();
+void PPCEieio();
+u32 PPCMfmmcr0();
+u32 PPCMfmmcr1();
+u32 PPCMfpmc2();
+u32 PPCMfsia();
+void PPCMtsia(u32 newSia);
+u32 PPCMfdmaL();
+u32 PPCMfpvr();
+u32 PPCMfdmaU();
+
+// PPCPm.c
+void PMBegin(void);
+void PMEnd(void);
+void PMCycles(void);
+void PML1FetchMisses(void);
+void PML1MissCycles(void);
+void PMInstructions(void);
 
 #ifdef __cplusplus
 }
