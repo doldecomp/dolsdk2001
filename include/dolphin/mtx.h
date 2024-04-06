@@ -43,6 +43,20 @@ void PSMTXIdentity(Mtx m);
 #define PSMTXIdentity  C_MTXIdentity
 #endif
 
+#ifdef DEBUG
+#define VECSquareMag C_VECSquareMag
+#define VECNormalize C_VECNormalize
+#define VECAdd C_VECAdd
+#define VECDotProduct C_VECDotProduct
+#define VECSquareDistance C_VECSquareDistance
+#else
+#define VECSquareMag PSVECSquareMag
+#define VECNormalize PSVECNormalize
+#define VECAdd PSVECAdd
+#define VECDotProduct PSVECDotProduct
+#define VECSquareDistance PSVECSquareDistance
+#endif
+
 #ifdef __cplusplus
 }
 #endif
