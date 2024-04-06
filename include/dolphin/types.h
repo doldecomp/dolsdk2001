@@ -42,4 +42,6 @@ typedef int BOOL;
 #include "libc/string.h"
 #include "libc/ctype.h"
 
+#include "cmath.h"
+
 #endif

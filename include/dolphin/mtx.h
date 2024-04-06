@@ -37,10 +37,6 @@ void C_MTXIdentity(Mtx m);
 
 void PSMTXIdentity(Mtx m);
 
-#define MTXFrustum     C_MTXFrustum
-#define MTXPerspective C_MTXPerspective 
-#define MTXLookAt      C_MTXLookAt
-
 #ifdef DEBUG
 #define PSMTXIdentity  C_MTXIdentity
 #endif
