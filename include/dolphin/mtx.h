@@ -25,6 +25,8 @@ typedef struct
 typedef f32 Mtx[3][4];
 typedef f32 Mtx44[4][4];
 
+typedef f32 ROMtx[4][3];
+
 void MTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
 void MTXOrtho(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f);
 
@@ -56,6 +58,13 @@ void PSMTXIdentity(Mtx m);
 #define VECDotProduct PSVECDotProduct
 #define VECSquareDistance PSVECSquareDistance
 #endif
+
+// asm only
+#define MTXReorder PSMTXReorder
+#define MTXROMultVecArray PSMTXROMultVecArray
+#define MTXROSkin2VecArray PSMTXROSkin2VecArray
+#define MTXROMultS16VecArray PSMTXROMultS16VecArray
+#define MTXMultS16VecArray PSMTXMultS16VecArray
 
 #ifdef __cplusplus
 }
