@@ -32,7 +32,7 @@ Currently this repository supports building the following libraries:
 | hio          | :heavy_check_mark: |
 | mcc          | :x: |
 | mix          | :x: |
-| mtx          | :warning: |
+| mtx          | :heavy_check_mark: |
 | odemustubs   | :heavy_check_mark: |
 | odenotstub   | :heavy_check_mark: |
 | os           | :heavy_check_mark: |

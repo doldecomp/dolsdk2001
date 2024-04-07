@@ -130,6 +130,9 @@ build/release/src/dvd/%.o: CFLAGS += -char signed
 build/debug/src/demo/%.o: CFLAGS += -char signed
 build/release/src/demo/%.o: CFLAGS += -char signed
 
+build/debug/src/mtx/%.o: CFLAGS += -char signed
+build/release/src/mtx/%.o: CFLAGS += -char signed
+
 %/stub.o: CFLAGS += -warn off
 
 ######################## Build #############################

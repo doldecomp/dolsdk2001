@@ -33,13 +33,6 @@ void MTXOrtho(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f);
 void C_MTXFrustum(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f);
 void C_MTXPerspective(Mtx44 m, f32 fovY, f32 aspect, f32 n, f32 f);
 void C_MTXLookAt(Mtx m, Point3dPtr camPos, VecPtr camUp, Point3dPtr target);
-void C_MTXIdentity(Mtx m);
-
-void PSMTXIdentity(Mtx m);
-
-#ifdef DEBUG
-#define PSMTXIdentity  C_MTXIdentity
-#endif
 
 #ifdef DEBUG
 #define VECSquareMag C_VECSquareMag
@@ -47,24 +40,28 @@ void PSMTXIdentity(Mtx m);
 #define VECAdd C_VECAdd
 #define VECDotProduct C_VECDotProduct
 #define VECSquareDistance C_VECSquareDistance
+#define VECCrossProduct C_VECCrossProduct
 #define MTXMultVec C_MTXMultVec
 #define MTXMultVecArray C_MTXMultVecArray
 #define MTXCopy C_MTXCopy
 #define MTXConcat C_MTXConcat
 #define MTXInverse C_MTXInverse
 #define MTXTranspose C_MTXTranspose
+#define MTXIdentity  C_MTXIdentity
 #else
 #define VECSquareMag PSVECSquareMag
 #define VECNormalize PSVECNormalize
 #define VECAdd PSVECAdd
 #define VECDotProduct PSVECDotProduct
 #define VECSquareDistance PSVECSquareDistance
+#define VECCrossProduct PSVECCrossProduct
 #define MTXMultVec PSMTXMultVec
 #define MTXMultVecArray PSMTXMultVecArray
 #define MTXCopy PSMTXCopy
 #define MTXConcat PSMTXConcat
 #define MTXInverse PSMTXInverse
 #define MTXTranspose PSMTXTranspose
+#define MTXIdentity  PSMTXIdentity
 #endif
 
 // asm only
@@ -74,6 +71,38 @@ void PSMTXIdentity(Mtx m);
 #define MTXROMultS16VecArray PSMTXROMultS16VecArray
 #define MTXMultS16VecArray PSMTXMultS16VecArray
 
+// mtx.c
+// functions
+void MTXRotRad(Mtx m, char axis, f32 rad);
+void MTXRotTrig(Mtx m, char axis, f32 sinA, f32 cosA);
+void MTXRotAxisRad(Mtx m, Vec *axis, f32 rad);
+void MTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
+void MTXTransApply(Mtx src, Mtx dst, f32 xT, f32 yT, f32 zT);
+void MTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
+void MTXScaleApply(Mtx src, Mtx dst, f32 xS, f32 yS, f32 zS);
+void MTXQuat(Mtx m, QuaternionPtr q);
+void MTXReflect(Mtx m, Vec *p, Vec *n);
+void MTXLookAt(Mtx m, Vec *camPos, Vec *camUp, Vec *target);
+void MTXLightFrustum(Mtx m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 scaleS, f32 scaleT, f32 transS, f32 transT);
+void MTXLightPerspective(Mtx m, f32 fovY, f32 aspect, f32 scaleS, f32 scaleT, f32 transS, f32 transT);
+void MTXLightOrtho(Mtx m, f32 t, f32 b, f32 l, f32 r, f32 scaleS, f32 scaleT, f32 transS, f32 transT);
+
+// C functions
+void C_MTXIdentity(Mtx m);
+void C_MTXCopy(Mtx src, Mtx dst);
+void C_MTXConcat(Mtx a, Mtx b, Mtx ab);
+void C_MTXTranspose(Mtx src, Mtx xPose);
+u32 C_MTXInverse(Mtx src, Mtx inv);
+u32 C_MTXInvXpose(Mtx src, Mtx invX);
+
+// asm functions
+void PSMTXIdentity(Mtx m);
+void PSMTXCopy(Mtx src, Mtx dst);
+void PSMTXConcat(Mtx mA, Mtx mB, Mtx mAB);
+void PSMTXTranspose(Mtx src, Mtx xPose);
+u32 PSMTXInverse(Mtx src, Mtx inv);
+u32 PSMTXInvXpose(Mtx src, Mtx invX);
+
 // mtxstack.c
 typedef struct {
     u32 numMtx;
@@ -82,10 +111,10 @@ typedef struct {
 } MTXStack;
 
 void MTXInitStack(MTXStack *sPtr, u32 numMtx);
-Mtx *MTXPush(MTXStack *sPtr, Mtx* m);
-Mtx *MTXPushFwd(MTXStack *sPtr, Mtx *m);
-Mtx *MTXPushInv(MTXStack *sPtr, Mtx *m);
-Mtx *MTXPushInvXpose(MTXStack *sPtr, Mtx *m);
+Mtx *MTXPush(MTXStack *sPtr, Mtx m);
+Mtx *MTXPushFwd(MTXStack *sPtr, Mtx m);
+Mtx *MTXPushInv(MTXStack *sPtr, Mtx m);
+Mtx *MTXPushInvXpose(MTXStack *sPtr, Mtx m);
 Mtx *MTXPop(MTXStack *sPtr);
 Mtx *MTXGetStackPtr(MTXStack *sPtr);
 
@@ -133,17 +162,6 @@ f32 PSVECSquareMag(Vec *vec1);
 f32 PSVECDotProduct(Vec *vec1, Vec *vec2);
 void PSVECCrossProduct(Vec *vec1, Vec *vec2, Vec *dst);
 f32 PSVECSquareDistance(Vec *vec1, Vec *vec2);
-
-// unsorted externs
-extern void C_MTXCopy(Mtx *, Mtx *);
-extern void C_MTXConcat(Mtx *, Mtx *, Mtx *);
-extern void C_MTXInverse(Mtx *, Mtx *);
-extern void C_MTXTranspose(Mtx *, Mtx *);
-
-extern void PSMTXCopy(Mtx *, Mtx *);
-extern void PSMTXConcat(Mtx *, Mtx *, Mtx *);
-extern void PSMTXInverse(Mtx *, Mtx *);
-extern void PSMTXTranspose(Mtx *, Mtx *);
 
 #ifdef __cplusplus
 }
