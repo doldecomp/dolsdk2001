@@ -125,16 +125,16 @@ int TTYQuery(void) {
 
 int TTYPrintf(const char *format, ...) {
     if (ttyIsInitialized() && (format != NULL)) {
-        MCC_Hdr *hdr; // r29
-        u32 *id; // r24
-        char *str; // r31
-        u32 maxDataSize; // r26
-        u32 formatLength; // r22
-        u32 dataSize; // r28
-        int err; // r23
-        char * eof; // r21
-        va_list argptr; // r1+0x6C
-        u32 prosecced; // r25
+        MCC_Hdr *hdr;
+        u32 *id;
+        char *str;
+        u32 maxDataSize;
+        u32 formatLength;
+        u32 dataSize;
+        int err;
+        char * eof;
+        va_list argptr;
+        u32 prosecced;
 
         hdr = (void*)&gBuf;
         id = (u32*)(hdr + 1);
