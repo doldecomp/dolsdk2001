@@ -144,7 +144,7 @@ TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) ai.a aiD.a amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a db.a dbD.a demo.a demoD.a dolformat.a dolformatD.a dsp.a dspD.a dtk.a dtkD.a fileCache.a fileCacheD.a gx.a gxD.a hio.a hioD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a support.a supportD.a texPalette.a texPaletteD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a vi.a viD.a syn.a synD.a base.a baseD.a mtx.a mtxD.a mcc.a mccD.a
+all: $(DTK) ai.a aiD.a amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a db.a dbD.a demo.a demoD.a dolformat.a dolformatD.a dsp.a dspD.a dtk.a dtkD.a fileCache.a fileCacheD.a gx.a gxD.a hio.a hioD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a support.a supportD.a texPalette.a texPaletteD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a vi.a viD.a syn.a synD.a base.a baseD.a mtx.a mtxD.a mcc.a mccD.a ax.a axD.a
 
 verify: build/release/test.bin build/debug/test.bin build/verify.sha1
 	@sha1sum -c build/verify.sha1
@@ -378,6 +378,10 @@ mtxD.a : $(addprefix $(BUILD_DIR)/debug/,$(mtx_c_files:.c=.o))
 mcc_c_files := $(wildcard src/mcc/*.c)
 mcc.a  : $(addprefix $(BUILD_DIR)/release/,$(mcc_c_files:.c=.o))
 mccD.a : $(addprefix $(BUILD_DIR)/debug/,$(mcc_c_files:.c=.o))
+
+ax_c_files := $(wildcard src/ax/*.c)
+ax.a  : $(addprefix $(BUILD_DIR)/release/,$(ax_c_files:.c=.o))
+axD.a : $(addprefix $(BUILD_DIR)/debug/,$(ax_c_files:.c=.o))
 
 # either the stub or non-stub version of some libraries can be linked, but not both
 TEST_LIBS := ai amcnotstub db dolformat dtk fileCache hio odenotstub card dvd gx os pad perf support texPalette vi

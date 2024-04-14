@@ -135,6 +135,12 @@ typedef struct _AXVPB {
     /* 0x138 */ AXPB pb;
 } AXVPB;
 
+#define AX_DSP_SLAVE_LENGTH 3264
+
+// DSPCode.c
+extern u16 axDspSlaveLength;
+extern u16 axDspSlave[AX_DSP_SLAVE_LENGTH];
+
 // unsorted externs
 extern void AXSetVoicePriority(struct _AXVPB * p /* r29 */, unsigned long priority /* r30 */);
 extern void AXFreeVoice(struct _AXVPB * p /* r30 */);
