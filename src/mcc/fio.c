@@ -965,18 +965,14 @@ exit:;
 static int fioPacketResultWrite(void *buffer, u32 dataSize) {
     register int nResult = 0;
     enum MCC_CHANNEL nChID;
-    u8 nChannelBlocks;
+    u8 nChannelBlocks = 0;
     u32 dataBlockSize;
     enum MCC_CONNECT state;
     int bNeedWaitDisconnect;
     u32 oldMaskWrite;
 
     nChID = gmChID;
-#ifdef DEBUG
-    nChannelBlocks = nChannelBlocks = gmSizeOfBlocks; // needed to match. dumb.
-#else
     nChannelBlocks = gmSizeOfBlocks; // needed to match. dumb.
-#endif
     dataBlockSize = (dataSize + 0x1FFF) >> 0xD;
     bNeedWaitDisconnect = 0;
     oldMaskWrite = MCCSetChannelEventMask(nChID, 0);
@@ -1028,14 +1024,7 @@ exit_loop:;
         oldMaskWrite = MCCSetChannelEventMask(gChID, oldMaskWrite);
         coder = fioPacketReceiveResult(7U, 1);
         if (coder == NULL) {
-            // this is fake, but i cant reproduce the branching on debug.
-#ifdef DEBUG
-            asm { 
-                b exit 
-            }
-#else
-            goto exit;
-#endif
+            (void)0;
         } else {
             if (coder->result) {
                 gLastErr = coder->result;
