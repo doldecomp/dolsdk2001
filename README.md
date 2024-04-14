@@ -30,7 +30,7 @@ Currently this repository supports building the following libraries:
 | G2D          | :x: |
 | gx           | :heavy_check_mark: |
 | hio          | :heavy_check_mark: |
-| mcc          | :warning: |
+| mcc          | :heavy_check_mark: |
 | mix          | :x: |
 | mtx          | :heavy_check_mark: |
 | odemustubs   | :heavy_check_mark: |

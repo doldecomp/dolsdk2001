@@ -664,11 +664,7 @@ int MCCInit(enum MCC_EXI exiChannel, u8 timeout, MCC_CBSysEvent callbackSysEvent
         SetChannelInfoDirty(1);
         return mccInitializeCheck(timeout);
     }
-#ifdef DEBUG
-    if ((exiChannel != 0) && (exiChannel != 1) && (exiChannel != 2)) {
-#else
-    if (!(((u32)exiChannel >= 0) && ((u32)exiChannel <= 2))) {
-#endif
+    if (!((exiChannel == 0) || (exiChannel == 1) || (exiChannel == 2))) {
         mccDebugPrint("[MCC] Error: Exi channel is out of range.\n");
         gLastError = 4;
         return 0;
@@ -753,11 +749,7 @@ u8 MCCGetFreeBlocks(enum MCC_MODE mode) {
     mccDebugPrint("MCCGetFreeBlocks\n");
     if (gMccInitialized == 0) {
         gLastError = 1;
-#ifdef DEBUG
-    } else if ((mode != 0) && (mode != 1) && (mode != 2)) {
-#else
-    } else if (!(((u32)mode >= 0) && ((u32)mode <= 2))) {
-#endif
+    } else if (!((mode == 0) || (mode == 1) || (mode == 2))) {
         gLastError = 0xD;
     } else {
         if (LoadChannelInfo(gChannelInfo) == 0) {
@@ -1142,11 +1134,7 @@ int MCCRead(enum MCC_CHANNEL chID, u32 offset, void *data, long size, enum MCC_S
         gLastError = 0xE;
         return 0;
     }
-#ifdef DEBUG
-    if ((async != 1) && (async != 0)) {
-#else
-    if (!(((u32)async >= 0) && ((u32)async <= 1))) {
-#endif
+    if (!((async == 1) || (async == 0))) {
         gLastError = 0xD;
         return 0;
     }
@@ -1226,11 +1214,7 @@ int MCCWrite(enum MCC_CHANNEL chID, u32 offset, void *data, long size, enum MCC_
         gLastError = 0xE;
         return 0;
     }
-#ifdef DEBUG
-    if ((async != 1) && (async != 0)) {
-#else
-    if (!(((u32)async >= 0) && ((u32)async <= 1))) {
-#endif
+    if (!((async == 1) || (async == 0))) {
         gLastError = 0xD;
         return 0;
     }

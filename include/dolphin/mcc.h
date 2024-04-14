@@ -53,11 +53,16 @@ typedef struct {
 } MCC_Hdr;
 
 typedef struct {
+    /* 0x00 */ u32 code;
+    /* 0x04 */ u32 number;
+} MCC_HdrFio;
+
+typedef struct {
     /* 0x00 */ MCC_Info info;
     /* 0x04 */ MCC_CBEvent callbackEvent;
-    /* 0x08 */ u32 eventMask; // offset 0x8, size 0x4
-    /* 0x0C */ int isStreamDone; // offset 0xC, size 0x4
-    /* 0x10 */ int isStreamConnection; // offset 0x10, size 0x4
+    /* 0x08 */ u32 eventMask;
+    /* 0x0C */ int isStreamDone;
+    /* 0x10 */ int isStreamConnection;
 } MCC_ChannelInfo;
 
 enum MCC_MODE {
@@ -77,6 +82,65 @@ enum MCC_SYNC_STATE {
     MCC_SYNC = 0,
     MCC_ASYNC = 1,
 };
+
+enum FIO_ASYNC_STATE {
+    FIO_ASYNC_STATE_IDOL = 0,
+    FIO_ASYNC_STATE_BUSY = 1,
+    FIO_ASYNC_STATE_DONE = 2,
+};
+
+struct FIO_Date {
+    /* 0x00 */ u16 year;
+    /* 0x02 */ u8 month;
+    /* 0x03 */ u8 day;
+};
+
+struct FIO_Daytime {
+    /* 0x00 */ u8 hour;
+    /* 0x01 */ u8 minute;
+    /* 0x02 */ u8 second;
+    /* 0x03 */ u8 reserved;
+};
+
+struct FIO_Timestamp {
+    /* 0x00 */ struct FIO_Date date;
+    /* 0x04 */ struct FIO_Daytime time;
+};
+
+struct FIO_Stat {
+    /* 0x00 */ u32 fileAttributes;
+    /* 0x04 */ struct FIO_Timestamp creationTime;
+    /* 0x0C */ struct FIO_Timestamp lastAccessTime;
+    /* 0x14 */ struct FIO_Timestamp lastWriteTime;
+    /* 0x1C */ u32 fileSizeHigh;
+    /* 0x20 */ u32 fileSizeLow;
+};
+
+struct FIO_Finddata {
+    /* 0x00 */ struct FIO_Stat stat;
+    /* 0x24 */ char filename[256];
+};
+
+// fio.c
+int FIOInit(enum MCC_EXI exiChannel, enum MCC_CHANNEL chID, u8 blockSize);
+void FIOExit(void);
+int FIOQuery(void);
+u8 FIOGetLastError();
+int FIOFopen(const char *filename, u32 mode);
+int FIOFclose(int handle);
+u32 FIOFread(int handle, void *data, u32 size);
+u32 FIOFwrite(int handle, void * data, u32 size);
+u32 FIOFseek(int handle, long offset, u32 mode);
+int FIOFprintf(int handle, const char *format, ...);
+int FIOFflush(int handle);
+int FIOFstat(int handle, struct FIO_Stat *stat);
+int FIOFerror(int handle);
+int FIOFindFirst(const char *filename, struct FIO_Finddata *finddata);
+int FIOFindNext(struct FIO_Finddata *finddata);
+u32 FIOGetAsyncBufferSize(void);
+int FIOFreadAsync(int handle, void * data, u32 size);
+int FIOFwriteAsync(int handle, void * data, u32 size);
+int FIOCheckAsyncDone(u32 * result);
 
 // mcc.c
 int MCCStreamOpen(enum MCC_CHANNEL chID, u8 blockSize);
