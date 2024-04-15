@@ -226,6 +226,17 @@ typedef struct _AXPROFILE {
 #define AX_SYNC_FLAG_COPYMXRCTRL   (1 << 1)
 #define AX_SYNC_FLAG_COPYSELECT    (1 << 0)
 
+// AXOut.c
+extern AXPROFILE __AXLocalProfile;
+extern DSPTaskInfo task;
+extern u16 ax_dram_image[8192];
+
+void AXRegisterCallback(void (* callback)());
+
+// AXProf.c
+void AXInitProfile(AXPROFILE * profile, u32 maxProfiles);
+u32 AXGetProfile(void);
+
 // AXVPB.c
 void AXSetVoiceSrcType(AXVPB * p, u32 type);
 void AXSetVoiceState(AXVPB * p, u16 state);
