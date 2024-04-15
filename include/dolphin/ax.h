@@ -232,6 +232,13 @@ struct AX_AUX_DATA {
 #define AX_SYNC_FLAG_COPYMXRCTRL   (1 << 1)
 #define AX_SYNC_FLAG_COPYSELECT    (1 << 0)
 
+#define AX_PRIORITY_STACKS 32
+
+// AXAlloc.c
+void AXFreeVoice(AXVPB * p);
+AXVPB * AXAcquireVoice(u32 priority, void (* callback)(void *), u32 userContext);
+void AXSetVoicePriority(AXVPB * p, u32 priority);
+
 // AXAux.c
 void AXRegisterAuxACallback(void (* callback)(void *, void *), void * context);
 void AXRegisterAuxBCallback(void (* callback)(void *, void *), void * context);
@@ -280,10 +287,5 @@ u32 AXGetDspCycles(void);
 // DSPCode.c
 extern u16 axDspSlaveLength;
 extern u16 axDspSlave[AX_DSP_SLAVE_LENGTH];
-
-// unsorted externs
-extern void AXSetVoicePriority(struct _AXVPB * p /* r29 */, unsigned long priority /* r30 */);
-extern void AXFreeVoice(struct _AXVPB * p /* r30 */);
-extern AXVPB *AXAcquireVoice(u32, void *, struct SYNSYNTH *);
 
 #endif // _DOLPHIN_AX_H_
