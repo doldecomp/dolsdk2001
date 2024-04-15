@@ -173,6 +173,16 @@ typedef struct _AXSPB {
     /* 0x34 */ s16 dpopBSDelta;
 } AXSPB;
 
+typedef struct _AXPROFILE {
+    /* 0x00 */ u64 axFrameStart;
+    /* 0x08 */ u64 auxProcessingStart;
+    /* 0x10 */ u64 auxProcessingEnd;
+    /* 0x18 */ u64 userCallbackStart;
+    /* 0x20 */ u64 userCallbackEnd;
+    /* 0x28 */ u64 axFrameEnd;
+    /* 0x30 */ u32 axNumVoices;
+} AXPROFILE;
+
 #define AX_DSP_SLAVE_LENGTH 3264
 #define AX_MAX_VOICES 64
 
