@@ -234,6 +234,10 @@ struct AX_AUX_DATA {
 
 #define AX_PRIORITY_STACKS 32
 
+// AX.c
+void AXInit(void);
+void AXQuit(void);
+
 // AXAlloc.c
 void AXFreeVoice(AXVPB * p);
 AXVPB * AXAcquireVoice(u32 priority, void (* callback)(void *), u32 userContext);
