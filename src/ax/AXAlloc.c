@@ -3,12 +3,10 @@
 
 #include "__ax.h"
 
-// .bss
-static AXVPB * __AXStackHead[AX_PRIORITY_STACKS]; // size: 0x80, address: 0x0
-static AXVPB * __AXStackTail[AX_PRIORITY_STACKS]; // size: 0x80, address: 0x80
+static AXVPB * __AXStackHead[AX_PRIORITY_STACKS];
+static AXVPB * __AXStackTail[AX_PRIORITY_STACKS];
 
-// .sbss
-static AXVPB * __AXCallbackStack; // size: 0x4, address: 0x0
+static AXVPB * __AXCallbackStack;
 
 AXVPB * __AXGetStackHead(u32 priority) {
     ASSERTLINE(0x3D, priority < AX_PRIORITY_STACKS);
