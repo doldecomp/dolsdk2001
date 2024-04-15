@@ -4,16 +4,25 @@
 #include <dolphin/ax.h>
 
 // unsorted externs
-extern unsigned long __AXClMode;
-
 extern AXVPB *__AXGetStackHead(u32);
 extern void __AXPushCallbackStack(AXVPB *);
-extern u32 __AXGetCommandListCycles(void);
 extern void __AXPushFreeStack(AXVPB *);
-extern u32 __AXGetCommandListAddress(void);
 extern void __AXServiceCallbackStack(void);
 extern void __AXProcessAux(void);
-extern void __AXNextFrame(void * sbuffer, void * buffer);
+extern void __AXGetAuxAInput(u32 *data);
+extern void __AXGetAuxAOutput(u32 *data);
+extern void __AXGetAuxBInput(u32 *data);
+extern void __AXGetAuxBOutput(u32 *data);
+
+// AXCL.c
+extern u32 __AXClMode;
+
+u32 __AXGetCommandListCycles(void);
+u32 __AXGetCommandListAddress(void);
+void __AXWriteToCommandList(u16 data);
+void __AXNextFrame(void * sbuffer, void * buffer);
+void __AXClInit(void);
+void __AXClQuit(void);
 
 // AXOut.c
 void __AXOutNewFrame(u32 lessDspCycles);

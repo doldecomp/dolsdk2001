@@ -226,6 +226,10 @@ typedef struct _AXPROFILE {
 #define AX_SYNC_FLAG_COPYMXRCTRL   (1 << 1)
 #define AX_SYNC_FLAG_COPYSELECT    (1 << 0)
 
+// AXCL.c
+void AXSetMode(u32 mode);
+u32 AXGetMode(void);
+
 // AXOut.c
 extern AXPROFILE __AXLocalProfile;
 extern DSPTaskInfo task;
