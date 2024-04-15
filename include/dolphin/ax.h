@@ -183,6 +183,12 @@ typedef struct _AXPROFILE {
     /* 0x30 */ u32 axNumVoices;
 } AXPROFILE;
 
+struct AX_AUX_DATA {
+    /* 0x00 */ long * l;
+    /* 0x00 */ long * r;
+    /* 0x00 */ long * s;
+};
+
 #define AX_DSP_SLAVE_LENGTH 3264
 #define AX_MAX_VOICES 64
 
@@ -225,6 +231,10 @@ typedef struct _AXPROFILE {
 #define AX_SYNC_FLAG_COPYSTATE     (1 << 2)
 #define AX_SYNC_FLAG_COPYMXRCTRL   (1 << 1)
 #define AX_SYNC_FLAG_COPYSELECT    (1 << 0)
+
+// AXAux.c
+void AXRegisterAuxACallback(void (* callback)(void *, void *), void * context);
+void AXRegisterAuxBCallback(void (* callback)(void *, void *), void * context);
 
 // AXCL.c
 void AXSetMode(u32 mode);
@@ -271,6 +281,7 @@ u32 AXGetDspCycles(void);
 extern u16 axDspSlaveLength;
 extern u16 axDspSlave[AX_DSP_SLAVE_LENGTH];
 
+// unsorted externs
 extern void AXSetVoicePriority(struct _AXVPB * p /* r29 */, unsigned long priority /* r30 */);
 extern void AXFreeVoice(struct _AXVPB * p /* r30 */);
 extern AXVPB *AXAcquireVoice(u32, void *, struct SYNSYNTH *);

@@ -8,11 +8,15 @@ extern AXVPB *__AXGetStackHead(u32);
 extern void __AXPushCallbackStack(AXVPB *);
 extern void __AXPushFreeStack(AXVPB *);
 extern void __AXServiceCallbackStack(void);
-extern void __AXProcessAux(void);
-extern void __AXGetAuxAInput(u32 *data);
-extern void __AXGetAuxAOutput(u32 *data);
-extern void __AXGetAuxBInput(u32 *data);
-extern void __AXGetAuxBOutput(u32 *data);
+
+// AXAux.c
+void __AXAuxInit(void);
+void __AXAuxQuit(void);
+void __AXGetAuxAInput(u32 * p);
+void __AXGetAuxAOutput(u32 * p);
+void __AXGetAuxBInput(u32 * p);
+void __AXGetAuxBOutput(u32 * p);
+void __AXProcessAux(void);
 
 // AXCL.c
 extern u32 __AXClMode;
