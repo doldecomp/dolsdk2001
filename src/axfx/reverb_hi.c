@@ -9,14 +9,9 @@ static void DLcreate(struct AXFX_REVHI_DELAYLINE * dl, long max_length);
 static void DLdelete(struct AXFX_REVHI_DELAYLINE * dl);
 static int ReverbHICreate(struct AXFX_REVHI_WORK * rv, float coloration, float time, float mix, float damping, float preDelay, float crosstalk);
 static int ReverbHIModify(struct AXFX_REVHI_WORK * rv, float coloration, float time, float mix, float damping, float preDelay, float crosstalk);
-void DoCrossTalk(long * l, long * r, float cross, float invcross);
 static void HandleReverb(long * sptr, struct AXFX_REVHI_WORK * rv, long k);
 static void ReverbHICallback(long * left, long * right, long * surround, struct AXFX_REVHI_WORK * rv);
 static void ReverbHIFree(struct AXFX_REVHI_WORK * rv);
-int AXFXReverbHiInit(struct AXFX_REVERBHI * rev);
-int AXFXReverbHiShutdown(struct AXFX_REVERBHI * rev);
-int AXFXReverbHiSettings(struct AXFX_REVERBHI * rev);
-void AXFXReverbHiCallback(struct AXFX_BUFFERUPDATE * bufferUpdate, struct AXFX_REVERBHI * reverb);
 
 static void DLsetdelay(struct AXFX_REVHI_DELAYLINE * dl, long lag) {
     dl->outPoint = dl->inPoint - (lag * 4);

@@ -73,6 +73,32 @@ struct AXFX_REVERBHI {
     /* 0x1DC */ float crosstalk;
 };
 
+struct AXFX_DELAY {
+    /* 0x00 */ u32 currentSize[3];
+    /* 0x0C */ u32 currentPos[3];
+    /* 0x18 */ u32 currentFeedback[3];
+    /* 0x24 */ u32 currentOutput[3];
+    /* 0x30 */ long * left;
+    /* 0x34 */ long * right;
+    /* 0x38 */ long * sur;
+    /* 0x3C */ u32 delay[3];
+    /* 0x48 */ u32 feedback[3];
+    /* 0x54 */ u32 output[3];
+};
+
+// delay.c
+void AXFXDelayCallback(struct AXFX_BUFFERUPDATE * bufferUpdate, struct AXFX_DELAY * delay);
+int AXFXDelaySettings(struct AXFX_DELAY * delay);
+int AXFXDelayInit(struct AXFX_DELAY * delay);
+int AXFXDelayShutdown(struct AXFX_DELAY * delay); 
+
+// reverb_hi.c
+void DoCrossTalk(long * l, long * r, float cross, float invcross);
+int AXFXReverbHiInit(struct AXFX_REVERBHI * rev);
+int AXFXReverbHiShutdown(struct AXFX_REVERBHI * rev);
+int AXFXReverbHiSettings(struct AXFX_REVERBHI * rev);
+void AXFXReverbHiCallback(struct AXFX_BUFFERUPDATE * bufferUpdate, struct AXFX_REVERBHI * reverb);
+
 // reverb_std.c
 int AXFXReverbStdInit(struct AXFX_REVERBSTD * rev);
 int AXFXReverbStdShutdown(struct AXFX_REVERBSTD * rev);
