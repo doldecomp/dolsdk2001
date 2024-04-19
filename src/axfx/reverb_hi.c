@@ -130,8 +130,8 @@ static int ReverbHIModify(struct AXFX_REVHI_WORK * rv, float coloration, float t
     return ReverbHICreate(rv, coloration, time, mix, damping, preDelay, crosstalk);
 }
 
-__declspec(section ".sdata2") static double i2fMagic = 4503601774854144.0;
-__declspec(section ".sdata2") static float value0_6 = 0.6f;
+const static double i2fMagic = 4503601774854144.0;
+const static float value0_6 = 0.6f;
 
 asm static void DoCrossTalk(register long * l, register long * r, register float cross, register float invcross) {
     nofralloc
@@ -238,7 +238,7 @@ loop:
 	blr
 }
 
-__declspec(section ".sdata2") static float value0_3 = 0.3f;
+const static float value0_3 = 0.3f;
 
 asm static void HandleReverb(register long * sptr, register struct AXFX_REVHI_WORK * rv, register long k) {
     nofralloc

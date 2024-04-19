@@ -120,10 +120,9 @@ static int ReverbSTDModify(struct AXFX_REVSTD_WORK * rv, float coloration, float
     return ReverbSTDCreate(rv, coloration, time, mix, damping, predelay);
 }
 
-// there's probably a non-hack way to match this but im too lazy to figure it out.
-__declspec(section ".sdata2") static float value0_3 = 0.3f;
-__declspec(section ".sdata2") static float value0_6 = 0.6f;
-__declspec(section ".sdata2") static double i2fMagic = 4503601774854144.0;
+const static float value0_3 = 0.3f;
+const static float value0_6 = 0.6f;
+const static double i2fMagic = 4503601774854144.0;
 
 asm static void HandleReverb(register long * sptr, register struct AXFX_REVSTD_WORK * rv) {
     nofralloc

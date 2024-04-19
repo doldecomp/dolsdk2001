@@ -86,6 +86,47 @@ struct AXFX_DELAY {
     /* 0x54 */ u32 output[3];
 };
 
+struct AXFX_CHORUS_SRCINFO {
+    /* 0x00 */ long * dest;
+    /* 0x04 */ long * smpBase;
+    /* 0x08 */ long * old;
+    /* 0x0C */ u32 posLo;
+    /* 0x10 */ u32 posHi;
+    /* 0x14 */ u32 pitchLo;
+    /* 0x18 */ u32 pitchHi;
+    /* 0x1C */ u32 trigger;
+    /* 0x20 */ u32 target;
+};
+
+struct AXFX_CHORUS_WORK {
+    /* 0x00 */ long * lastLeft[3];
+    /* 0x0C */ long * lastRight[3];
+    /* 0x18 */ long * lastSur[3];
+    /* 0x24 */ u8 currentLast;
+    /* 0x28 */ long oldLeft[4];
+    /* 0x38 */ long oldRight[4];
+    /* 0x48 */ long oldSur[4];
+    /* 0x58 */ u32 currentPosLo;
+    /* 0x5C */ u32 currentPosHi;
+    /* 0x60 */ long pitchOffset;
+    /* 0x64 */ u32 pitchOffsetPeriodCount;
+    /* 0x68 */ u32 pitchOffsetPeriod;
+    /* 0x6C */ struct AXFX_CHORUS_SRCINFO src;
+};
+
+struct AXFX_CHORUS {
+    /* 0x00 */ struct AXFX_CHORUS_WORK work;
+    /* 0x90 */ u32 baseDelay;
+    /* 0x94 */ u32 variation;
+    /* 0x98 */ u32 period;
+};
+
+// chorus.c
+int AXFXChorusInit(struct AXFX_CHORUS * c);
+int AXFXChorusShutdown(struct AXFX_CHORUS * c);
+int AXFXChorusSettings(struct AXFX_CHORUS * c);
+void AXFXChorusCallback(struct AXFX_BUFFERUPDATE * bufferUpdate, struct AXFX_CHORUS * chorus);
+
 // delay.c
 void AXFXDelayCallback(struct AXFX_BUFFERUPDATE * bufferUpdate, struct AXFX_DELAY * delay);
 int AXFXDelaySettings(struct AXFX_DELAY * delay);
