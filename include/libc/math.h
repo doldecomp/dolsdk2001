@@ -21,11 +21,11 @@ double scalbn(double x, int n);
 
 double copysign(double x, double y);
 
-double floor(double x);
-
 #ifdef __MWERKS__
 #pragma cplusplus on
 #endif
+
+double floor(double x);
 
 extern inline float sqrtf(float x)
 {

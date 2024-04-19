@@ -50,4 +50,18 @@ extern inline float fabs(float x)
 #endif
             }
 
+inline float floor(float x)
+			{
+			 int i=(int)x;   
+             float y=x-(float)i; 
+
+             if(!y || x > 8388608.0f)
+               return x ;               // x is already an int 
+
+             if(x < 0) 
+               return (float)--i;  
+                   // x < 0 -> int conversion of x above rounded toward zero(so decrement)                
+             return (float)i;
+			}
+
 #pragma cplusplus reset

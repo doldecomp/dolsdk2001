@@ -27,7 +27,7 @@ Currently this repository supports building the following libraries:
 | dtk          | :heavy_check_mark: |
 | dvd          | :heavy_check_mark: |
 | fileCache    | :heavy_check_mark: |
-| G2D          | :x: |
+| G2D          | :heavy_check_mark: |
 | gx           | :heavy_check_mark: |
 | hio          | :heavy_check_mark: |
 | mcc          | :heavy_check_mark: |
