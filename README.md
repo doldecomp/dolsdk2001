@@ -38,7 +38,7 @@ Currently this repository supports building the following libraries:
 | os           | :heavy_check_mark: |
 | pad          | :heavy_check_mark: |
 | perf         | :heavy_check_mark: |
-| seq          | :x: |
+| seq          | :heavy_check_mark: |
 | support      | :heavy_check_mark: |
 | syn          | :heavy_check_mark: |
 | texPalette   | :heavy_check_mark: |
