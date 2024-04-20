@@ -31,7 +31,7 @@ Currently this repository supports building the following libraries:
 | gx           | :heavy_check_mark: |
 | hio          | :heavy_check_mark: |
 | mcc          | :heavy_check_mark: |
-| mix          | :x: |
+| mix          | :heavy_check_mark: |
 | mtx          | :heavy_check_mark: |
 | odemustubs   | :heavy_check_mark: |
 | odenotstub   | :heavy_check_mark: |
