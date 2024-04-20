@@ -36,19 +36,19 @@ typedef struct ARQRequest ARQRequest;
 #define ARQ_PRIORITY_HIGH 1
 
 // ar.c
-u32 ARInit(u32 *stack_index_addr, u32 num_entries);
-u32 ARGetBaseAddress(void);
-u32 ARGetSize(void);
+ARQCallback ARRegisterDMACallback(ARQCallback callback);
 u32 ARGetDMAStatus(void);
 void ARStartDMA(u32 type, u32 mainmem_addr, u32 aram_addr, u32 length);
+u32 ARAlloc(u32 length);
+u32 ARFree(u32 * length);
+int ARCheckInit(void);
+u32 ARInit(u32 * stack_index_addr, u32 num_entries);
+void ARReset(void);
+void ARSetSize(void);
+u32 ARGetBaseAddress(void);
+u32 ARGetSize(void);
 
 // arq.c
-void __ARQPopTaskQueueHi(void);
-void __ARQServiceQueueLo(void);
-void __ARQCallbackHack(u32 pointerToARQRequest);
-void __ARQInterruptServiceRoutine(void);
-void __ARQInitTempQueue(void);
-void __ARQPushTempQueue(struct ARQRequest * task);
 void ARQInit(void);
 void ARQReset(void);
 void ARQPostRequest(struct ARQRequest * request, u32 owner, u32 type, u32 priority, u32 source, u32 dest, u32 length, ARQCallback callback);
@@ -57,8 +57,5 @@ void ARQRemoveOwnerRequest(u32 owner);
 void ARQFlushQueue(void);
 void ARQSetChunkSize(u32 size);
 u32 ARQGetChunkSize(void);
-
-// unsorted externs
-void ARRegisterDMACallback(void *func);
 
 #endif

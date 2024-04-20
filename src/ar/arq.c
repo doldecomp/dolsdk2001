@@ -1,19 +1,20 @@
 #include <dolphin.h>
 #include <dolphin/ar.h>
 
-// .sbss
-static struct ARQRequest * __ARQRequestQueueHi; // size: 0x4, address: 0x0
-static struct ARQRequest * __ARQRequestTailHi; // size: 0x4, address: 0x4
-static struct ARQRequest * __ARQRequestQueueLo; // size: 0x4, address: 0x8
-static struct ARQRequest * __ARQRequestTailLo; // size: 0x4, address: 0xC
-static struct ARQRequest * __ARQRequestQueueTemp; // size: 0x4, address: 0x10
-static struct ARQRequest * __ARQRequestTailTemp; // size: 0x4, address: 0x14
-static struct ARQRequest * __ARQRequestPendingHi; // size: 0x4, address: 0x18
-static struct ARQRequest * __ARQRequestPendingLo; // size: 0x4, address: 0x1C
-static void (* __ARQCallbackHi)(unsigned long); // size: 0x4, address: 0x20
-static void (* __ARQCallbackLo)(unsigned long); // size: 0x4, address: 0x24
-static unsigned long __ARQChunkSize; // size: 0x4, address: 0x28
-static int __ARQ_init_flag; // size: 0x4, address: 0x2C
+#include "__ar.h"
+
+static struct ARQRequest * __ARQRequestQueueHi;
+static struct ARQRequest * __ARQRequestTailHi;
+static struct ARQRequest * __ARQRequestQueueLo;
+static struct ARQRequest * __ARQRequestTailLo;
+static struct ARQRequest * __ARQRequestQueueTemp;
+static struct ARQRequest * __ARQRequestTailTemp;
+static struct ARQRequest * __ARQRequestPendingHi;
+static struct ARQRequest * __ARQRequestPendingLo;
+static ARQCallback __ARQCallbackHi;
+static ARQCallback __ARQCallbackLo;
+static u32 __ARQChunkSize;
+static int __ARQ_init_flag;
 
 void __ARQPopTaskQueueHi(void) {
     if (__ARQRequestQueueHi) {
@@ -56,7 +57,7 @@ void __ARQCallbackHack(u32 unused) {
     
 }
 
-void __ARQInterruptServiceRoutine(void) {
+void __ARQInterruptServiceRoutine() {
     if (__ARQCallbackHi) {
         __ARQCallbackHi((u32)__ARQRequestPendingHi);
         __ARQRequestPendingHi = NULL;
