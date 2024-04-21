@@ -372,7 +372,7 @@ static void __SYNNoteOn(struct SYNSYNTH * synth, u8 midiChannel, u8 keyNum, u8 k
             __SYNSetVoiceToRelease(synth->voice[midiChannel][keyNum], synth->priorityNoteRelease);
             synth->voice[midiChannel][keyNum] = 0;
         }
-        axvpb = AXAcquireVoice(synth->priorityVoiceAlloc, &__SYNClearVoiceReferences, synth);
+        axvpb = AXAcquireVoice(synth->priorityVoiceAlloc, &__SYNClearVoiceReferences, (u32)synth);
         if(axvpb) {
             voice = &__SYNVoice[axvpb->index];
             voice->axvpb = axvpb;
