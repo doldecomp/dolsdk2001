@@ -25,7 +25,11 @@ typedef struct
 typedef f32 Mtx[3][4];
 typedef f32 Mtx44[4][4];
 
+typedef f32 (*MtxPtr)[4];
+typedef f32 (*Mtx44Ptr)[4];
+
 typedef f32 ROMtx[4][3];
+typedef f32 (*ROMtxPtr)[3];
 
 void MTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
 void MTXOrtho(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f);
@@ -131,7 +135,7 @@ void PSMTXMultVec(Mtx44 m, Vec *src, Vec *dst);
 void PSMTXMultVecArray(Mtx m, Vec *srcBase, Vec *dstBase, u32 count);
 
 // psmtx.c
-void PSMTXReorder(Mtx44 *src, ROMtx *dest);
+void PSMTXReorder(Mtx src, ROMtx dest);
 void PSMTXROMultVecArray(ROMtx *m, Vec *srcBase, Vec *dstBase, u32 count);
 void PSMTXROSkin2VecArray(ROMtx *m0, ROMtx *m1, f32 * wtBase, Vec *srcBase, Vec *dstBase, u32 count);
 void PSMTXROMultS16VecArray(ROMtx *m, S16Vec *srcBase, Vec *dstBase, u32 count);

@@ -505,7 +505,6 @@ void PPCMtmmcr1(u32 newMmcr0);
 void PPCMtdmaU(u32 newdmau);
 void PPCMtdmaL(u32 newdmal);
 u32 PPCMfdec(void);
-u32 PPCMfpmc2(void);
 u32 PPCAndMsr(u32 value);
 u32 PPCAndCMsr(u32 value);
 u32 PPCMfhid1();

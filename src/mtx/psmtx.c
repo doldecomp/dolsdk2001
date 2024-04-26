@@ -6,7 +6,7 @@
 #define qr1 1
 #define qr6 6
 
-asm void PSMTXReorder(register Mtx44 *src, register ROMtx *dest) {
+asm void PSMTXReorder(register Mtx src, register ROMtx dest) {
     psq_l f0, 0(src), 0, qr0
     psq_l f2, 16(src), 0, qr0
     psq_l f4, 32(src), 0, qr0
