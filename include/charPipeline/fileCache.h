@@ -34,6 +34,9 @@ void DSReleaseCacheObj(DSCachePtr cache, Ptr data);
 void DSSetCachePurgeFlag(DSCachePtr cache, u8 purgeFlag);
 void CSHInitDisplayCache(void);
 
+extern DSCache DODisplayCache;
+extern u8 DOCacheInitialized;
+
 #ifdef __cplusplus
 }
 #endif
