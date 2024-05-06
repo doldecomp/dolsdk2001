@@ -130,6 +130,12 @@ build/debug/src/dvd/%.o: CFLAGS += -char signed
 build/release/src/dvd/%.o: CFLAGS += -char signed
 endif
 
+build/debug/src/demo/%.o: CFLAGS += -char signed
+build/release/src/demo/%.o: CFLAGS += -char signed
+
+build/debug/src/mtx/%.o: CFLAGS += -char signed
+build/release/src/mtx/%.o: CFLAGS += -char signed
+
 %/stub.o: CFLAGS += -warn off
 
 ######################## Build #############################
@@ -141,7 +147,7 @@ TARGET_LIBS_DEBUG := $(addprefix baserom/,$(addsuffix .a,$(TARGET_LIBS_DEBUG)))
 
 default: all
 
-all: $(DTK) ai.a aiD.a amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a db.a dbD.a dolformat.a dolformatD.a dsp.a dspD.a dtk.a dtkD.a gx.a gxD.a hio.a hioD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a support.a supportD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a vi.a viD.a
+all: $(DTK) ai.a aiD.a amcnotstub.a amcnotstubD.a amcstubs.a amcstubsD.a db.a dbD.a demo.a demoD.a dolformat.a dolformatD.a dsp.a dspD.a dtk.a dtkD.a fileCache.a fileCacheD.a gx.a gxD.a hio.a hioD.a odemustubs.a odemustubsD.a odenotstub.a odenotstubD.a os.a osD.a support.a supportD.a texPalette.a texPaletteD.a card.a cardD.a pad.a padD.a perf.a perfD.a dvd.a dvdD.a vi.a viD.a syn.a synD.a base.a baseD.a mtx.a mtxD.a mcc.a mccD.a ax.a axD.a axfx.a axfxD.a G2D.a G2DD.a ar.a arD.a seq.a seqD.a mix.a mixD.a
 
 verify: build/release/test.bin build/debug/test.bin build/verify.sha1
 	@sha1sum -c build/verify.sha1
@@ -312,6 +318,10 @@ dtk_c_files := $(wildcard src/dtk/*.c)
 dtk.a  : $(addprefix $(BUILD_DIR)/release/,$(dtk_c_files:.c=.o))
 dtkD.a : $(addprefix $(BUILD_DIR)/debug/,$(dtk_c_files:.c=.o))
 
+fileCache_c_files := $(wildcard src/fileCache/*.c)
+fileCache.a  : $(addprefix $(BUILD_DIR)/release/,$(fileCache_c_files:.c=.o))
+fileCacheD.a : $(addprefix $(BUILD_DIR)/debug/,$(fileCache_c_files:.c=.o))
+
 hio_c_files := $(wildcard src/hio/*.c)
 hio.a  : $(addprefix $(BUILD_DIR)/release/,$(hio_c_files:.c=.o))
 hioD.a : $(addprefix $(BUILD_DIR)/debug/,$(hio_c_files:.c=.o))
@@ -332,6 +342,10 @@ support_c_files := \
 support.a  : $(addprefix $(BUILD_DIR)/release/,$(support_c_files:.c=.o))
 supportD.a : $(addprefix $(BUILD_DIR)/debug/,$(support_c_files:.c=.o))
 
+texPalette_c_files := $(wildcard src/texPalette/*.c)
+texPalette.a  : $(addprefix $(BUILD_DIR)/release/,$(texPalette_c_files:.c=.o))
+texPaletteD.a : $(addprefix $(BUILD_DIR)/debug/,$(texPalette_c_files:.c=.o))
+
 dvd_c_files := \
 	src/dvd/dvdlow.c \
 	src/dvd/dvdfs.c \
@@ -350,8 +364,52 @@ vi_c_files := \
 vi.a  : $(addprefix $(BUILD_DIR)/release/,$(vi_c_files:.c=.o))
 viD.a : $(addprefix $(BUILD_DIR)/debug/,$(vi_c_files:.c=.o))
 
+demo_c_files := $(wildcard src/demo/*.c)
+demo.a  : $(addprefix $(BUILD_DIR)/release/,$(demo_c_files:.c=.o))
+demoD.a : $(addprefix $(BUILD_DIR)/debug/,$(demo_c_files:.c=.o))
+
+syn_c_files := $(wildcard src/syn/*.c)
+syn.a  : $(addprefix $(BUILD_DIR)/release/,$(syn_c_files:.c=.o))
+synD.a : $(addprefix $(BUILD_DIR)/debug/,$(syn_c_files:.c=.o))
+
+base_c_files := $(wildcard src/base/*.c)
+base.a  : $(addprefix $(BUILD_DIR)/release/,$(base_c_files:.c=.o))
+baseD.a : $(addprefix $(BUILD_DIR)/debug/,$(base_c_files:.c=.o))
+
+mtx_c_files := $(wildcard src/mtx/*.c)
+mtx.a  : $(addprefix $(BUILD_DIR)/release/,$(mtx_c_files:.c=.o))
+mtxD.a : $(addprefix $(BUILD_DIR)/debug/,$(mtx_c_files:.c=.o))
+
+mcc_c_files := $(wildcard src/mcc/*.c)
+mcc.a  : $(addprefix $(BUILD_DIR)/release/,$(mcc_c_files:.c=.o))
+mccD.a : $(addprefix $(BUILD_DIR)/debug/,$(mcc_c_files:.c=.o))
+
+ax_c_files := $(wildcard src/ax/*.c)
+ax.a  : $(addprefix $(BUILD_DIR)/release/,$(ax_c_files:.c=.o))
+axD.a : $(addprefix $(BUILD_DIR)/debug/,$(ax_c_files:.c=.o))
+
+axfx_c_files := $(wildcard src/axfx/*.c)
+axfx.a  : $(addprefix $(BUILD_DIR)/release/,$(axfx_c_files:.c=.o))
+axfxD.a : $(addprefix $(BUILD_DIR)/debug/,$(axfx_c_files:.c=.o))
+
+G2D_c_files := $(wildcard src/G2D/*.c)
+G2D.a  : $(addprefix $(BUILD_DIR)/release/,$(G2D_c_files:.c=.o))
+G2DD.a : $(addprefix $(BUILD_DIR)/debug/,$(G2D_c_files:.c=.o))
+
+ar_c_files := $(wildcard src/ar/*.c)
+ar.a  : $(addprefix $(BUILD_DIR)/release/,$(ar_c_files:.c=.o))
+arD.a : $(addprefix $(BUILD_DIR)/debug/,$(ar_c_files:.c=.o))
+
+seq_c_files := $(wildcard src/seq/*.c)
+seq.a  : $(addprefix $(BUILD_DIR)/release/,$(seq_c_files:.c=.o))
+seqD.a : $(addprefix $(BUILD_DIR)/debug/,$(seq_c_files:.c=.o))
+
+mix_c_files := $(wildcard src/mix/*.c)
+mix.a  : $(addprefix $(BUILD_DIR)/release/,$(mix_c_files:.c=.o))
+mixD.a : $(addprefix $(BUILD_DIR)/debug/,$(mix_c_files:.c=.o))
+
 # either the stub or non-stub version of some libraries can be linked, but not both
-TEST_LIBS := ai amcnotstub db dolformat dtk hio odenotstub card dvd gx os pad perf support vi
+TEST_LIBS := ai amcnotstub db dolformat dtk fileCache hio odenotstub card dvd gx os pad perf support texPalette vi
 
 build/release/baserom.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
 build/release/test.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)

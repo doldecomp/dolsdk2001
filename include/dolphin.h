@@ -12,13 +12,12 @@
 #include <dolphin/card.h>
 #include <dolphin/perf.h>
 #include <dolphin/ar.h>
-#include <dolphin/arq.h>
 #include <dolphin/base/PPCArch.h>
 #include <dolphin/db.h>
-#include <dolphin/DEMOPuts.h>
 #include <dolphin/pad.h>
 #include <dolphin/dtk.h>
 #include <dolphin/ai.h>
+#include <dolphin/demo.h>
 
 #include "macros.h"
 

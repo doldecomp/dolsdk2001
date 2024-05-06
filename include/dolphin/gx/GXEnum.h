@@ -569,7 +569,11 @@ typedef enum _GXTevColorArg
     GX_CC_ONE,
     GX_CC_HALF,
     GX_CC_KONST,
-    GX_CC_ZERO
+    GX_CC_ZERO,
+    GX_CC_TEXRRR,
+    GX_CC_TEXGGG,
+    GX_CC_TEXBBB,
+    GX_CC_QUARTER = GX_CC_KONST
 } GXTevColorArg;
 
 typedef enum _GXTevAlphaArg
@@ -581,7 +585,8 @@ typedef enum _GXTevAlphaArg
     GX_CA_TEXA,
     GX_CA_RASA,
     GX_CA_KONST,
-    GX_CA_ZERO
+    GX_CA_ZERO,
+    GX_CA_ONE = GX_CA_KONST
 } GXTevAlphaArg;
 
 typedef enum _GXTevOp
@@ -607,6 +612,15 @@ typedef enum _GXTevBias
     GX_TB_SUBHALF,
     GX_MAX_TEVBIAS
 } GXTevBias;
+
+typedef enum _GXTevClampMode
+{
+    GX_TC_LINEAR,
+    GX_TC_GE,
+    GX_TC_EQ,
+    GX_TC_LE,
+    GX_MAX_TEVCLAMPMODE
+} GXTevClampMode;
 
 typedef enum _GXTevScale
 {
