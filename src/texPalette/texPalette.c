@@ -5,8 +5,6 @@
 #include <charPipeline/texPalette.h>
 #include <macros.h>
 
-#include "__fileCache.h"
-
 static void LoadTexPalette(TEXPalettePtr *pal, char *name);
 static void UnpackTexPalette(TEXPalettePtr pal);
 static void TexFreeFunc(TEXPalettePtr pal);

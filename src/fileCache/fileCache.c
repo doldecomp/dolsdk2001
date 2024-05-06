@@ -1,8 +1,6 @@
 #include <dolphin/os.h>
 #include <charPipeline/fileCache.h>
 
-#include "__fileCache.h"
-
 DSCache DODisplayCache;
 u8 DOCacheInitialized;
 
