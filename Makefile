@@ -55,6 +55,8 @@ TARGET_LIBS := G2D              \
                texPalette       \
                vi
 
+VERIFY_LIBS := $(filter-out amcstubs dsp odemustubs,$(TARGET_LIBS))
+
 ifeq ($(VERBOSE),0)
   QUIET := @
 endif
@@ -210,6 +212,95 @@ amcstubs_c_files := $(wildcard src/amcstubs/*.c)
 amcstubs.a  : $(addprefix $(BUILD_DIR)/release/,$(amcstubs_c_files:.c=.o))
 amcstubsD.a : $(addprefix $(BUILD_DIR)/debug/,$(amcstubs_c_files:.c=.o))
 
+ar_c_files := $(wildcard src/ar/*.c)
+ar.a  : $(addprefix $(BUILD_DIR)/release/,$(ar_c_files:.c=.o))
+arD.a : $(addprefix $(BUILD_DIR)/debug/,$(ar_c_files:.c=.o))
+
+ax_c_files := \
+	src/ax/AX.c \
+	src/ax/AXAlloc.c \
+	src/ax/AXAux.c \
+	src/ax/AXCL.c \
+	src/ax/AXOut.c \
+	src/ax/AXSPB.c \
+	src/ax/AXVPB.c \
+	src/ax/AXProf.c \
+	src/ax/DSPCode.c
+ax.a  : $(addprefix $(BUILD_DIR)/release/,$(ax_c_files:.c=.o))
+axD.a : $(addprefix $(BUILD_DIR)/debug/,$(ax_c_files:.c=.o))
+
+axfx_c_files := \
+	src/axfx/reverb_hi.c \
+	src/axfx/reverb_std.c \
+	src/axfx/chorus.c \
+	src/axfx/delay.c
+axfx.a  : $(addprefix $(BUILD_DIR)/release/,$(axfx_c_files:.c=.o))
+axfxD.a : $(addprefix $(BUILD_DIR)/debug/,$(axfx_c_files:.c=.o))
+
+base_c_files := $(wildcard src/base/*.c)
+base.a  : $(addprefix $(BUILD_DIR)/release/,$(base_c_files:.c=.o))
+baseD.a : $(addprefix $(BUILD_DIR)/debug/,$(base_c_files:.c=.o))
+
+card_c_files := \
+	src/card/CARDBios.c \
+	src/card/CARDUnlock.c \
+	src/card/CARDRdwr.c \
+	src/card/CARDBlock.c \
+	src/card/CARDDir.c \
+	src/card/CARDCheck.c \
+	src/card/CARDMount.c \
+	src/card/CARDFormat.c \
+	src/card/CARDOpen.c \
+	src/card/CARDCreate.c \
+	src/card/CARDRead.c \
+	src/card/CARDWrite.c \
+	src/card/CARDDelete.c \
+	src/card/CARDStat.c \
+	src/card/CARDRename.c \
+	src/card/CARDStatEx.c \
+	src/card/CARDRaw.c
+card.a  : $(addprefix $(BUILD_DIR)/release/,$(card_c_files:.c=.o))
+cardD.a : $(addprefix $(BUILD_DIR)/debug/,$(card_c_files:.c=.o))
+
+db_c_files := $(wildcard src/db/*.c)
+db.a  : $(addprefix $(BUILD_DIR)/release/,$(db_c_files:.c=.o))
+dbD.a : $(addprefix $(BUILD_DIR)/debug/,$(db_c_files:.c=.o))
+
+demo_c_files := \
+	src/demo/DEMOInit.c \
+	src/demo/DEMOPuts.c \
+	src/demo/DEMOFont.c \
+	src/demo/DEMOPad.c \
+	src/demo/DEMOStats.c \
+	src/demo/DEMOWin.c
+demo.a  : $(addprefix $(BUILD_DIR)/release/,$(demo_c_files:.c=.o))
+demoD.a : $(addprefix $(BUILD_DIR)/debug/,$(demo_c_files:.c=.o))
+
+dolformat_c_files := $(wildcard src/dolformat/*.c)
+dolformat.a  : $(addprefix $(BUILD_DIR)/release/,$(dolformat_c_files:.c=.o))
+dolformatD.a : $(addprefix $(BUILD_DIR)/debug/,$(dolformat_c_files:.c=.o))
+
+dsp_c_files := $(wildcard src/dsp/*.c)
+dsp.a  : $(addprefix $(BUILD_DIR)/release/,$(dsp_c_files:.c=.o))
+dspD.a : $(addprefix $(BUILD_DIR)/debug/,$(dsp_c_files:.c=.o))
+
+dtk_c_files := $(wildcard src/dtk/*.c)
+dtk.a  : $(addprefix $(BUILD_DIR)/release/,$(dtk_c_files:.c=.o))
+dtkD.a : $(addprefix $(BUILD_DIR)/debug/,$(dtk_c_files:.c=.o))
+
+dvd_c_files := \
+	src/dvd/dvdlow.c \
+	src/dvd/dvdfs.c \
+	src/dvd/dvd.c \
+	src/dvd/dvdqueue.c \
+	src/dvd/fstload.c
+dvd.a  : $(addprefix $(BUILD_DIR)/release/,$(dvd_c_files:.c=.o))
+dvdD.a : $(addprefix $(BUILD_DIR)/debug/,$(dvd_c_files:.c=.o))
+
+fileCache_c_files := $(wildcard src/fileCache/*.c)
+fileCache.a  : $(addprefix $(BUILD_DIR)/release/,$(fileCache_c_files:.c=.o))
+fileCacheD.a : $(addprefix $(BUILD_DIR)/debug/,$(fileCache_c_files:.c=.o))
+
 gx_c_files := \
 	src/gx/GXInit.c \
 	src/gx/GXFifo.c \
@@ -234,6 +325,31 @@ gx_c_files := \
 	src/gx/GXPerf.c
 gx.a  : $(addprefix $(BUILD_DIR)/release/,$(gx_c_files:.c=.o))
 gxD.a : $(addprefix $(BUILD_DIR)/debug/,$(gx_c_files:.c=.o))
+
+hio_c_files := $(wildcard src/hio/*.c)
+hio.a  : $(addprefix $(BUILD_DIR)/release/,$(hio_c_files:.c=.o))
+hioD.a : $(addprefix $(BUILD_DIR)/debug/,$(hio_c_files:.c=.o))
+
+mcc_c_files := \
+	src/mcc/mcc.c \
+	src/mcc/fio.c \
+	src/mcc/tty.c
+mcc.a  : $(addprefix $(BUILD_DIR)/release/,$(mcc_c_files:.c=.o))
+mccD.a : $(addprefix $(BUILD_DIR)/debug/,$(mcc_c_files:.c=.o))
+
+mix_c_files := $(wildcard src/mix/*.c)
+mix.a  : $(addprefix $(BUILD_DIR)/release/,$(mix_c_files:.c=.o))
+mixD.a : $(addprefix $(BUILD_DIR)/debug/,$(mix_c_files:.c=.o))
+
+mtx_c_files := \
+	src/mtx/mtx.c \
+	src/mtx/mtx44.c \
+	src/mtx/vec.c \
+	src/mtx/mtxvec.c \
+	src/mtx/mtxstack.c \
+	src/mtx/psmtx.c
+mtx.a  : $(addprefix $(BUILD_DIR)/release/,$(mtx_c_files:.c=.o))
+mtxD.a : $(addprefix $(BUILD_DIR)/debug/,$(mtx_c_files:.c=.o))
 
 odemustubs_c_files := $(wildcard src/odemustubs/*.c)
 odemustubs.a  : $(addprefix $(BUILD_DIR)/release/,$(odemustubs_c_files:.c=.o))
@@ -277,51 +393,6 @@ os_c_files := \
 os.a  : $(addprefix $(BUILD_DIR)/release/,$(os_c_files:.c=.o))
 osD.a : $(addprefix $(BUILD_DIR)/debug/,$(os_c_files:.c=.o))
 
-card_c_files := \
-	src/card/CARDBios.c \
-	src/card/CARDUnlock.c \
-	src/card/CARDRdwr.c \
-	src/card/CARDBlock.c \
-	src/card/CARDDir.c \
-	src/card/CARDCheck.c \
-	src/card/CARDMount.c \
-	src/card/CARDFormat.c \
-	src/card/CARDOpen.c \
-	src/card/CARDCreate.c \
-	src/card/CARDRead.c \
-	src/card/CARDWrite.c \
-	src/card/CARDDelete.c \
-	src/card/CARDStat.c \
-	src/card/CARDRename.c \
-	src/card/CARDStatEx.c \
-	src/card/CARDRaw.c
-card.a  : $(addprefix $(BUILD_DIR)/release/,$(card_c_files:.c=.o))
-cardD.a : $(addprefix $(BUILD_DIR)/debug/,$(card_c_files:.c=.o))
-
-db_c_files := $(wildcard src/db/*.c)
-db.a  : $(addprefix $(BUILD_DIR)/release/,$(db_c_files:.c=.o))
-dbD.a : $(addprefix $(BUILD_DIR)/debug/,$(db_c_files:.c=.o))
-
-dolformat_c_files := $(wildcard src/dolformat/*.c)
-dolformat.a  : $(addprefix $(BUILD_DIR)/release/,$(dolformat_c_files:.c=.o))
-dolformatD.a : $(addprefix $(BUILD_DIR)/debug/,$(dolformat_c_files:.c=.o))
-
-dsp_c_files := $(wildcard src/dsp/*.c)
-dsp.a  : $(addprefix $(BUILD_DIR)/release/,$(dsp_c_files:.c=.o))
-dspD.a : $(addprefix $(BUILD_DIR)/debug/,$(dsp_c_files:.c=.o))
-
-dtk_c_files := $(wildcard src/dtk/*.c)
-dtk.a  : $(addprefix $(BUILD_DIR)/release/,$(dtk_c_files:.c=.o))
-dtkD.a : $(addprefix $(BUILD_DIR)/debug/,$(dtk_c_files:.c=.o))
-
-fileCache_c_files := $(wildcard src/fileCache/*.c)
-fileCache.a  : $(addprefix $(BUILD_DIR)/release/,$(fileCache_c_files:.c=.o))
-fileCacheD.a : $(addprefix $(BUILD_DIR)/debug/,$(fileCache_c_files:.c=.o))
-
-hio_c_files := $(wildcard src/hio/*.c)
-hio.a  : $(addprefix $(BUILD_DIR)/release/,$(hio_c_files:.c=.o))
-hioD.a : $(addprefix $(BUILD_DIR)/debug/,$(hio_c_files:.c=.o))
-
 pad_c_files := src/pad/Padclamp.c src/pad/Pad.c
 pad.a  : $(addprefix $(BUILD_DIR)/release/,$(pad_c_files:.c=.o))
 padD.a : $(addprefix $(BUILD_DIR)/debug/,$(pad_c_files:.c=.o))
@@ -329,6 +400,10 @@ padD.a : $(addprefix $(BUILD_DIR)/debug/,$(pad_c_files:.c=.o))
 perf_c_files := $(wildcard src/perf/*.c)
 perf.a  : $(addprefix $(BUILD_DIR)/release/,$(perf_c_files:.c=.o))
 perfD.a : $(addprefix $(BUILD_DIR)/debug/,$(perf_c_files:.c=.o))
+
+seq_c_files := $(wildcard src/seq/*.c)
+seq.a  : $(addprefix $(BUILD_DIR)/release/,$(seq_c_files:.c=.o))
+seqD.a : $(addprefix $(BUILD_DIR)/debug/,$(seq_c_files:.c=.o))
 
 support_c_files := \
 	src/support/List.c \
@@ -338,18 +413,13 @@ support_c_files := \
 support.a  : $(addprefix $(BUILD_DIR)/release/,$(support_c_files:.c=.o))
 supportD.a : $(addprefix $(BUILD_DIR)/debug/,$(support_c_files:.c=.o))
 
+syn_c_files := $(wildcard src/syn/*.c)
+syn.a  : $(addprefix $(BUILD_DIR)/release/,$(syn_c_files:.c=.o))
+synD.a : $(addprefix $(BUILD_DIR)/debug/,$(syn_c_files:.c=.o))
+
 texPalette_c_files := $(wildcard src/texPalette/*.c)
 texPalette.a  : $(addprefix $(BUILD_DIR)/release/,$(texPalette_c_files:.c=.o))
 texPaletteD.a : $(addprefix $(BUILD_DIR)/debug/,$(texPalette_c_files:.c=.o))
-
-dvd_c_files := \
-	src/dvd/dvdlow.c \
-	src/dvd/dvdfs.c \
-	src/dvd/dvd.c \
-	src/dvd/dvdqueue.c \
-	src/dvd/fstload.c
-dvd.a  : $(addprefix $(BUILD_DIR)/release/,$(dvd_c_files:.c=.o))
-dvdD.a : $(addprefix $(BUILD_DIR)/debug/,$(dvd_c_files:.c=.o))
 
 vi_c_files := \
 	src/vi/vi.c \
@@ -359,57 +429,14 @@ vi_c_files := \
 vi.a  : $(addprefix $(BUILD_DIR)/release/,$(vi_c_files:.c=.o))
 viD.a : $(addprefix $(BUILD_DIR)/debug/,$(vi_c_files:.c=.o))
 
-demo_c_files := $(wildcard src/demo/*.c)
-demo.a  : $(addprefix $(BUILD_DIR)/release/,$(demo_c_files:.c=.o))
-demoD.a : $(addprefix $(BUILD_DIR)/debug/,$(demo_c_files:.c=.o))
-
-syn_c_files := $(wildcard src/syn/*.c)
-syn.a  : $(addprefix $(BUILD_DIR)/release/,$(syn_c_files:.c=.o))
-synD.a : $(addprefix $(BUILD_DIR)/debug/,$(syn_c_files:.c=.o))
-
-base_c_files := $(wildcard src/base/*.c)
-base.a  : $(addprefix $(BUILD_DIR)/release/,$(base_c_files:.c=.o))
-baseD.a : $(addprefix $(BUILD_DIR)/debug/,$(base_c_files:.c=.o))
-
-mtx_c_files := $(wildcard src/mtx/*.c)
-mtx.a  : $(addprefix $(BUILD_DIR)/release/,$(mtx_c_files:.c=.o))
-mtxD.a : $(addprefix $(BUILD_DIR)/debug/,$(mtx_c_files:.c=.o))
-
-mcc_c_files := $(wildcard src/mcc/*.c)
-mcc.a  : $(addprefix $(BUILD_DIR)/release/,$(mcc_c_files:.c=.o))
-mccD.a : $(addprefix $(BUILD_DIR)/debug/,$(mcc_c_files:.c=.o))
-
-ax_c_files := $(wildcard src/ax/*.c)
-ax.a  : $(addprefix $(BUILD_DIR)/release/,$(ax_c_files:.c=.o))
-axD.a : $(addprefix $(BUILD_DIR)/debug/,$(ax_c_files:.c=.o))
-
-axfx_c_files := $(wildcard src/axfx/*.c)
-axfx.a  : $(addprefix $(BUILD_DIR)/release/,$(axfx_c_files:.c=.o))
-axfxD.a : $(addprefix $(BUILD_DIR)/debug/,$(axfx_c_files:.c=.o))
-
 G2D_c_files := $(wildcard src/G2D/*.c)
 G2D.a  : $(addprefix $(BUILD_DIR)/release/,$(G2D_c_files:.c=.o))
 G2DD.a : $(addprefix $(BUILD_DIR)/debug/,$(G2D_c_files:.c=.o))
 
-ar_c_files := $(wildcard src/ar/*.c)
-ar.a  : $(addprefix $(BUILD_DIR)/release/,$(ar_c_files:.c=.o))
-arD.a : $(addprefix $(BUILD_DIR)/debug/,$(ar_c_files:.c=.o))
-
-seq_c_files := $(wildcard src/seq/*.c)
-seq.a  : $(addprefix $(BUILD_DIR)/release/,$(seq_c_files:.c=.o))
-seqD.a : $(addprefix $(BUILD_DIR)/debug/,$(seq_c_files:.c=.o))
-
-mix_c_files := $(wildcard src/mix/*.c)
-mix.a  : $(addprefix $(BUILD_DIR)/release/,$(mix_c_files:.c=.o))
-mixD.a : $(addprefix $(BUILD_DIR)/debug/,$(mix_c_files:.c=.o))
-
-# either the stub or non-stub version of some libraries can be linked, but not both
-TEST_LIBS := ai amcnotstub db dolformat dtk fileCache hio odenotstub card dvd gx os pad perf support texPalette vi
-
-build/release/baserom.elf: build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l).a)
-build/release/test.elf:    build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l).a)
-build/debug/baserom.elf:   build/release/src/stub.o $(foreach l,$(TEST_LIBS),baserom/$(l)D.a)
-build/debug/test.elf:      build/release/src/stub.o $(foreach l,$(TEST_LIBS),$(l)D.a)
+build/release/baserom.elf: build/release/src/stub.o $(foreach l,$(VERIFY_LIBS),baserom/$(l).a)
+build/release/test.elf:    build/release/src/stub.o $(foreach l,$(VERIFY_LIBS),$(l).a)
+build/debug/baserom.elf:   build/release/src/stub.o $(foreach l,$(VERIFY_LIBS),baserom/$(l)D.a)
+build/debug/test.elf:      build/release/src/stub.o $(foreach l,$(VERIFY_LIBS),$(l)D.a)
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@

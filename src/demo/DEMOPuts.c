@@ -62,7 +62,7 @@ void DEMOSetupScrnSpc(long width, long height, float depth) {
 
     MTXOrtho(pMtx, 0.0f, height, 0.0f, width, 0.0f, -depth);
     GXSetProjection(pMtx, 1);
-    PSMTXIdentity(mMtx);
+    MTXIdentity(mMtx);
     GXLoadPosMtxImm(mMtx, 0);
     GXSetCurrentMtx(0);
 }
