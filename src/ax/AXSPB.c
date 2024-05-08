@@ -4,7 +4,7 @@
 #include "__ax.h"
 
 // .bss
-static struct _AXSPB __AXStudio;
+static struct _AXSPB __AXStudio ATTRIBUTE_ALIGN(32);
 
 // .sbss
 static long __AXSpbAL;
