@@ -17,6 +17,7 @@ static volatile u8 __DTKVolumeR;
 static volatile u32 __DTKShutdownFlag;
 static volatile u32 __DTKTrackEnded;
 static DTKFlushCallback __DTKFlushCallback;
+static BOOL __busy_for_ais_address;
 
 static DVDCommandBlock __block_for_run_callback;
 static DVDCommandBlock __block_for_prep_callback;
@@ -44,9 +45,11 @@ static void __DTKStopAi(void)
     AISetStreamPlayState(0);
 }
 
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 3 : 0)
+
 static void __DTKCheckUserCallback(struct DTKTrack *track, u32 event)
 {
-    ASSERTLINE(0x53, track);
+    ASSERTLINE(0x53+LINE_OFFSET, track);
     if (track && track->callback && (track->eventMask & event)) {
         track->callback(track->eventMask & event);
     }
@@ -107,6 +110,9 @@ static void __DTKPrepareCurrentTrackPaused(void)
 static void __DTKCallbackForPlaylist(s32 result, DVDCommandBlock *block)
 {
     __DTKPosition = result;
+#if DOLPHIN_REVISION >= 45
+    __busy_for_ais_address = 0;
+#endif
     if (__DTKTrackEnded) {
         __DTKTrackEnded = 0;
         __DTKCheckUserCallback(__DTKCurrentTrack, 16);
@@ -154,6 +160,12 @@ static void __DTKCallbackForAIInterrupt(u32 count)
 {
     AISetStreamTrigger(count + __DTKInterruptFrequency);
     if (__DTKCurrentTrack) {
+#if DOLPHIN_REVISION >= 45
+        if (__busy_for_ais_address) {
+            return;
+        }
+        __busy_for_ais_address = TRUE;
+#endif
         DVDGetStreamPlayAddrAsync(&__block_for_ais_isr, __DTKCallbackForPlaylist);
     }
 }
