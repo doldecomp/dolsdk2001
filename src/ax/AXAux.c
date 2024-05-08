@@ -3,8 +3,8 @@
 
 #include "__ax.h"
 
-static long __AXBufferAuxA[3][480];
-static long __AXBufferAuxB[3][480];
+static long __AXBufferAuxA[3][480] ATTRIBUTE_ALIGN(32);
+static long __AXBufferAuxB[3][480] ATTRIBUTE_ALIGN(32);
 
 static void (* __AXCallbackAuxA)(void *, void *);
 static void (* __AXCallbackAuxB)(void *, void *);
