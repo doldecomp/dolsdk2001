@@ -27,41 +27,52 @@ void DEMOPadInit();
 static void DEMOPadCopy(struct PADStatus * pad, DEMODMPad *dmpad) {
     unsigned short dirs;
 
-    dirs = 0;
-    if (pad->stickX < -0x30) {
-        dirs |= 0x4000;
+#if DOLPHIN_REVISION >= 45
+    if (pad->err != PAD_ERR_TRANSFER) {
+#endif
+        dirs = 0;
+        if (pad->stickX < -0x30) {
+            dirs |= 0x4000;
+        }
+        if (pad->stickX > 0x30) {
+            dirs |= 0x8000;
+        }
+        if (pad->stickY < -0x30) {
+            dirs |= 0x2000;
+        }
+        if (pad->stickY > 0x30) {
+            dirs |= 0x1000;
+        }
+        if (pad->substickX < -0x30) {
+            dirs |= 0x400;
+        }
+        if (pad->substickX > 0x30) {
+            dirs |= 0x800;
+        }
+        if (pad->substickY < -0x30) {
+            dirs |= 0x200;
+        }
+        if (pad->substickY > 0x30) {
+            dirs |= 0x100;
+        }
+        dmpad->dirsNew = (dirs & (dmpad->dirs ^ dirs));
+        dmpad->dirsReleased = (dmpad->dirs & (dmpad->dirs ^ dirs));
+        dmpad->dirs = dirs;
+        dmpad->buttonDown = (pad->button & (dmpad->pst.button ^ pad->button));
+        dmpad->buttonUp = (dmpad->pst.button & (dmpad->pst.button ^ pad->button));
+        dmpad->stickDeltaX = (pad->stickX - dmpad->pst.stickX);
+        dmpad->stickDeltaY = (pad->stickY - dmpad->pst.stickY);
+        dmpad->substickDeltaX = (pad->substickX - dmpad->pst.substickX);
+        dmpad->substickDeltaY = (pad->substickY - dmpad->pst.substickY);
+        dmpad->pst = *pad;
+#if DOLPHIN_REVISION >= 45
+    } else {
+        dmpad->dirsNew = dmpad->dirsReleased = 0;
+        dmpad->buttonDown = dmpad->buttonUp = 0;
+        dmpad->stickDeltaX = dmpad->stickDeltaY = 0;
+        dmpad->substickDeltaX = dmpad->substickDeltaY = 0;
     }
-    if (pad->stickX > 0x30) {
-        dirs |= 0x8000;
-    }
-    if (pad->stickY < -0x30) {
-        dirs |= 0x2000;
-    }
-    if (pad->stickY > 0x30) {
-        dirs |= 0x1000;
-    }
-    if (pad->substickX < -0x30) {
-        dirs |= 0x400;
-    }
-    if (pad->substickX > 0x30) {
-        dirs |= 0x800;
-    }
-    if (pad->substickY < -0x30) {
-        dirs |= 0x200;
-    }
-    if (pad->substickY > 0x30) {
-        dirs |= 0x100;
-    }
-    dmpad->dirsNew = (dirs & (dmpad->dirs ^ dirs));
-    dmpad->dirsReleased = (dmpad->dirs & (dmpad->dirs ^ dirs));
-    dmpad->dirs = dirs;
-    dmpad->buttonDown = (pad->button & (dmpad->pst.button ^ pad->button));
-    dmpad->buttonUp = (dmpad->pst.button & (dmpad->pst.button ^ pad->button));
-    dmpad->stickDeltaX = (pad->stickX - dmpad->pst.stickX);
-    dmpad->stickDeltaY = (pad->stickY - dmpad->pst.stickY);
-    dmpad->substickDeltaX = (pad->substickX - dmpad->pst.substickX);
-    dmpad->substickDeltaY = (pad->substickY - dmpad->pst.substickY);
-    dmpad->pst = *pad;
+#endif
 }
 
 void DEMOPadRead() {
@@ -78,9 +89,13 @@ void DEMOPadRead() {
         } else if (Pad[i].err == -1) {
             ResetReq |= PadChanMask[i];
         }
+#if DOLPHIN_REVISION < 45
         if (Pad[i].err != -3) {
+#endif
             DEMOPadCopy(&Pad[i], &DemoPad[i]);
+#if DOLPHIN_REVISION < 45
         }
+#endif
     }
     if (ResetReq != 0) {
         PADReset(ResetReq);

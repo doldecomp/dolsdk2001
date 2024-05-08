@@ -33,47 +33,61 @@ typedef f32 (*ROMtxPtr)[3];
 
 void MTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
 void MTXOrtho(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f);
+#if DOLPHIN_REVISION >= 45
+void C_MTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
+void C_MTXOrtho(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f);
+void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
+void PSMTXOrtho(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f);
+#endif
 
 void C_MTXFrustum(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f);
 void C_MTXPerspective(Mtx44 m, f32 fovY, f32 aspect, f32 n, f32 f);
 void C_MTXLookAt(Mtx m, Point3dPtr camPos, VecPtr camUp, Point3dPtr target);
 
 #ifdef DEBUG
-#define VECSquareMag C_VECSquareMag
-#define VECNormalize C_VECNormalize
-#define VECAdd C_VECAdd
-#define VECDotProduct C_VECDotProduct
+#define VECSquareMag      C_VECSquareMag
+#define VECNormalize      C_VECNormalize
+#define VECAdd            C_VECAdd
+#define VECDotProduct     C_VECDotProduct
 #define VECSquareDistance C_VECSquareDistance
-#define VECCrossProduct C_VECCrossProduct
-#define MTXMultVec C_MTXMultVec
-#define MTXMultVecArray C_MTXMultVecArray
-#define MTXCopy C_MTXCopy
-#define MTXConcat C_MTXConcat
-#define MTXInverse C_MTXInverse
-#define MTXTranspose C_MTXTranspose
-#define MTXIdentity  C_MTXIdentity
+#define VECCrossProduct   C_VECCrossProduct
+#define MTXMultVec        C_MTXMultVec
+#define MTXMultVecArray   C_MTXMultVecArray
+#define MTXCopy           C_MTXCopy
+#define MTXConcat         C_MTXConcat
+#define MTXInverse        C_MTXInverse
+#define MTXTranspose      C_MTXTranspose
+#define MTXIdentity       C_MTXIdentity
+#if DOLPHIN_REVISION >= 45
+#define MTXOrtho          C_MTXOrtho
+#define MTXScale          C_MTXScale
+#endif
 #else
-#define VECSquareMag PSVECSquareMag
-#define VECNormalize PSVECNormalize
-#define VECAdd PSVECAdd
-#define VECDotProduct PSVECDotProduct
+#define VECSquareMag      PSVECSquareMag
+#define VECNormalize      PSVECNormalize
+#define VECAdd            PSVECAdd
+#define VECDotProduct     PSVECDotProduct
 #define VECSquareDistance PSVECSquareDistance
-#define VECCrossProduct PSVECCrossProduct
-#define MTXMultVec PSMTXMultVec
-#define MTXMultVecArray PSMTXMultVecArray
-#define MTXCopy PSMTXCopy
-#define MTXConcat PSMTXConcat
-#define MTXInverse PSMTXInverse
-#define MTXTranspose PSMTXTranspose
-#define MTXIdentity  PSMTXIdentity
+#define VECCrossProduct   PSVECCrossProduct
+#define MTXMultVec        PSMTXMultVec
+#define MTXMultVecArray   PSMTXMultVecArray
+#define MTXCopy           PSMTXCopy
+#define MTXConcat         PSMTXConcat
+#define MTXInverse        PSMTXInverse
+#define MTXTranspose      PSMTXTranspose
+#define MTXIdentity       PSMTXIdentity
+#if DOLPHIN_REVISION >= 45
+#define MTXOrtho          PSMTXOrtho
+#define MTXScale          PSMTXScale
+#endif
 #endif
 
 // asm only
-#define MTXReorder PSMTXReorder
-#define MTXROMultVecArray PSMTXROMultVecArray
-#define MTXROSkin2VecArray PSMTXROSkin2VecArray
+#define MTXReorder           PSMTXReorder
+#define MTXROMultVecArray    PSMTXROMultVecArray
+#define MTXROSkin2VecArray   PSMTXROSkin2VecArray
 #define MTXROMultS16VecArray PSMTXROMultS16VecArray
-#define MTXMultS16VecArray PSMTXMultS16VecArray
+#define MTXMultS16VecArray   PSMTXMultS16VecArray
 
 // mtx.c
 // functions
