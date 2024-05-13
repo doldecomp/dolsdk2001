@@ -29,6 +29,9 @@ static void CreateCallbackFat(long chan, long result) {
         ent->iconFormat = 0;
         ent->iconSpeed = 0;
         ent->commentAddr = -1;
+#if DOLPHIN_REVISION >= 37
+        __CARDSetIconSpeed(ent, 0, CARD_STAT_SPEED_FAST);
+#endif
         card->fileInfo->offset = 0;
         card->fileInfo->iBlock = ent->startBlock;
         ent->time = OSTicksToSeconds(OSGetTime());

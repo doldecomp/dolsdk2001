@@ -18,6 +18,9 @@ static void UpdateIconOffsets(CARDDir *ent, CARDStat *stat) {
         stat->bannerFormat = 0;
         stat->iconFormat = 0;
         stat->iconSpeed = 0;
+#if DOLPHIN_REVISION >= 37
+        offset = 0;
+#endif
     }
 
     iconTlut = FALSE;
@@ -119,8 +122,15 @@ s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat *stat, CARDCallback callba
     ASSERTLINE(0xD5, 0 <= fileNo && fileNo < CARD_MAX_FILE);
     ASSERTLINE(0xD6, 0 <= chan && chan < 2);
 
+#if DOLPHIN_REVISION >= 37
+    if (fileNo < 0 || CARD_MAX_FILE <= fileNo || (stat->iconAddr != 0xffffffff && CARD_READ_SIZE <= stat->iconAddr)
+        || (stat->commentAddr != 0xffffffff
+            && CARD_SYSTEM_BLOCK_SIZE - CARD_COMMENT_SIZE < stat->commentAddr % CARD_SYSTEM_BLOCK_SIZE))
+        return CARD_RESULT_FATAL_ERROR;
+#else
     if (fileNo < 0 || CARD_MAX_FILE <= fileNo)
         return CARD_RESULT_FATAL_ERROR;
+#endif
 
     result = __CARDGetControlBlock(chan, &card);
     if (result < 0)
@@ -138,6 +148,11 @@ s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat *stat, CARDCallback callba
     ent->iconSpeed = stat->iconSpeed;
     ent->commentAddr = stat->commentAddr;
     UpdateIconOffsets(ent, stat);
+
+#if DOLPHIN_REVISION >= 37
+    if (ent->iconAddr == 0xffffffff)
+        __CARDSetIconSpeed(ent, 0, CARD_STAT_SPEED_FAST);
+#endif
 
     ent->time = (u32)OSTicksToSeconds(OSGetTime());
     result = __CARDUpdateDir(chan, callback);

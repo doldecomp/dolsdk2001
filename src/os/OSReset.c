@@ -127,6 +127,15 @@ L_00000208:
     b L_000001A0
 }
 
+#if DOLPHIN_REVISION >= 37
+void __OSDoHotReset(u32 resetCode) {
+    OSDisableInterrupts();
+    __VIRegs[1] = 0;
+    ICFlashInvalidate();
+    Reset(resetCode << 3);
+}
+#endif
+
 void OSResetSystem(int reset, unsigned long resetCode, int forceMenu) {
     int rc;
     int enabled;
@@ -145,10 +154,33 @@ void OSResetSystem(int reset, unsigned long resetCode, int forceMenu) {
     enabled = OSDisableInterrupts();
     rc = CallResetFunctions(1);
     ASSERTLINE(0x117, rc);
+#if DOLPHIN_REVISION >= 37
+    if (reset == 1) {
+        OSDisableInterrupts();
+        __VIRegs[1] = 0;
+        ICFlashInvalidate();
+        Reset(resetCode * 8);
+    } else {
+        OSThread *thread = UNK_800000DC;
+        while (thread != NULL) {
+            OSThread *next = thread->linkActive.next;
+            switch (thread->state) {
+            case 1:
+            case 4:
+                OSCancelThread(thread);
+                break;
+            }
+            thread = next;
+        }
+        OSEnableScheduler();
+        __OSReboot(resetCode, forceMenu);
+    }
+#else
     if (reset != 0) {
         ICFlashInvalidate();
         Reset(resetCode * 8);
     }
+#endif
     OSRestoreInterrupts(enabled);
     OSEnableScheduler();
 }

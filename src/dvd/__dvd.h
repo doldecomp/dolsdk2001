@@ -5,6 +5,7 @@
 
 // dvd.c
 void __DVDAudioBufferConfig(struct DVDCommandBlock * block, unsigned long enable, unsigned long size, void (* callback)(long, struct DVDCommandBlock *));
+void __DVDPrepareResetAsync(DVDCBCallback callback);
 
 // dvdfs.c
 extern struct OSThreadQueue __DVDThreadQueue;
@@ -13,6 +14,9 @@ extern unsigned long __DVDLongFileNameFlag;
 void __DVDFSInit();
 
 // dvdlow.c
+#if DOLPHIN_REVISION >= 37
+void __DVDInitWA(void);
+#endif
 void __DVDInterruptHandler(short unused, struct OSContext * context);
 
 // dvdqueue.c
