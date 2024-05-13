@@ -86,6 +86,7 @@ static inline void __GXAbortWait(u32 clocks)
     } while (time1 - time0 <= (clocks / 4));
 }
 
+#if DOLPHIN_REVISION >= 45
 void __GXAbort(void)
 {
     __piReg[6] = 1;
@@ -93,6 +94,7 @@ void __GXAbort(void)
     __piReg[6] = 0;
     __GXAbortWait(0x14);
 }
+#endif
 
 void GXAbortFrame(void)
 {

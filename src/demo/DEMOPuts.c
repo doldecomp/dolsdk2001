@@ -71,7 +71,11 @@ void DEMOSetupScrnSpc(long width, long height, float depth) {
     float pMtx[4][4];
     float mMtx[3][4];
 
+#if DOLPHIN_REVISION >= 45  // Why?
     C_MTXOrtho(pMtx, 0.0f, height, 0.0f, width, 0.0f, -depth);
+#else
+    MTXOrtho(pMtx, 0.0f, height, 0.0f, width, 0.0f, -depth);
+#endif
     GXSetProjection(pMtx, 1);
     MTXIdentity(mMtx);
     GXLoadPosMtxImm(mMtx, 0);

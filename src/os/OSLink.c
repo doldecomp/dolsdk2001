@@ -38,10 +38,10 @@
 #define R_PPC_PLTREL24 18 //  low24*  (L + A - P) >> 2
 #define R_PPC_COPY 19     //  none    none
 #define R_PPC_GLOB_DAT 20 //  word32  S + A
-#define R_PPC_JMP_SLOT 21 //  none    
+#define R_PPC_JMP_SLOT 21 //  none
 #define R_PPC_RELATIVE 22 //  word32  B + A
 
-#define R_PPC_LOCAL24PC 23 //  low24*  
+#define R_PPC_LOCAL24PC 23 //  low24*
 
 #define R_PPC_UADDR32 24 //  word32  S + A
 #define R_PPC_UADDR16 25 //  half16* S + A
@@ -68,14 +68,14 @@
 #define R_PPC_EMB_SDAI16 106     //  uhalf16 Y       T
 #define R_PPC_EMB_SDA2I16 107    //  uhalf16 Y       U
 #define R_PPC_EMB_SDA2REL 108    //  uhalf16 Y       S + A - _SDA2_BASE_
-#define R_PPC_EMB_SDA21 109      //  ulow21  N       
-#define R_PPC_EMB_MRKREF 110     //  none    N       
+#define R_PPC_EMB_SDA21 109      //  ulow21  N
+#define R_PPC_EMB_MRKREF 110     //  none    N
 #define R_PPC_EMB_RELSEC16 111   //  uhalf16 Y       V + A
 #define R_PPC_EMB_RELST_LO 112   //  uhalf16 N       #lo(W + A)
 #define R_PPC_EMB_RELST_HI 113   //  uhalf16 N       #hi(W + A)
 #define R_PPC_EMB_RELST_HA 114   //  uhalf16 N       #ha(W + A)
-#define R_PPC_EMB_BIT_FLD 115    //  uword32 Y       
-#define R_PPC_EMB_RELSDA 116     //  uhalf16 Y       
+#define R_PPC_EMB_BIT_FLD 115    //  uword32 Y
+#define R_PPC_EMB_RELSDA 116     //  uhalf16 Y
 
 OSModuleQueue __OSModuleInfoList : (OS_BASE_CACHED | 0x30C8);
 const void* __OSStringTable : (OS_BASE_CACHED | 0x30D0);
@@ -217,9 +217,22 @@ BOOL OSLink(OSModuleInfo* newModule, void* bss) {
   OSModuleInfo* moduleInfo;
   OSImportInfo* imp;
 
+#if DOLPHIN_REVISION >= 45
+  ASSERTLINE(0xF1, newModule->version <= OS_MODULE_VERSION);
+#else
   ASSERTLINE(0xEB, newModule->version == OS_MODULE_VERSION);
+#endif
 
   moduleHeader = (OSModuleHeader*)newModule;
+
+#if DOLPHIN_REVISION >= 45
+  ASSERTLINE(0xF6, newModule->version < 2 || (u32) newModule % moduleHeader->align == 0);
+  ASSERTLINE(0xF7, newModule->version < 2 || (u32) bss % moduleHeader->bssAlign == 0);
+  if (newModule->version > 2
+   || (newModule->version >= 2U && ((u32)newModule % moduleHeader->align != 0 || (u32)bss % moduleHeader->bssAlign != 0))) {
+    return 0;
+  }
+#endif
 
   ENQUEUE_INFO(&__OSModuleInfoList, newModule, link);
 
@@ -271,6 +284,8 @@ BOOL OSLink(OSModuleInfo* newModule, void* bss) {
   return TRUE;
 }
 
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 18 : 0)
+
 static BOOL Undo(OSModuleHeader* newModule, OSModuleHeader* module) {
   OSModuleID idNew;
   OSImportInfo* imp;
@@ -281,10 +296,10 @@ static BOOL Undo(OSModuleHeader* newModule, OSModuleHeader* module) {
   u32 offset;
   u32 x;
 
-  ASSERTLINE(0x147, newModule);
+  ASSERTLINE(0x147+LINE_OFFSET, newModule);
   idNew = newModule->info.id;
-  ASSERTLINE(0x149, idNew);
-  
+  ASSERTLINE(0x149+LINE_OFFSET, idNew);
+
   for (imp = (OSImportInfo*)module->impOffset;
        imp < (OSImportInfo*)(module->impOffset + module->impSize); imp++) {
     if (imp->id == idNew) {
@@ -358,7 +373,11 @@ BOOL OSUnlink(OSModuleInfo* oldModule) {
   OSModuleHeader* moduleHeader;
   OSModuleInfo* moduleInfo;
 
-  ASSERTLINE(0x1AA, oldModule->version == OS_MODULE_VERSION);
+#if DOLPHIN_REVISION >= 45
+  ASSERTLINE(0x1AA+LINE_OFFSET, oldModule->version <= OS_MODULE_VERSION);
+#else
+  ASSERTLINE(0x1AA+LINE_OFFSET, oldModule->version == OS_MODULE_VERSION);
+#endif
   moduleHeader = (OSModuleHeader*)oldModule;
 
   DEQUEUE_INFO(oldModule, &__OSModuleInfoList, link);

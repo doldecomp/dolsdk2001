@@ -1,3 +1,4 @@
+#include <stddef.h>  // NULL must be defined as 0L in this file
 #include <dolphin.h>
 #include <dolphin/exi.h>
 #include <dolphin/os.h>
@@ -53,6 +54,9 @@ static unsigned long * BI2DebugFlag;
 static double ZeroF;
 static int AreWeInitialized;
 static void (* * OSExceptionTable)(unsigned char, struct OSContext *);
+#if DOLPHIN_REVISION >= 45
+OSTime __OSStartTime;
+#endif
 
 // functions
 static asm void __OSInitFPRs(void);
@@ -102,6 +106,15 @@ static asm void __OSInitFPRs(void)
     blr
 }
 
+#if DOLPHIN_REVISION >= 45
+static void DisableWriteGatherPipe(void)
+{
+    u32 hid2 = PPCMfhid2();
+    hid2 &= ~0x40000000;
+    PPCMthid2(hid2);
+}
+#endif
+
 unsigned long OSGetConsoleType() {
     if ((!BootInfo) || (BootInfo->consoleType == 0)) {
         return OS_CONSOLE_ARTHUR;
@@ -109,7 +122,41 @@ unsigned long OSGetConsoleType() {
     return BootInfo->consoleType;
 }
 
-#if DOLPHIN_REVISION == 37
+#if DOLPHIN_REVISION >= 45
+static void ClearArena(void)
+{
+    void *regionStart;
+    void *regionEnd;
+
+    if (OSGetResetCode() != 0x80000000) {
+        memset(OSGetArenaLo(), 0, (u8 *)OSGetArenaHi() - (u8 *)OSGetArenaLo());
+        return;
+    }
+    regionStart = *(void **)0x812FDFF0;
+    regionEnd   = *(void **)0x812FDFEC;
+    if (regionStart == NULL) {
+        memset(OSGetArenaLo(), 0, (u8 *)OSGetArenaHi() - (u8 *)OSGetArenaLo());
+        return;
+    }
+    ASSERTLINE(0x232, regionEnd != NULL);
+    if (OSGetArenaLo() >= regionStart) {
+        return;
+    }
+    if (OSGetArenaHi() <= regionStart) {
+        memset(OSGetArenaLo(), 0, (u8 *)OSGetArenaHi() - (u8 *)OSGetArenaLo());
+        return;
+    }
+    memset(OSGetArenaLo(), 0, (u8 *)regionStart - (u8 *)OSGetArenaLo());
+    if (OSGetArenaHi() > regionEnd) {
+        memset(regionEnd, 0, (u8 *)OSGetArenaHi() - (u8 *)regionEnd);
+    }
+}
+#endif
+
+#if DOLPHIN_REVISION == 45
+#   define BUILD_DATE      "Sep  8 2001"
+#   define BUILD_TIMESTAMP "01:29:38"
+#elif DOLPHIN_REVISION == 37
 #   define BUILD_DATE      "Jul 19 2001"
 #   define BUILD_TIMESTAMP "05:43:42"
 #elif DOLPHIN_REVISION == 36
@@ -126,12 +173,17 @@ unsigned long OSGetConsoleType() {
 #define _STRINGIFY(x) #x
 #define STRINGIFY(x) _STRINGIFY(x)
 
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 101 : 0)
+
 void OSInit() {
     unsigned long consoleType;
     void * bi2StartAddr;
 
     if (AreWeInitialized == 0) {
         AreWeInitialized = 1;
+#if DOLPHIN_REVISION >= 45
+        __OSStartTime = __OSGetSystemTime();
+#endif
         OSDisableInterrupts();
         BootInfo = (struct OSBootInfo_s *)OSPhysicalToCached(0);
         BI2DebugFlag = NULL;
@@ -149,6 +201,9 @@ void OSInit() {
         OSSetArenaHi((!BootInfo->arenaHi) ? &__ArenaHi : BootInfo->arenaHi);
         OSExceptionInit();
         __OSInitSystemCall();
+#if DOLPHIN_REVISION >= 45
+        OSInitAlarm();
+#endif
         __OSModuleInit();
         __OSInterruptInit();
         __OSSetInterruptHandler(0x16, &__OSResetSWInterruptHandler);
@@ -159,13 +214,19 @@ void OSInit() {
         __OSInitSram();
         __OSThreadInit();
         __OSInitAudioSystem();
-        ASSERTLINE(0x252, BootInfo); // oh sure, assert NOW, you've already dereferenced it a bunch of times.
+#if DOLPHIN_REVISION >= 45
+        DisableWriteGatherPipe();
+#endif
+        ASSERTLINE(0x252+LINE_OFFSET, BootInfo); // oh sure, assert NOW, you've already dereferenced it a bunch of times.
         if ((BootInfo->consoleType & OS_CONSOLE_DEVELOPMENT) != 0) {
             BootInfo->consoleType = OS_CONSOLE_DEVHW1;
         } else {
             BootInfo->consoleType = OS_CONSOLE_RETAIL1;
         }
         BootInfo->consoleType += (__PIRegs[11] & 0xF0000000) >> 28;
+#if DOLPHIN_REVISION >= 45
+        __OSInitMemoryProtection();
+#endif
         OSReport("\nDolphin OS $Revision: " STRINGIFY(DOLPHIN_REVISION) " $.\n");
         OSReport("Kernel built : %s %s\n", BUILD_DATE, BUILD_TIMESTAMP);
         OSReport("Console Type : ");
@@ -203,6 +264,9 @@ void OSInit() {
         if (BI2DebugFlag && ((*BI2DebugFlag) >= 2)) {
           EnableMetroTRKInterrupts();
         }
+#if DOLPHIN_REVISION >= 45
+        ClearArena();
+#endif
         OSEnableInterrupts();
     }
 }
@@ -232,6 +296,9 @@ char * __OSExceptionNames[15] = {
 };
 #endif
 
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 109 : 0)
+
 static void OSExceptionInit(void) {
     __OSException exception;
     void* destAddr;
@@ -245,7 +312,7 @@ static void OSExceptionInit(void) {
     u8* handlerStart;
     u32 handlerSize;
     
-    ASSERTMSGLINE(0x2F1, ((u32)&__OSEVEnd - (u32)&__OSEVStart) <= 0x100, "OSExceptionInit(): too big exception vector code.");
+    ASSERTMSGLINE(0x2F1+LINE_OFFSET, ((u32)&__OSEVEnd - (u32)&__OSEVStart) <= 0x100, "OSExceptionInit(): too big exception vector code.");
       
     // Install the first level exception vector.
     opCodeAddr = (u32*)__OSEVSetNumber;
@@ -343,7 +410,7 @@ entry __OSDBJUMPEND
 __OSExceptionHandler __OSSetExceptionHandler(__OSException exception, __OSExceptionHandler handler) {
     __OSExceptionHandler oldHandler;
     
-    ASSERTMSGLINE(0x37F, exception < __OS_EXCEPTION_MAX, "__OSSetExceptionHandler(): unknown exception."); 
+    ASSERTMSGLINE(0x37F+LINE_OFFSET, exception < __OS_EXCEPTION_MAX, "__OSSetExceptionHandler(): unknown exception."); 
     
     oldHandler = OSExceptionTable[exception];
     OSExceptionTable[exception] = handler;
@@ -351,7 +418,7 @@ __OSExceptionHandler __OSSetExceptionHandler(__OSException exception, __OSExcept
 }
 
 __OSExceptionHandler __OSGetExceptionHandler(__OSException exception) {
-    ASSERTMSGLINE(0x396, exception < __OS_EXCEPTION_MAX, "__OSGetExceptionHandler(): unknown exception.");
+    ASSERTMSGLINE(0x396+LINE_OFFSET, exception < __OS_EXCEPTION_MAX, "__OSGetExceptionHandler(): unknown exception.");
     return OSExceptionTable[exception];
 }
 
@@ -467,6 +534,10 @@ void __OSPSInit(void)
 
 #if DOLPHIN_REVISION >= 37
 u32 __OSGetDIConfig(void) {
+#if DOLPHIN_REVISION >= 45
+    return UNK_REG_CC006000[9] & 0xFF;
+#else
     return (u8)UNK_REG_CC006000[9];
+#endif
 }
 #endif

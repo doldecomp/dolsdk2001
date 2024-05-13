@@ -4,9 +4,18 @@
 #include <dolphin/os.h>
 
 OSThread *UNK_800000DC : 0x800000DC;
+extern u8 UNK_800030E2 : 0x800030E2;
+extern u8 UNK_800030E3 : 0x800030E3;
+extern void *UNK_812FDFEC : 0x812FDFEC;
+extern void *UNK_812FDFF0 : 0x812FDFF0;
+extern u32 UNK_817FFFF8 : 0x817FFFF8;
+extern u32 UNK_817FFFFC : 0x817FFFFC;
 
 // OS.c
 extern char * __OSExceptionNames[15]; // D ONLY
+#if DOLPHIN_REVISION >= 45
+extern OSTime __OSStartTime;
+#endif
 
 unsigned long __OSIsDebuggerPresent(void);
 void __OSPSInit(void);
@@ -45,6 +54,9 @@ OSInterruptMask __OSMaskInterrupts(OSInterruptMask global);
 OSInterruptMask __OSUnmaskInterrupts(OSInterruptMask global);
 void __OSDispatchInterrupt(__OSException exception, OSContext* context);
 void __OSModuleInit(void);
+
+// OSMemory.c
+void __OSInitMemoryProtection(void);
 
 // OSMutex.c
 void __OSUnlockAllMutex(struct OSThread *thread);
@@ -94,6 +106,9 @@ void __OSReschedule(void);
 // OSTime.c
 void __OSSetTime(long long time);
 long long __OSGetSystemTime();
+#if DOLPHIN_REVISION >= 45
+OSTime __OSTimeToSystemTime(OSTime);
+#endif
 void __OSSetTick(register unsigned long newTicks);
 
 // ppc_eabi_init.c

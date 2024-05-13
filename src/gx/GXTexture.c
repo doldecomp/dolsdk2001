@@ -1185,7 +1185,7 @@ void __GXGetSUTexSize(GXTexCoordID coord, u16 *width, u16 *height)
 }
 
 #if DOLPHIN_REVISION >= 45
-void __GXSetTmemConfig(s32 config) {
+void __GXSetTmemConfig(u32 config) {
     switch (config) {
     case 1:
         GX_WRITE_RAS_REG(0x8C0D8000);

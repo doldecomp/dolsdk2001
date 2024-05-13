@@ -494,7 +494,7 @@ char * OSGetFontTexture(char * string, void ** image, long * x, long * y, long *
     string++;
     if (OSGetFontEncode() == OS_FONT_ENCODE_SJIS) {
         if ((((code >= 0x80) && (code <= 0x9F)) || ((code >= 0xE0) && (code <= 0xFF)))
-#if DOLPHIN_REVISION >= 37
+#if DOLPHIN_REVISION == 37
          && (*string != 0U)) {
 #else
          && ((s8)*string != 0U)) {
@@ -532,7 +532,7 @@ char * OSGetFontWidth(char * string, long * width) {
     string++;
     if (OSGetFontEncode() == OS_FONT_ENCODE_SJIS) {
         if ((((code >= 0x80) && (code <= 0x9F)) || ((code >= 0xE0) && (code <= 0xFF)))
-#if DOLPHIN_REVISION >= 37
+#if DOLPHIN_REVISION == 37
          && (*string != 0U)) {
 #else
          && ((s8)*string != 0U)) {
