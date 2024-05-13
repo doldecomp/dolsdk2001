@@ -4,11 +4,13 @@
 
 #include "__gx.h"
 
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 3 : 0)
+
 void GXSetGPMetric(GXPerf0 perf0, GXPerf1 perf1)
 {
     u32 reg;
 
-    CHECK_GXBEGIN(0x6A, "GXSetGPMetric");
+    CHECK_GXBEGIN(0x6A+LINE_OFFSET, "GXSetGPMetric");
 
     switch (gx->perf0) {
     case GX_PERF0_VERTICES:
@@ -58,7 +60,7 @@ void GXSetGPMetric(GXPerf0 perf0, GXPerf1 perf1)
     case GX_PERF0_NONE:
         break;
     default:
-        ASSERTMSGLINE(0xA6, 0, "GXSetGPMetric: Invalid GXPerf0 metric name");
+        ASSERTMSGLINE(0xA6+LINE_OFFSET, 0, "GXSetGPMetric: Invalid GXPerf0 metric name");
         break;
     }
 
@@ -97,7 +99,7 @@ void GXSetGPMetric(GXPerf0 perf0, GXPerf1 perf1)
     case GX_PERF1_NONE:
         break;
     default:
-        ASSERTMSGLINE(0xD8, 0, "GXSetGPMetric: Invalid GXPerf1 metric name");
+        ASSERTMSGLINE(0xD8+LINE_OFFSET, 0, "GXSetGPMetric: Invalid GXPerf1 metric name");
         break;
     }
 
@@ -140,7 +142,7 @@ void GXSetGPMetric(GXPerf0 perf0, GXPerf1 perf1)
     case GX_PERF0_CLOCKS:              reg = 0x21; GX_WRITE_XF_REG(6, reg); break;
     case GX_PERF0_NONE: break;
     default:
-        ASSERTMSGLINE(0x1DA, 0, "GXSetGPMetric: Invalid GXPerf0 metric name");
+        ASSERTMSGLINE(0x1DA+LINE_OFFSET, 0, "GXSetGPMetric: Invalid GXPerf0 metric name");
         break;
     }
 
@@ -170,11 +172,15 @@ void GXSetGPMetric(GXPerf0 perf0, GXPerf1 perf1)
     case GX_PERF1_CLOCKS: reg = 0x67000021; GX_WRITE_RAS_REG(reg); break;
     case GX_PERF1_NONE: break;
     default:
-        ASSERTMSGLINE(0x26B, 0, "GXSetGPMetric: Invalid GXPerf1 metric name");
+        ASSERTMSGLINE(0x26B+LINE_OFFSET, 0, "GXSetGPMetric: Invalid GXPerf1 metric name");
         break;
     }
 
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
 }
 
 void GXReadGPMetric(u32 *cnt0, u32 *cnt1)
@@ -182,7 +188,7 @@ void GXReadGPMetric(u32 *cnt0, u32 *cnt1)
     u32 ctrl, ctrh;
     u32 cpCtr0, cpCtr1, cpCtr2, cpCtr3;
 
-    ASSERTMSGLINE(0x286, !gx->inDispList, "GXReadGPMetric: don't use in a display list");
+    ASSERTMSGLINE(0x286+LINE_OFFSET, !gx->inDispList, "GXReadGPMetric: don't use in a display list");
 
     ctrl = __cpReg[32]; ctrh = __cpReg[33];
     cpCtr0 = (ctrh << 16) | ctrl;
@@ -241,7 +247,7 @@ void GXReadGPMetric(u32 *cnt0, u32 *cnt1)
         *cnt0 = 0;
         break;
     default:
-        ASSERTMSGLINE(0x2CF, 0, "GXReadGPMetric: Invalid GXPerf0 metric name");
+        ASSERTMSGLINE(0x2CF+LINE_OFFSET, 0, "GXReadGPMetric: Invalid GXPerf0 metric name");
         *cnt0 = 0;
         break;
     }
@@ -287,7 +293,7 @@ void GXReadGPMetric(u32 *cnt0, u32 *cnt1)
         *cnt1 = 0;
         break;
     default:
-        ASSERTMSGLINE(0x30A, 0, "GXReadGPMetric: Invalid GXPerf1 metric name");
+        ASSERTMSGLINE(0x30A+LINE_OFFSET, 0, "GXReadGPMetric: Invalid GXPerf1 metric name");
         *cnt1 = 0;
         break;
     }
@@ -297,7 +303,7 @@ void GXClearGPMetric(void)
 {
     u32 reg;
 
-    ASSERTMSGLINE(0x322, !gx->inDispList, "GXClearGPMetric: don't use in a display list");
+    ASSERTMSGLINE(0x322+LINE_OFFSET, !gx->inDispList, "GXClearGPMetric: don't use in a display list");
     reg = 4;
     __cpReg[2] = reg;
 }
@@ -322,7 +328,7 @@ void GXReadMemMetric(u32 *cp_req, u32 *tc_req, u32 *cpu_rd_req, u32 *cpu_wr_req,
 {
     u32 ctrl, ctrh;
 
-    ASSERTMSGLINE(0x380, !gx->inDispList, "GXReadMemMetric: don't use in a display list");
+    ASSERTMSGLINE(0x380+LINE_OFFSET, !gx->inDispList, "GXReadMemMetric: don't use in a display list");
 
     ctrl = __memReg[26]; ctrh = __memReg[25];
     *cp_req = (ctrh << 16) | ctrl;
@@ -357,7 +363,7 @@ void GXReadMemMetric(u32 *cp_req, u32 *tc_req, u32 *cpu_rd_req, u32 *cpu_wr_req,
 
 void GXClearMemMetric(void)
 {
-    ASSERTMSGLINE(0x3B9, !gx->inDispList, "GXClearMemMetric: don't use in a display list");
+    ASSERTMSGLINE(0x3B9+LINE_OFFSET, !gx->inDispList, "GXClearMemMetric: don't use in a display list");
 
     __memReg[25] = 0;
     __memReg[26] = 0;
@@ -385,7 +391,7 @@ void GXReadPixMetric(u32 *top_pixels_in, u32 *top_pixels_out, u32 *bot_pixels_in
 {
     u32 ctrl, ctrh;
 
-    ASSERTMSGLINE(0x3F1, !gx->inDispList, "GXReadPixMetric: don't use in a display list");
+    ASSERTMSGLINE(0x3F1+LINE_OFFSET, !gx->inDispList, "GXReadPixMetric: don't use in a display list");
 
     ctrl = __peReg[12]; ctrh = __peReg[13];
     *top_pixels_in = ((ctrh << 16) | ctrl) * 4;
@@ -410,20 +416,24 @@ void GXClearPixMetric(void)
 {
     u32 reg;
 
-    CHECK_GXBEGIN(0x41D, "GXClearPixMetric");
+    CHECK_GXBEGIN(0x41D+LINE_OFFSET, "GXClearPixMetric");
 
     reg = 0x57000000;
     GX_WRITE_RAS_REG(reg);
     reg = 0x57000AAA;
     GX_WRITE_RAS_REG(reg);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
 }
 
 void GXSetVCacheMetric(GXVCachePerf attr)
 {
     u32 reg;
 
-    SET_REG_FIELD(0x43C, gx->perfSel, 4, 0, attr);
+    SET_REG_FIELD(0x43C+LINE_OFFSET, gx->perfSel, 4, 0, attr);
     GX_WRITE_SOME_REG4(8, 0x20, gx->perfSel, -12);
     reg = 1;
     GX_WRITE_SOME_REG4(8, 0x10, reg, -12);
@@ -452,13 +462,17 @@ void GXInitXfRasMetric(void)
 {
     u32 reg;
 
-    CHECK_GXBEGIN(0x489, "GXInitXfRasMetric");
+    CHECK_GXBEGIN(0x489+LINE_OFFSET, "GXInitXfRasMetric");
 
     reg = 0x2402C022;
     GX_WRITE_RAS_REG(reg);
     reg = 0x31000;
     GX_WRITE_XF_REG(6, reg);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 1;
+#else
     gx->bpSent = 0;
+#endif
 }
 
 void GXReadXfRasMetric(u32 *xf_wait_in, u32 *xf_wait_out, u32 *ras_busy, u32 *clocks)
