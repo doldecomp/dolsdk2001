@@ -1,3 +1,6 @@
+#if DOLPHIN_REVISION >= 45
+#include <stddef.h>  // need NULL to be defined as 0L
+#endif
 #include <dolphin.h>
 #include <dolphin/card.h>
 
@@ -8,11 +11,14 @@ static s32 VerifyID(CARDControl *card);
 static s32 VerifyDir(CARDControl *card, int *outCurrent);
 static s32 VerifyFAT(CARDControl *card, int *outCurrent);
 
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 7 : 0)
+
 void __CARDCheckSum(void *ptr, int length, u16 *checksum, u16 *checksumInv) {
     u16 *p;
     int i;
 
-    ASSERTLINE(0x44, length % sizeof(u16) == 0);
+    ASSERTLINE(0x44+LINE_OFFSET, length % sizeof(u16) == 0);
 
     length /= sizeof(u16);
     *checksum = *checksumInv = 0;
@@ -181,8 +187,8 @@ s32 __CARDVerify(CARDControl *card) {
     switch (errors)
     {
     case 0: 
-        ASSERTLINE(0x11F, card->currentDir);
-        ASSERTLINE(0x120, card->currentFat);
+        ASSERTLINE(0x11F+LINE_OFFSET, card->currentDir);
+        ASSERTLINE(0x120+LINE_OFFSET, card->currentFat);
         return CARD_RESULT_READY;
     case 1: return CARD_RESULT_BROKEN;
     default: return CARD_RESULT_BROKEN;
@@ -208,6 +214,10 @@ s32 CARDCheckExAsync(s32 chan, s32 *xferBytes, CARDCallback callback)
     BOOL updateDir = FALSE;
     BOOL updateOrphan = FALSE;
 
+#if DOLPHIN_REVISION >= 45
+    ASSERTLINE(0x152, 0 <= chan && chan < 2);
+#endif
+
     if (xferBytes)
         *xferBytes = 0;
 
@@ -229,18 +239,33 @@ s32 CARDCheckExAsync(s32 chan, s32 *xferBytes, CARDCallback callback)
     fat[0] = (u16 *)((u8 *)card->workArea + (3 + 0) * CARD_SYSTEM_BLOCK_SIZE);
     fat[1] = (u16 *)((u8 *)card->workArea + (3 + 1) * CARD_SYSTEM_BLOCK_SIZE);
 
+#if DOLPHIN_REVISION >= 45
+    ASSERTLINE(0x171, errors == 0 || errors == 1);
+#endif
+
     switch (errors)
     {
-    case 0: break;
+    case 0:
+#if DOLPHIN_REVISION >= 45
+        ASSERTLINE(0x175, card->currentDir);
+        ASSERTLINE(0x176, card->currentFat);
+#endif
+        break;
     case 1:
         if (!card->currentDir)
         {
+#if DOLPHIN_REVISION >= 45
+            ASSERTLINE(0x17B, card->currentFat);
+#endif
             card->currentDir = dir[currentDir];
             memcpy(dir[currentDir], dir[currentDir ^ 1], CARD_SYSTEM_BLOCK_SIZE);
             updateDir = TRUE;
         }
         else
         {
+#if DOLPHIN_REVISION >= 45
+            ASSERTLINE(0x182, !card->currentFat);
+#endif
             card->currentFat = fat[currentFat];
             memcpy(fat[currentFat], fat[currentFat ^ 1], CARD_SYSTEM_BLOCK_SIZE);
             updateFat = TRUE;
@@ -458,11 +483,29 @@ s32 CARDCheckAsync(s32 chan, CARDCallback callback) {
 #endif
 }
 
+#if DOLPHIN_REVISION >= 45
+long CARDCheckEx(long chan, long *xferBytes)
+{
+    long result = CARDCheckExAsync(chan, xferBytes, __CARDSyncCallback);
+
+    if (result < 0 || xferBytes == NULL) {
+        return result;
+    }
+    return __CARDSync(chan);
+}
+#endif
+
 long CARDCheck(long chan) {
+#if DOLPHIN_REVISION >= 45
+    long xferBytes;
+
+    return CARDCheckEx(chan, &xferBytes);
+#else
     long result = CARDCheckAsync(chan, __CARDSyncCallback);
 
     if (result < 0) {
         return result;
     }
     return __CARDSync(chan);
+#endif
 }

@@ -7,6 +7,9 @@
 // functions
 static void UpdateIconOffsets(CARDDir *ent, CARDStat *stat);
 
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 12 : 0)
+
 static void UpdateIconOffsets(CARDDir *ent, CARDStat *stat) {
     u32 offset;
     BOOL iconTlut;
@@ -78,8 +81,8 @@ s32 CARDGetStatus(s32 chan, s32 fileNo, CARDStat *stat) {
     CARDDir *ent;
     s32 result;
 
-    ASSERTLINE(0x97, 0 <= chan && chan < 2);
-    ASSERTLINE(0x98, 0 <= fileNo && fileNo < CARD_MAX_FILE);
+    ASSERTLINE(0x97+LINE_OFFSET, 0 <= chan && chan < 2);
+    ASSERTLINE(0x98+LINE_OFFSET, 0 <= fileNo && fileNo < CARD_MAX_FILE);
 
     if (fileNo < 0 || CARD_MAX_FILE <= fileNo)
         return CARD_RESULT_FATAL_ERROR;
@@ -119,8 +122,12 @@ s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat *stat, CARDCallback callba
     CARDDir *ent;
     s32 result;
 
-    ASSERTLINE(0xD5, 0 <= fileNo && fileNo < CARD_MAX_FILE);
-    ASSERTLINE(0xD6, 0 <= chan && chan < 2);
+    ASSERTLINE(0xD5+LINE_OFFSET, 0 <= fileNo && fileNo < CARD_MAX_FILE);
+    ASSERTLINE(0xD6+LINE_OFFSET, 0 <= chan && chan < 2);
+#if DOLPHIN_REVISION >= 45
+    ASSERTMSGLINE(0xEA, stat->iconAddr == 0xFFFFFFFF || stat->iconAddr < CARD_READ_SIZE, "CARDSetStatus[Async](): stat->iconAddr must be 0xffffffff or less than CARD_READ_SIZE.");
+    ASSERTMSGLINE(0xED, stat->commentAddr == 0xFFFFFFFF || (stat->commentAddr & 0x1FFF) <= 0x1FC0, "CARDSetStatus[Async](): comment strings (set by stat->commentAddr) must not cross 8KB byte boundary.");
+#endif
 
 #if DOLPHIN_REVISION >= 37
     if (fileNo < 0 || CARD_MAX_FILE <= fileNo || (stat->iconAddr != 0xffffffff && CARD_READ_SIZE <= stat->iconAddr)

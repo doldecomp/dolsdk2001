@@ -1,3 +1,6 @@
+#if DOLPHIN_REVISION >= 45
+#include <stddef.h>  // need NULL to be defined as 0L
+#endif
 #include <dolphin.h>
 #include <dolphin/os.h>
 #include <dolphin/card.h>
@@ -28,18 +31,25 @@ void __CARDSyncCallback(s32 chan, s32 result) {
     OSWakeupThread(&card->threadQueue);
 }
 
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 16 : 0)
+
 void __CARDExtHandler(s32 chan, OSContext *context) {
     CARDControl *card;
     CARDCallback callback;
 
-    ASSERTLINE(0xB6, 0 <= chan && chan < 2);
+    ASSERTLINE(0xB6+LINE_OFFSET, 0 <= chan && chan < 2);
+
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 19 : 0)
 
     card = &__CARDBlock[chan];
     if (card->attached)
     {
-        ASSERTLINE(0xBA, card->txCallback == 0);
+        ASSERTLINE(0xBA+LINE_OFFSET, card->txCallback == 0);
         card->attached = FALSE;
+#if DOLPHIN_REVISION < 45
         card->result = CARD_RESULT_NOCARD;
+#endif
         EXISetExiCallback(chan, 0);
 #if DOLPHIN_REVISION >= 37
         OSCancelAlarm(&card->alarm);
@@ -51,6 +61,11 @@ void __CARDExtHandler(s32 chan, OSContext *context) {
             card->exiCallback = 0;
             callback(chan, CARD_RESULT_NOCARD);
         }
+#if DOLPHIN_REVISION >= 37
+        if (card->result != -1) {
+            card->result = -3;
+        }
+#endif
 
         callback = card->extCallback;
         if (callback && CARD_MAX_MOUNT_STEP <= card->mountStep)
@@ -61,13 +76,16 @@ void __CARDExtHandler(s32 chan, OSContext *context) {
     }
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 29 : 0)
+
 void __CARDExiHandler(s32 chan, OSContext *context) {
     CARDControl *card;
     CARDCallback callback;
     u8 status;
     s32 result;
 
-    ASSERTLINE(0xDC, 0 <= chan && chan < 2);
+    ASSERTLINE(0xDC+LINE_OFFSET, 0 <= chan && chan < 2);
 
     card = &__CARDBlock[chan];
 
@@ -113,6 +131,9 @@ fatal:
     }
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 30 : 0)
+
 void __CARDTxHandler(s32 chan, OSContext *context) {
     CARDControl *card;
     CARDCallback callback;
@@ -120,7 +141,7 @@ void __CARDTxHandler(s32 chan, OSContext *context) {
     BOOL r31;
 #endif
 
-    ASSERTLINE(0x12D, 0 <= chan && chan < 2);
+    ASSERTLINE(0x12D+LINE_OFFSET, 0 <= chan && chan < 2);
     
     card = &__CARDBlock[chan];
 #if DOLPHIN_REVISION >= 37
@@ -145,7 +166,7 @@ void __CARDUnlockedHandler(s32 chan, OSContext *context) {
     CARDControl *card;
     CARDCallback callback;
 
-    ASSERTLINE(0x15C, 0 <= chan && chan < 2);
+    ASSERTLINE(0x15C+LINE_OFFSET, 0 <= chan && chan < 2);
 
     card = &__CARDBlock[chan];
     callback = card->unlockCallback;
@@ -160,7 +181,7 @@ int __CARDReadNintendoID(s32 chan, u32 *id) {
     BOOL err;
     u32 cmd;
 
-    ASSERTLINE(0x16F, 0 <= chan && chan < 2);
+    ASSERTLINE(0x16F+LINE_OFFSET, 0 <= chan && chan < 2);
 
     if (!EXISelect(chan, 0, 0)) {
         return CARD_RESULT_NOCARD;
@@ -187,7 +208,7 @@ s32 __CARDEnableInterrupt(s32 chan, BOOL enable) {
     BOOL err;
     u32 cmd;
 
-    ASSERTLINE(0x190, 0 <= chan && chan < 2);
+    ASSERTLINE(0x190+LINE_OFFSET, 0 <= chan && chan < 2);
 
     if (!EXISelect(chan, 0, 4)) {
         return CARD_RESULT_NOCARD;
@@ -205,7 +226,7 @@ s32 __CARDReadStatus(s32 chan, u8 *status) {
     BOOL err;
     u32 cmd;
 
-    ASSERTLINE(0x1A3, 0 <= chan && chan < 2);
+    ASSERTLINE(0x1A3+LINE_OFFSET, 0 <= chan && chan < 2);
 
     if (!EXISelect(chan, 0, 4)) {
         return CARD_RESULT_NOCARD;
@@ -225,7 +246,7 @@ s32 __CARDClearStatus(s32 chan) {
     BOOL err;
     u32 cmd;
 
-    ASSERTLINE(0x1B8, 0 <= chan && chan < 2);
+    ASSERTLINE(0x1B8+LINE_OFFSET, 0 <= chan && chan < 2);
 
     if (!EXISelect(chan, 0, 4)) {
         return CARD_RESULT_NOCARD;
@@ -244,7 +265,7 @@ long __CARDSleep(long chan) {
     int err;
     unsigned long cmd;
 
-    ASSERTLINE(0x1CB, 0 <= chan && chan < 2);
+    ASSERTLINE(0x1CB+LINE_OFFSET, 0 <= chan && chan < 2);
 
     if (!EXISelect(chan, 0, 4)) {
         return CARD_RESULT_NOCARD;
@@ -265,7 +286,7 @@ long __CARDWakeup(long chan) {
     int err;
     unsigned long cmd;
 
-    ASSERTLINE(0x1DE, 0 <= chan && chan < 2);
+    ASSERTLINE(0x1DE+LINE_OFFSET, 0 <= chan && chan < 2);
     if (!EXISelect(chan, 0, 4)) {
         return CARD_RESULT_NOCARD;
     }
@@ -294,13 +315,18 @@ static void TimeoutHandler(OSAlarm *alarm, OSContext *context) {
         }
     }
 
-#if DOLPHIN_REVISION >= 37
+#if DOLPHIN_REVISION == 37
     if (!card->attached) {
         return;
     }
 #endif
 
-    ASSERTLINE(0x20E, 0 <= chan && chan < 2);
+    ASSERTLINE(0x20E+LINE_OFFSET, 0 <= chan && chan < 2);
+#if DOLPHIN_REVISION >= 45
+    if (!card->attached) {
+        return;
+    }
+#endif
 
     EXISetExiCallback(chan, NULL);
     callback = card->exiCallback;
@@ -330,10 +356,13 @@ static void SetupTimeoutAlarm(CARDControl *card) {
     }
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 41 : 0)
+
 static s32 Retry(s32 chan) {
     CARDControl *card;
 
-    ASSERTLINE(0x247, 0 <= chan && chan < 2);
+    ASSERTLINE(0x247+LINE_OFFSET, 0 <= chan && chan < 2);
     
     card = &__CARDBlock[chan];
     if (!EXISelect(chan, 0, 4))
@@ -381,7 +410,7 @@ static void UnlockedCallback(s32 chan, s32 result) {
     CARDCallback callback;
     CARDControl *card;
 
-    ASSERTLINE(0x287, 0 <= chan && chan < 2);
+    ASSERTLINE(0x287+LINE_OFFSET, 0 <= chan && chan < 2);
 
     card = &__CARDBlock[chan];
     if (result >= 0)
@@ -425,16 +454,30 @@ static void UnlockedCallback(s32 chan, s32 result) {
     }
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 45 : 0)
+
 static s32 __CARDStart(s32 chan, CARDCallback txCallback, CARDCallback exiCallback) {
+#if DOLPHIN_REVISION >= 45
+    BOOL enabled;
+#endif
     CARDControl *card;
     s32 result;
 
-    ASSERTLINE(0x2C5, 0 <= chan && chan < 2);
+#if DOLPHIN_REVISION >= 45
+    enabled = OSDisableInterrupts();
+#endif
+
+    ASSERTLINE(0x2C5+LINE_OFFSET, 0 <= chan && chan < 2);
 
     card = &__CARDBlock[chan];
     if (!card->attached)
     {
+#if DOLPHIN_REVISION >= 45
+        result = CARD_RESULT_NOCARD;
+#else
         return CARD_RESULT_NOCARD;
+#endif
     }
     else
     {
@@ -450,7 +493,11 @@ static s32 __CARDStart(s32 chan, CARDCallback txCallback, CARDCallback exiCallba
         card->unlockCallback = UnlockedCallback;
         if (!EXILock(chan, 0, __CARDUnlockedHandler))
         {
+#if DOLPHIN_REVISION >= 45
+            result = CARD_RESULT_BUSY;
+#else
             return CARD_RESULT_BUSY;
+#endif
         }
         else
         {
@@ -459,17 +506,30 @@ static s32 __CARDStart(s32 chan, CARDCallback txCallback, CARDCallback exiCallba
             if (!EXISelect(chan, 0, 4))
             {
                 EXIUnlock(chan);
+#if DOLPHIN_REVISION >= 45
+                result = CARD_RESULT_NOCARD;
+#else
                 return CARD_RESULT_NOCARD;
+#endif
             }
             else
             {
                 SetupTimeoutAlarm(card);
+#if DOLPHIN_REVISION >= 45
+                result = CARD_RESULT_READY;
+#else
                 return CARD_RESULT_READY;
+#endif
             }
         }
     }
 
+#if DOLPHIN_REVISION >= 45
+    OSRestoreInterrupts(enabled);
+    return result;
+#else
     return CARD_RESULT_READY;
+#endif
 }
 
 #define AD1(x) ((u8)(((x) >> 17) & 0x7f))
@@ -478,15 +538,18 @@ static s32 __CARDStart(s32 chan, CARDCallback txCallback, CARDCallback exiCallba
 #define AD3(x) ((u8)(((x) >> 7) & 0x03))
 #define BA(x) ((u8)((x)&0x7f))
 
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 55 : 0)
+
 s32 __CARDReadSegment(s32 chan, CARDCallback callback) {
     CARDControl *card;
     s32 result;
 
-    ASSERTLINE(0x2F9, 0 <= chan && chan < 2);
+    ASSERTLINE(0x2F9+LINE_OFFSET, 0 <= chan && chan < 2);
 
     card = &__CARDBlock[chan];
-    ASSERTLINE(0x2FB, card->addr % CARD_SEG_SIZE == 0);
-    ASSERTLINE(0x2FC, card->addr < (u32) card->size * 1024 * 1024 / 8);
+    ASSERTLINE(0x2FB+LINE_OFFSET, card->addr % CARD_SEG_SIZE == 0);
+    ASSERTLINE(0x2FC+LINE_OFFSET, card->addr < (u32) card->size * 1024 * 1024 / 8);
     card->cmd[0] = 0x52;
     card->cmd[1] = AD1(card->addr);
     card->cmd[2] = AD2(card->addr);
@@ -499,34 +562,56 @@ s32 __CARDReadSegment(s32 chan, CARDCallback callback) {
     result = __CARDStart(chan, callback, 0);
     if (result == CARD_RESULT_BUSY)
     {
+#if DOLPHIN_REVISION >= 45
+        result = CARD_RESULT_READY;
+#else
         return CARD_RESULT_READY;
+#endif
     }
-    if (result < 0)
-    {
-        return result;
+#if DOLPHIN_REVISION >= 45
+    else if (result >= 0) {
+#else
+        if (result < 0) {
+            return result;
+        }
+#endif
+        if (!EXIImmEx(chan, card->cmd, card->cmdlen, 1) ||
+            !EXIImmEx(chan, (u8 *)card->workArea + sizeof(CARDID), card->latency,
+                      1) || // XXX use DMA if possible
+            !EXIDma(chan, card->buffer, 512, card->mode, __CARDTxHandler))
+        {
+            card->txCallback = NULL;
+            EXIDeselect(chan);
+            EXIUnlock(chan);
+#if DOLPHIN_REVISION >= 45
+            result = CARD_RESULT_NOCARD;
+#else
+            return CARD_RESULT_NOCARD;
+#endif
+        }
+#if DOLPHIN_REVISION >= 45
+        else {
+            result = CARD_RESULT_READY;
+        }
     }
-    if (!EXIImmEx(chan, card->cmd, card->cmdlen, 1) ||
-        !EXIImmEx(chan, (u8 *)card->workArea + sizeof(CARDID), card->latency,
-                  1) || // XXX use DMA if possible
-        !EXIDma(chan, card->buffer, 512, card->mode, __CARDTxHandler))
-    {
-        card->txCallback = NULL;
-        EXIDeselect(chan);
-        EXIUnlock(chan);
-        return CARD_RESULT_NOCARD;
-    }
+    return result;
+#else
     return CARD_RESULT_READY;
+#endif
 }
+
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 56 : 0)
 
 s32 __CARDWritePage(s32 chan, CARDCallback callback) {
     CARDControl *card;
     s32 result;
 
-    ASSERTLINE(0x331, 0 <= chan && chan < 2);
+    ASSERTLINE(0x331+LINE_OFFSET, 0 <= chan && chan < 2);
 
     card = &__CARDBlock[chan];
-    ASSERTLINE(0x333, card->addr % CARD_PAGE_SIZE == 0);
-    ASSERTLINE(0x334, card->addr < (u32) card->size * 1024 * 1024 / 8);
+    ASSERTLINE(0x333+LINE_OFFSET, card->addr % CARD_PAGE_SIZE == 0);
+    ASSERTLINE(0x334+LINE_OFFSET, card->addr < (u32) card->size * 1024 * 1024 / 8);
     card->cmd[0] = 0xF2;
     card->cmd[1] = AD1(card->addr);
     card->cmd[2] = AD2(card->addr);
@@ -539,28 +624,51 @@ s32 __CARDWritePage(s32 chan, CARDCallback callback) {
     result = __CARDStart(chan, 0, callback);
     if (result == CARD_RESULT_BUSY)
     {
+#if DOLPHIN_REVISION >= 45
+        result = CARD_RESULT_READY;
+#else
         return CARD_RESULT_READY;
+#endif
     }
-    if (result < 0)
-    {
-        return result;
+#if DOLPHIN_REVISION >= 45
+    else if (result >= 0) {
+#else
+        if (result < 0)
+        {
+            return result;
+        }
+#endif
+        if (!EXIImmEx(chan, card->cmd, card->cmdlen, 1) ||
+            !EXIDma(chan, card->buffer, 128, card->mode, __CARDTxHandler))
+        {
+            card->exiCallback = 0;
+            EXIDeselect(chan);
+            EXIUnlock(chan);
+#if DOLPHIN_REVISION >= 45
+            result = CARD_RESULT_NOCARD;
+#else
+            return CARD_RESULT_NOCARD;
+#endif
+        }
+#if DOLPHIN_REVISION >= 45
+        else {
+            result = CARD_RESULT_READY;
+        }
     }
-    if (!EXIImmEx(chan, card->cmd, card->cmdlen, 1) ||
-        !EXIDma(chan, card->buffer, 128, card->mode, __CARDTxHandler))
-    {
-        card->exiCallback = 0;
-        EXIDeselect(chan);
-        EXIUnlock(chan);
-        return CARD_RESULT_NOCARD;
-    }
+    return result;
+#else
     return CARD_RESULT_READY;
+#endif
 }
+
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 57 : 0)
 
 long __CARDErase(long chan, void (* callback)(long, long)) {
     struct CARDControl * card;
     long result;
 
-    ASSERTLINE(0x364, 0 <= chan && chan < 2);
+    ASSERTLINE(0x364+LINE_OFFSET, 0 <= chan && chan < 2);
 
     card = &__CARDBlock[chan];
     card->cmd[0] = 0xF4;
@@ -571,18 +679,34 @@ long __CARDErase(long chan, void (* callback)(long, long)) {
     card->retry = 3;
     result = __CARDStart(chan, 0, callback);
     if (result == -1) {
+#if DOLPHIN_REVISION >= 45
+        result = 0;
+#else
         return 0;
+#endif
     }
-    if (result < 0) {
-        return result;
+#if DOLPHIN_REVISION >= 45
+    else if (result >= 0) {
+#else
+        if (result < 0) {
+            return result;
+        }
+        result = 0;
+#endif
+        if (EXIImmEx(chan, &card->cmd, card->cmdlen, 1) == 0) {
+            result = -3;
+            card->exiCallback = 0;
+        }
+#if DOLPHIN_REVISION >= 45
+        else {
+            result = 0;
+        }
+#endif
+        EXIDeselect(chan);
+        EXIUnlock(chan);
+#if DOLPHIN_REVISION >= 45
     }
-    result = 0;
-    if (EXIImmEx(chan, &card->cmd, card->cmdlen, 1) == 0) {
-        result = -3;
-        card->exiCallback = 0;
-    }
-    EXIDeselect(chan);
-    EXIUnlock(chan);
+#endif
     return result;
 }
 
@@ -590,11 +714,11 @@ s32 __CARDEraseSector(s32 chan, u32 addr, CARDCallback callback) {
     s32 result;
     CARDControl *card;
 
-    ASSERTLINE(0x394, 0 <= chan && chan < 2);
+    ASSERTLINE(0x394+LINE_OFFSET, 0 <= chan && chan < 2);
 
     card = &__CARDBlock[chan];
-    ASSERTLINE(0x396, addr % card->sectorSize == 0);
-    ASSERTLINE(0x397, addr < (u32) card->size * 1024 * 1024 / 8);
+    ASSERTLINE(0x396+LINE_OFFSET, addr % card->sectorSize == 0);
+    ASSERTLINE(0x397+LINE_OFFSET, addr < (u32) card->size * 1024 * 1024 / 8);
     card->cmd[0] = 0xF1;
     card->cmd[1] = AD1(addr);
     card->cmd[2] = AD2(addr);
@@ -606,22 +730,36 @@ s32 __CARDEraseSector(s32 chan, u32 addr, CARDCallback callback) {
 
     if (result == CARD_RESULT_BUSY)
     {
+#if DOLPHIN_REVISION >= 45
+        result = CARD_RESULT_READY;
+#else
         return CARD_RESULT_READY;
+#endif
     }
-    if (result < 0)
-    {
-        return result;
+#if DOLPHIN_REVISION >= 45
+    else if (result >= 0) {
+#else
+        if (result < 0)
+        {
+            return result;
+        }
+        result = CARD_RESULT_READY;
+#endif
+        if (!EXIImmEx(chan, card->cmd, card->cmdlen, 1))
+        {
+            result = CARD_RESULT_NOCARD;
+            card->exiCallback = NULL;
+        }
+#if DOLPHIN_REVISION >= 45
+        else {
+            result = 0;
+        }
+#endif
+        EXIDeselect(chan);
+        EXIUnlock(chan);
+#if DOLPHIN_REVISION >= 45
     }
-
-    result = CARD_RESULT_READY;
-    if (!EXIImmEx(chan, card->cmd, card->cmdlen, 1))
-    {
-        result = CARD_RESULT_NOCARD;
-        card->exiCallback = NULL;
-    }
-
-    EXIDeselect(chan);
-    EXIUnlock(chan);
+#endif
     return result;
 }
 
@@ -684,25 +822,38 @@ s32 __CARDGetControlBlock(s32 chan, CARDControl **pcard) {
     return result;
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 43 : 0)
+
 s32 __CARDPutControlBlock(CARDControl *card, s32 result) {
     BOOL enabled;
 
-    ASSERTLINE(0x43A, result != CARD_RESULT_BUSY);
+    ASSERTLINE(0x43A+LINE_OFFSET, result != CARD_RESULT_BUSY);
 
     enabled = OSDisableInterrupts();
     if (card->attached) {
         card->result = result;
-    } else {
+    }
+#if DOLPHIN_REVISION >= 45
+    else if (card->result == -1) {
+        card->result = result;
+    }
+#else
+    else {
         ASSERTLINE(0x442, card->result == CARD_RESULT_NOCARD);
     }
+#endif
     OSRestoreInterrupts(enabled);
     return result;
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 49 : 0)
+
 s32 CARDGetResultCode(s32 chan) {
     CARDControl *card;
     
-    ASSERTLINE(0x455, 0 <= chan && chan < 2);
+    ASSERTLINE(0x455+LINE_OFFSET, 0 <= chan && chan < 2);
 
     if (chan < 0 || chan >= 2)
     {
@@ -781,7 +932,7 @@ long CARDGetMemSize(long chan, unsigned short * size) {
 s32 CARDGetSectorSize(s32 chan, u32 *size) {
     struct CARDControl *card;
     long result;
-#if DOLPHIN_REVISION >= 37
+#if DOLPHIN_REVISION == 37
     BOOL enabled;
     CARDControl *tmp;
 #endif
@@ -792,7 +943,7 @@ s32 CARDGetSectorSize(s32 chan, u32 *size) {
         return result;
     }
     *size = card->sectorSize;
-#if DOLPHIN_REVISION >= 37
+#if DOLPHIN_REVISION == 37
     tmp = card;
     enabled = OSDisableInterrupts();
     if (tmp->attached) {
