@@ -53,7 +53,11 @@ struct SIPacket {
     void * input;
     unsigned long inputBytes;
     void (* callback)(long, unsigned long, struct OSContext *);
+#if DOLPHIN_REVISION >= 45
+    long long fire;
+#else
     long long time;
+#endif
 };
 
 int SIBusy();
@@ -66,8 +70,16 @@ void SITransferCommands();
 unsigned long SISetXY(unsigned long x, unsigned long y);
 unsigned long SIEnablePolling(unsigned long poll);
 unsigned long SIDisablePolling(unsigned long poll);
-void SIGetResponse(long chan, void * data);
+#if DOLPHIN_REVISION >= 45
+int
+#else
+void
+#endif
+SIGetResponse(long chan, void * data);
 int SITransfer(long chan, void * output, unsigned long outputBytes, void * input, unsigned long inputBytes, 
                 void (* callback)(long, unsigned long, struct OSContext *), long long time);
+#if DOLPHIN_REVISION >= 45
+u32 SIGetType(s32 chan);
+#endif
 
 #endif // _DOLPHIN_OSSERIAL_H
