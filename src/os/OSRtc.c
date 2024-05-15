@@ -104,14 +104,16 @@ static int ReadSram(void * buffer) {
     return !err;
 }
 
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 9 : 0)
+
 static void WriteSramCallback() {
     int unused;
-    ASSERTLINE(0xF0, !Scb.locked);
+    ASSERTLINE(0xF0+LINE_OFFSET, !Scb.locked);
     Scb.sync = WriteSram(&Scb.sram[Scb.offset], Scb.offset, 0x40 - Scb.offset);
     if (Scb.sync != 0) {
         Scb.offset = 0x40;
     }
-    ASSERTLINE(0xF6, Scb.sync);
+    ASSERTLINE(0xF6+LINE_OFFSET, Scb.sync);
 }
 
 static int WriteSram(void * buffer, unsigned long offset, unsigned long size) {
@@ -139,7 +141,7 @@ static int WriteSram(void * buffer, unsigned long offset, unsigned long size) {
 void __OSInitSram() {
     Scb.locked = Scb.enabled = 0;
     Scb.sync = ReadSram(&Scb);
-    ASSERTLINE(0x12C, Scb.sync);
+    ASSERTLINE(0x12C+LINE_OFFSET, Scb.sync);
     Scb.offset = 0x40;
 }
 
@@ -147,7 +149,7 @@ static void * LockSram(unsigned long offset) {
     int enabled;
 
     enabled = OSDisableInterrupts();
-    ASSERTLINE(0x140, !Scb.locked);
+    ASSERTLINE(0x140+LINE_OFFSET, !Scb.locked);
     if (Scb.locked) {
         OSRestoreInterrupts(enabled);
         return NULL;
@@ -168,7 +170,7 @@ struct OSSramEx * __OSLockSramEx(void) {
 static int UnlockSram(int commit, unsigned long offset) {
     unsigned short * p;
 
-    ASSERTLINE(0x162, Scb.locked);
+    ASSERTLINE(0x162+LINE_OFFSET, Scb.locked);
     if (commit != 0) {
         if (offset == 0) {
             struct OSSram * sram  = (struct OSSram *)&Scb.sram[0];
@@ -208,6 +210,9 @@ int __OSSyncSram() {
     return Scb.sync;
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 15 : 0)
+
 int __OSCheckSram() {
     unsigned short * p;
     unsigned short checkSum;
@@ -215,7 +220,7 @@ int __OSCheckSram() {
     struct OSSram * sram;
     int unused;
 
-    ASSERTLINE(0x1A9, Scb.locked);
+    ASSERTLINE(0x1A9+LINE_OFFSET, Scb.locked);
 
     checkSum = checkSumInv = 0;
 
@@ -233,7 +238,7 @@ int __OSReadROM(void * buffer, long length, long offset) {
     int err;
     unsigned long cmd;
 
-    ASSERTLINE(0x1C8, length <= 1024);
+    ASSERTLINE(0x1C8+LINE_OFFSET, length <= 1024);
     DCInvalidateRange(buffer, length);
     if (EXILock(0, 1, NULL) == 0) {
         return 0;
@@ -269,8 +274,8 @@ int __OSReadROMAsync(void * buffer, long length, long offset, void (* callback)(
     int err;
     unsigned long cmd;
 
-    ASSERTLINE(0x203, length <= 1024);
-    ASSERTLINE(0x204, callback);
+    ASSERTLINE(0x203+LINE_OFFSET, length <= 1024);
+    ASSERTLINE(0x204+LINE_OFFSET, callback);
     DCInvalidateRange(buffer, length);
     Scb.callback = callback;
     if (EXILock(0, 1, NULL) == 0) {
@@ -300,7 +305,7 @@ void OSSetSoundMode(unsigned long mode) {
     struct OSSram * sram;
     int unused;
 
-    ASSERTLINE(0x22A, mode == OS_SOUND_MODE_MONO || mode == OS_SOUND_MODE_STEREO);
+    ASSERTLINE(0x22A+LINE_OFFSET, mode == OS_SOUND_MODE_MONO || mode == OS_SOUND_MODE_STEREO);
     mode *= 4;
     mode &= 4;
     sram = __OSLockSram();
@@ -313,21 +318,65 @@ void OSSetSoundMode(unsigned long mode) {
     __OSUnlockSram(1);
 }
 
+#if DOLPHIN_REVISION >= 45
+u32 OSGetProgressiveMode(void)
+{
+    struct OSSram *sram;
+    u32 on;
+
+    sram = __OSLockSram();
+    on = (sram->flags & 0x80) ? 1 : 0;
+    __OSUnlockSram(0);
+    return on;
+}
+
+void OSSetProgressiveMode(u32 on)
+{
+    struct OSSram *sram;
+    
+    ASSERTLINE(0x258, on == OS_PROGRESSIVE_MODE_OFF || on == OS_PROGRESSIVE_MODE_ON);
+    on <<= 7;
+    on &= 0x80;
+    sram = __OSLockSram();
+    if (on == (sram->flags & 0x80)) {
+        __OSUnlockSram(0);
+    } else {
+        sram->flags &= ~0x80;
+        sram->flags |= on;
+        __OSUnlockSram(1);
+    }
+}
+#endif
+
 unsigned long OSGetVideoMode() {
     struct OSSram * sram = __OSLockSram();
     unsigned long mode = sram->flags & 3;
 
     __OSUnlockSram(0);
+#if DOLPHIN_REVISION >= 45
+    if (mode > 2) {
+        mode = 0;
+    }
+#endif
     return mode;
 }
+
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 51 : 0)
 
 void OSSetVideoMode(unsigned long mode) {
     struct OSSram * sram;
     int unused;
 
-    ASSERTLINE(0x249, OS_VIDEO_MODE_NTSC <= mode && mode <= OS_VIDEO_MODE_MPAL);
+    ASSERTLINE(0x249+LINE_OFFSET, OS_VIDEO_MODE_NTSC <= mode && mode <= OS_VIDEO_MODE_MPAL);
 
+#if DOLPHIN_REVISION >= 45
+    if (mode > 2) {
+        mode = 0;
+    }
+#else
     mode &= 3;
+#endif
     sram = __OSLockSram();
     if (mode == (sram->flags & 3)) {
         __OSUnlockSram(0);
@@ -379,3 +428,29 @@ void __OSSetBootMode(unsigned char ntd) {
     sram->ntd |= ntd;
     __OSUnlockSram(1);
 }
+
+#if DOLPHIN_REVISION >= 45
+u16 OSGetWirelessID(s32 chan)
+{
+    struct OSSramEx *sram;
+    u16 id;
+
+    sram = __OSLockSramEx();
+    id = sram->wirelessPadID[chan];
+    __OSUnlockSramEx(0);
+    return id;
+}
+
+void OSSetWirelessID(s32 chan, u16 id)
+{
+    struct OSSramEx *sram;
+
+    sram = __OSLockSramEx();
+    if (sram->wirelessPadID[chan] != id) {
+        sram->wirelessPadID[chan] = id;
+        __OSUnlockSramEx(1);
+    } else {
+        __OSUnlockSramEx(0);
+    }
+}
+#endif

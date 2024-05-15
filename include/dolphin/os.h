@@ -174,6 +174,11 @@ void *OSUncachedToCached(void *ucaddr);
 #define OSUncachedToCached(ucaddr)   ((void*) ((u8*)(ucaddr) - (OS_BASE_UNCACHED - OS_BASE_CACHED)))
 #endif
 
+#if DOLPHIN_REVISION >= 45
+#define OS_PROGRESSIVE_MODE_OFF 0
+#define OS_PROGRESSIVE_MODE_ON 1
+#endif
+
 #ifdef __cplusplus
 }
 #endif
