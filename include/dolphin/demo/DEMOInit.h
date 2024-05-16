@@ -15,7 +15,11 @@ void DEMOSetTevColorIn(enum _GXTevStageID stage, enum _GXTevColorArg a, enum _GX
 void DEMOSetTevOp(enum _GXTevStageID id, enum _GXTevMode mode);
 struct _GXRenderModeObj * DEMOGetRenderModeObj();
 u32 DEMOGetCurrentBuffer(void);
+#if DOLPHIN_REVISION >= 45
+void DEMOEnableGPHangWorkaround(unsigned long timeoutFrames);
+#else
 void DEMOEnableBypassWorkaround(unsigned long timeoutFrames);
+#endif
 void DEMOReInit(struct _GXRenderModeObj * mode);
 
 #endif // _DOLPHIN_DEMOINIT_H_

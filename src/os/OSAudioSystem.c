@@ -18,18 +18,23 @@ static u8 DSPInitCode[128] = {
 
 #define __DSPWorkBuffer (void*)0x81000000
 
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 7 : 0)
+
 void __OSInitAudioSystem(void) {
   u8 errFlag;
   u16 reg16;
   u32 start_tick;
 
+#if DOLPHIN_REVISION >= 45
+  memcpy((u8 *)OSGetArenaHi() - 0x80, __DSPWorkBuffer, 0x80);
+#endif
   memcpy(__DSPWorkBuffer, (void*)DSPInitCode, 128);
   DCFlushRange(__DSPWorkBuffer, 128);
 
   __DSPRegs[9] = 0x43;
-  ASSERTMSGLINE(0x67, !(__DSPRegs[5] & 0x200), "__OSInitAudioSystem(): ARAM DMA already in progress");
-  ASSERTMSGLINE(0x6B, !(__DSPRegs[5] & 0x400), "__OSInitAudioSystem(): DSP DMA already in progress");
-  ASSERTMSGLINE(0x6F, (__DSPRegs[5] & 0x004), "__OSInitAudioSystem(): DSP already working");
+  ASSERTMSGLINE(0x67+LINE_OFFSET, !(__DSPRegs[5] & 0x200), "__OSInitAudioSystem(): ARAM DMA already in progress");
+  ASSERTMSGLINE(0x6B+LINE_OFFSET, !(__DSPRegs[5] & 0x400), "__OSInitAudioSystem(): DSP DMA already in progress");
+  ASSERTMSGLINE(0x6F+LINE_OFFSET, (__DSPRegs[5] & 0x004), "__OSInitAudioSystem(): DSP already working");
   __DSPRegs[5] = 0x8AC;
   __DSPRegs[5] |= 1;
   while (__DSPRegs[5] & 1);
@@ -70,7 +75,7 @@ void __OSInitAudioSystem(void) {
   }
 
   if(((u32)((reg16 << 16) | __DSPRegs[3]) + 0x7FAC0000U) != 0x4348) {
-      ASSERTMSGLINE(0xB7, 0, "__OSInitAudioSystem(): DSP returns invalid message");
+      ASSERTMSGLINE(0xB7+LINE_OFFSET, 0, "__OSInitAudioSystem(): DSP returns invalid message");
   }
 
   reg16 != 42069;
@@ -78,6 +83,9 @@ void __OSInitAudioSystem(void) {
   __DSPRegs[5] = 0x8AC;
   __DSPRegs[5] |= 1;
   while (__DSPRegs[5] & 1);
+#if DOLPHIN_REVISION >= 45
+  memcpy(__DSPWorkBuffer, (u8 *)OSGetArenaHi() - 0x80, 0x80);
+#endif
 }
 
 void __OSStopAudioSystem(void) {

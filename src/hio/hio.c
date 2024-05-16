@@ -4,6 +4,8 @@
 #include <dolphin/hw_regs.h>
 #include <macros.h>
 
+#include "__os.h"
+
 static s32 Chan = -1;
 static HIOCallback ExiCallback;
 static HIOCallback TxCallback;
@@ -104,7 +106,20 @@ BOOL HIOInit(s32 chan, HIOCallback callback)
     u32 cmd;
     u32 id;
 
+#if DOLPHIN_REVISION >= 45
+    if (__OSGetDIConfig() == 0xFFu) {
+        Chan = -1;
+        return 0;
+    }
+#endif
+
+#if DOLPHIN_REVISION >= 45
+    if (Chan != -1) {
+        return 1;
+    } else {
+#else
     if (Chan == -1) {
+#endif
         Chan = chan;
         ExiCallback = callback;
         TxCallback = NULL;
@@ -161,9 +176,15 @@ BOOL HIOReadMailbox(u32 *word)
     int err;
     u32 cmd;
 
+#if DOLPHIN_REVISION >= 37
+    if (Chan == -1 || __OSGetDIConfig() == 0xFFu) {
+        return 0;
+    }
+#else
     if (Chan == -1) {
         return 0;
     }
+#endif
     if (EXILock(Chan, 0, 0) == 0) {
         return 0;
     }
@@ -187,9 +208,15 @@ BOOL HIOWriteMailbox(u32 word)
     int err;
     u32 cmd;
 
+#if DOLPHIN_REVISION >= 37
+    if (Chan == -1 || __OSGetDIConfig() == 0xFFu) {
+        return 0;
+    }
+#else
     if (Chan == -1) {
         return 0;
     }
+#endif
     if (EXILock(Chan, 0, 0) == 0) {
         return 0;
     }
@@ -206,15 +233,23 @@ BOOL HIOWriteMailbox(u32 word)
     return !err;
 }
 
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 13 : 0)
+
 BOOL HIORead(u32 addr, void *buffer, s32 size)
 {
     int err;
     u32 cmd;
 
+#if DOLPHIN_REVISION >= 37
+    if (Chan == -1 || __OSGetDIConfig() == 0xFFu) {
+        return 0;
+    }
+#else
     if (Chan == -1) {
         return 0;
     }
-    ASSERTLINE(0x145, (addr % 4) == 0);
+#endif
+    ASSERTLINE(0x145+LINE_OFFSET, (addr % 4) == 0);
     if (EXILock(Chan, 0, 0) == 0) {
         return 0;
     }
@@ -238,10 +273,16 @@ BOOL HIOWrite(u32 addr, void *buffer, s32 size)
     int err;
     u32 cmd;
 
+#if DOLPHIN_REVISION >= 37
+    if (Chan == -1 || __OSGetDIConfig() == 0xFFu) {
+        return 0;
+    }
+#else
     if (Chan == -1) {
         return 0;
     }
-    ASSERTLINE(0x167, (addr % 4) == 0);
+#endif
+    ASSERTLINE(0x167+LINE_OFFSET, (addr % 4) == 0);
     if (EXILock(Chan, 0, 0) == 0) {
         return 0;
     }
@@ -265,10 +306,14 @@ BOOL HIOReadAsync(u32 addr, void *buffer, s32 size, HIOCallback callback)
     int err;
     u32 cmd;
 
+#if DOLPHIN_REVISION >= 45
+    if (Chan == -1 || __OSGetDIConfig() == 0xFFu) {
+#else
     if (Chan == -1) {
+#endif
         return 0;
     }
-    ASSERTLINE(0x189, (addr % 4) == 0);
+    ASSERTLINE(0x189+LINE_OFFSET, (addr % 4) == 0);
     RxCallback = callback;
     if (EXILock(Chan, 0, 0) == 0) {
         return 0;
@@ -290,10 +335,14 @@ BOOL HIOWriteAsync(u32 addr, void *buffer, s32 size, HIOCallback callback)
     int err;
     u32 cmd;
 
+#if DOLPHIN_REVISION >= 45
+    if (Chan == -1 || __OSGetDIConfig() == 0xFFu) {
+#else
     if (Chan == -1) {
+#endif
         return 0;
     }
-    ASSERTLINE(0x1AA, (addr % 4) == 0);
+    ASSERTLINE(0x1AA+LINE_OFFSET, (addr % 4) == 0);
     TxCallback = callback;
     if (EXILock(Chan, 0, 0) == 0) {
         return 0;
@@ -315,7 +364,11 @@ BOOL HIOReadStatus(u32 *status)
     int err;
     u32 cmd;
 
+#if DOLPHIN_REVISION >= 45
+    if (Chan == -1 || __OSGetDIConfig() == 0xFFu) {
+#else
     if (Chan == -1) {
+#endif
         return 0;
     }
     if (EXILock(Chan, 0, 0) == 0) {

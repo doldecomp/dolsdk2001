@@ -69,7 +69,9 @@ typedef struct {
 } SomeVIStruct;
 
 static volatile u32 retraceCount;
+#if DOLPHIN_REVISION < 45
 static u32 changeMode;
+#endif
 static volatile u32 flushFlag;
 static struct OSThreadQueue retraceQueue;
 static void (*PreCB)(u32);
@@ -77,7 +79,13 @@ static void (*PostCB)(u32);
 static u32 encoderType;
 static s16 displayOffsetH;
 static s16 displayOffsetV;
+#if DOLPHIN_REVISION >= 45
+static volatile u32 changeMode;
+#endif
 static volatile u64 changed;
+#if DOLPHIN_REVISION >= 45
+static volatile u32 shdwChangeMode;
+#endif
 static u16 regs[59];
 static volatile u64 shdwChanged;
 static u16 shdwRegs[59];
@@ -92,7 +100,11 @@ static VITiming timing[7] =
     { 5, 287, 35, 35, 2, 2, 13, 11, 13, 11, 619, 621, 619, 621, 626, 432, 64, 75, 106, 172, 380, 133, 420 },
     { 6, 240, 24, 25, 3, 2, 16, 15, 14, 13, 518, 517, 516, 519, 525, 429, 64, 78, 112, 162, 373, 122, 412 },
     { 6, 240, 24, 24, 4, 4, 16, 14, 16, 14, 518, 520, 518, 520, 526, 429, 64, 78, 112, 162, 373, 122, 412 },
+#if DOLPHIN_REVISION >= 37
+    { 12, 480, 48, 48, 6, 6, 24, 24, 24, 24, 1038, 1038, 1038, 1038, 1050, 429, 64, 71, 105, 162, 373, 122, 412 },
+#else
     { 12, 480, 44, 44, 10, 10, 24, 24, 24, 24, 1038, 1038, 1038, 1038, 1050, 429, 64, 71, 105, 162, 373, 122, 412 },
+#endif
 };
 static u16 taps[25] = {
     0x01F0, 0x01DC,
@@ -139,17 +151,29 @@ static int VISetRegs(void)
 {
     s32 regIndex;
 
-    if (changeMode != 1 || getCurrentFieldEvenOdd() != 0) {
+    if (
+#if DOLPHIN_REVISION >= 45
+     shdwChangeMode != 1
+#else
+     changeMode != 1
+#endif
+     || getCurrentFieldEvenOdd() != 0) {
         while (shdwChanged != 0) {
             regIndex = cntlzd(shdwChanged);
             __VIRegs[regIndex] = shdwRegs[regIndex];
             shdwChanged &= ~((u64)1 << (63 - regIndex));
         }
+#if DOLPHIN_REVISION >= 45
+        shdwChangeMode = 0;
+#else
         changeMode = 0;
+#endif
         return 1;
     }
     return 0;
 }
+
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 19 : 0)
 
 static void __VIRetraceHandler(__OSInterrupt unused, OSContext *context)
 {
@@ -187,7 +211,7 @@ static void __VIRetraceHandler(__OSInterrupt unused, OSContext *context)
         return;
     }
     if (inter == 0) {
-        ASSERTLINE(0x2BA, FALSE);
+        ASSERTLINE(0x2BA+LINE_OFFSET, FALSE);
     }
     retraceCount += 1;
     OSClearContext(&exceptionContext);
@@ -349,7 +373,7 @@ static void ImportAdjustingValues(void)
 {
     OSSram *sram = __OSLockSram();
 
-    ASSERTLINE(0x3E2, sram);
+    ASSERTLINE(0x3E2+LINE_OFFSET, sram);
     displayOffsetH = sram->displayOffsetH;
     displayOffsetV = 0;
     __OSUnlockSram(0);
@@ -369,6 +393,9 @@ void VIInit(void)
     changed = 0;
     shdwChanged = 0;
     changeMode = 0;
+#if DOLPHIN_REVISION >= 45
+    shdwChangeMode = 0;
+#endif
     flushFlag = 0;
     __VIRegs[39] = taps[0] | ((taps[1] & 0x3F) << 10);
     __VIRegs[38] = (taps[1] >> 6) | (taps[2] << 4);
@@ -626,9 +653,17 @@ static void setVerticalRegs(u16 dispPosY, u16 dispSizeY, u8 equ, u16 acv, u16 pr
     }
     actualAcv = dispSizeY / c;
     if (black) {
+#if DOLPHIN_REVISION >= 37
+        actualPrbOdd += (actualAcv * 2) - 2;
+#else
         actualPrbOdd += dispSizeY - 2;
+#endif
         actualPsbOdd += 2;
+#if DOLPHIN_REVISION >= 37
+        actualPrbEven += (actualAcv * 2) - 2;
+#else
         actualPrbEven += dispSizeY - 2;
+#endif
         actualPsbEven += 2;
         actualAcv = 0;
     }
@@ -644,6 +679,9 @@ static void setVerticalRegs(u16 dispPosY, u16 dispSizeY, u8 equ, u16 acv, u16 pr
     MARK_CHANGED(8);
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 28 : 0)
+
 void VIConfigure(GXRenderModeObj *rm)
 {
     VITiming *tm;
@@ -653,35 +691,50 @@ void VIConfigure(GXRenderModeObj *rm)
     u32 tvInBootrom;
     u32 tvInGame;
 
-    ASSERTMSGLINEV(0x601, (rm->viHeight & 1) == 0,
+    ASSERTMSGLINEV(0x601+LINE_OFFSET, (rm->viHeight & 1) == 0,
         "VIConfigure(): Odd number(%d) is specified to viHeight\n",
         rm->viHeight);
 
     if (rm->xFBmode == VI_XFBMODE_DF || rm->viTVmode == VI_TVMODE_NTSC_PROG) {
-        ASSERTMSGLINEV(0x607, rm->xfbHeight == rm->viHeight,
+        ASSERTMSGLINEV(0x607+LINE_OFFSET, rm->xfbHeight == rm->viHeight,
             "VIConfigure(): xfbHeight(%d) is not equal to viHeight(%d) when DF XFB mode or progressive mode is specified\n",
             rm->xfbHeight, rm->viHeight);
     }
     if (rm->xFBmode == VI_XFBMODE_SF && rm->viTVmode != VI_TVMODE_NTSC_PROG) {
-        ASSERTMSGLINEV(0x60E, rm->viHeight == rm->xfbHeight * 2,
+        ASSERTMSGLINEV(0x60E+LINE_OFFSET, rm->viHeight == rm->xfbHeight * 2,
             "VIConfigure(): xfbHeight(%d) is not as twice as viHeight(%d) when SF XFB mode is specified\n",
             rm->xfbHeight, rm->viHeight);
     }
 
     enabled = OSDisableInterrupts();
+#if DOLPHIN_REVISION < 45
     if (rm->viTVmode == VI_TVMODE_NTSC_PROG) {
         HorVer.nonInter = 2;
+#if DOLPHIN_REVISION >= 37
+        changeMode = 1;
+#endif
     } else {
+
         newNonInter = rm->viTVmode & 1;
         if (HorVer.nonInter != newNonInter) {
             changeMode = 1;
         }
         HorVer.nonInter = newNonInter;
     }
+#else
+    newNonInter = rm->viTVmode & 3;
+    if (HorVer.nonInter != newNonInter) {
+        changeMode = 1;
+        HorVer.nonInter = newNonInter;
+    }
+#endif
+
+#undef LINE_OFFSET
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 21 : 0)
 
     tvInBootrom = VIGetTvFormat();
     tvInGame = (u32)rm->viTVmode >> 2;
-    ASSERTMSGLINEV(0x635, tvInBootrom == tvInGame || (tvInBootrom == 2 && tvInGame == 0) || (tvInBootrom == 0 && tvInGame == 2),
+    ASSERTMSGLINEV(0x635+LINE_OFFSET, tvInBootrom == tvInGame || (tvInBootrom == 2 && tvInGame == 0) || (tvInBootrom == 0 && tvInGame == 2),
         "Doesn't match TV format: TV format in bootrom is %d but TV format specified in the game is %d (0:NTSC, 1:PAL, 2:MPAL)\n"
         /* BUG: forgot to pass in additional parameters! */);
 
@@ -702,10 +755,10 @@ void VIConfigure(GXRenderModeObj *rm)
     tm = getTiming(rm->viTVmode);
     HorVer.timing = tm;
     AdjustPosition(tm->acv);
-    ASSERTMSGLINEV(0x654, rm->viXOrigin <= tm->hlw + 40 - tm->hbe640,
+    ASSERTMSGLINEV(0x654+LINE_OFFSET, rm->viXOrigin <= tm->hlw + 40 - tm->hbe640,
         "VIConfigure(): viXOrigin(%d) cannot be greater than %d in this TV mode\n",
         rm->viXOrigin, tm->hlw + 40 - tm->hbe640);
-    ASSERTMSGLINEV(0x659,  rm->viXOrigin + rm->viWidth >= 0x2A8 - tm->hbs640,
+    ASSERTMSGLINEV(0x659+LINE_OFFSET,  rm->viXOrigin + rm->viWidth >= 0x2A8 - tm->hbs640,
         "VIConfigure(): viXOrigin + viWidth (%d) cannot be less than %d in this TV mode\n",
         rm->viXOrigin + rm->viWidth, 0x2A8 - tm->hbs640);
 
@@ -713,11 +766,37 @@ void VIConfigure(GXRenderModeObj *rm)
         HorVer.tv = 3;
     }
     setInterruptRegs(tm);
+
+#undef LINE_OFFSET
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 27 : 0)
+
     reg = regs[1];
-    SET_REG_FIELD(0x66A, reg, 1, 2, (HorVer.nonInter & 1));
-    SET_REG_FIELD(0x66B, reg, 2, 8, HorVer.tv);
+#if DOLPHIN_REVISION >= 37
+    if (HorVer.nonInter == 2) {
+        SET_REG_FIELD(0x66A+LINE_OFFSET, reg, 1, 2, 1);
+    } else {
+        SET_REG_FIELD(0x66A+LINE_OFFSET, reg, 1, 2, (HorVer.nonInter & 1));
+    }
+#else
+    SET_REG_FIELD(0x66A+LINE_OFFSET, reg, 1, 2, (HorVer.nonInter & 1));
+#endif
+
+#undef LINE_OFFSET
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 28 : 0)
+
+    SET_REG_FIELD(0x66B+LINE_OFFSET, reg, 2, 8, HorVer.tv);
     regs[1] = reg;
     MARK_CHANGED(1);
+#if DOLPHIN_REVISION >= 37
+    reg = regs[54];
+#if DOLPHIN_REVISION >= 45
+    reg = (rm->viTVmode != 2) ? (reg & ~1) : ((reg & ~1) | 1);
+    regs[54] = reg;
+#else
+    regs[54] = (rm->viTVmode != 2) ? (reg & ~1) : ((reg & ~1) | 1);
+#endif
+    MARK_CHANGED(54);
+#endif
     setScalingRegs(HorVer.PanSizeX, HorVer.DispSizeX, HorVer.threeD);
     setHorizontalRegs(tm, HorVer.AdjustedDispPosX, HorVer.DispSizeX);
     setBBIntervalRegs(tm);
@@ -729,17 +808,20 @@ void VIConfigure(GXRenderModeObj *rm)
     OSRestoreInterrupts(enabled);
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 42 : 0)
+
 void VIConfigurePan(u16 xOrg, u16 yOrg, u16 width, u16 height)
 {
     BOOL enabled;
     VITiming *tm;
 
 #if DEBUG
-    ASSERTMSGLINEV(0x69C, (xOrg & 1) == 0,
+    ASSERTMSGLINEV(0x69C+LINE_OFFSET, (xOrg & 1) == 0,
         "VIConfigurePan(): Odd number(%d) is specified to xOrg\n",
         xOrg);
     if (HorVer.FBMode == VI_XFBMODE_DF) {
-        ASSERTMSGLINEV(0x6A1, (height & 1) == 0,
+        ASSERTMSGLINEV(0x6A1+LINE_OFFSET, (height & 1) == 0,
             "VIConfigurePan(): Odd number(%d) is specified to height when DF XFB mode\n",
             height);
     }
@@ -769,6 +851,10 @@ void VIFlush(void)
     s32 regIndex;
 
     enabled = OSDisableInterrupts();
+#if DOLPHIN_REVISION >= 45
+    shdwChangeMode |= changeMode;
+    changeMode = 0;
+#endif
     shdwChanged |= changed;
     while (changed != 0) {
         regIndex = cntlzd(changed);
@@ -779,11 +865,14 @@ void VIFlush(void)
     OSRestoreInterrupts(enabled);
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 44 : 0)
+
 void VISetNextFrameBuffer(void *fb)
 {
     BOOL enabled;
 
-    ASSERTMSGLINEV(0x6F7, ((u32)fb & 0x1F) == 0,
+    ASSERTMSGLINEV(0x6F7+LINE_OFFSET, ((u32)fb & 0x1F) == 0,
         "VISetNextFrameBuffer(): Frame buffer address(0x%08x) is not 32byte aligned\n",
         fb);
     enabled = OSDisableInterrupts();
@@ -797,7 +886,7 @@ void VISetNextRightFrameBuffer(void *fb)
 {
     BOOL enabled;
 
-    ASSERTMSGLINEV(0x71F, ((u32)fb & 0x1F) == 0,
+    ASSERTMSGLINEV(0x71F+LINE_OFFSET, ((u32)fb & 0x1F) == 0,
         "VISetNextFrameBuffer(): Frame buffer address(0x%08x) is not 32byte aligned\n",
         fb);
     enabled = OSDisableInterrupts();
@@ -827,7 +916,7 @@ void VISet3D(BOOL threeD)
     enabled = OSDisableInterrupts();
     HorVer.threeD = threeD;
     reg = regs[1];
-    SET_REG_FIELD(0x766, reg, 1, 3, HorVer.threeD);
+    SET_REG_FIELD(0x766+LINE_OFFSET, reg, 1, 3, HorVer.threeD);
     regs[1] = reg;
     MARK_CHANGED(1);
     setScalingRegs(HorVer.PanSizeX, HorVer.DispSizeX, HorVer.threeD);
@@ -915,17 +1004,31 @@ u32 VIGetTvFormat(void)
 {
     u32 format = *(u32 *)OSPhysicalToCached(0xCC);
 
-    ASSERTMSGLINE(0x80D, format == 0 || format == 1 || format == 2,
+    ASSERTMSGLINE(0x80D+LINE_OFFSET, format == 0 || format == 1 || format == 2,
         "VIGetTvFormat(): Wrong format is stored in lo mem. Maybe lo mem is trashed");
     return format;
 }
+
+u32 VIGetDTVStatus() {
+    // Local variables
+    unsigned long dtvStatus; // r31
+    BOOL enabled; // r30
+    
+    enabled = OSDisableInterrupts();
+    dtvStatus = __VIRegs[55] & 3;
+    OSRestoreInterrupts(enabled);
+    return dtvStatus & 1;
+}
+
+#undef LINE_OFFSET
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 66 : 0)
 
 void __VISetAdjustingValues(s16 x, s16 y)
 {
     BOOL enabled;
     VITiming *tm;
 
-    ASSERTMSGLINE(0x822, (y & 1) == 0, "__VISetAdjustValues(): y offset should be an even number");
+    ASSERTMSGLINE(0x822+LINE_OFFSET, (y & 1) == 0, "__VISetAdjustValues(): y offset should be an even number");
     enabled = OSDisableInterrupts();
     displayOffsetH = x;
     displayOffsetV = y;

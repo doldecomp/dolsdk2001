@@ -44,13 +44,24 @@ void DEMOLoadFont(enum _GXTexMapID texMap, enum _GXTexMtx texMtx, DMTexFlt texFl
     width = 64;
     height = 0x1800 / width;
     GXInitTexObj(&fontTexObj,(void*)DEMOFontBitmap, width, (u16)height, 0, 0, 0, 0);
+#if DOLPHIN_REVISION < 45
     fontShift = 1;
+#endif
     if (texFlt == 0) {
         GXInitTexObjLOD(&fontTexObj, 0, 0, 0, 0, 0, 0.0f, 0.0f, 0.0f);
         fontShift = 0;
     }
+#if DOLPHIN_REVISION >= 45
+    else {
+        fontShift = 1;
+    }
+#endif
     GXLoadTexObj(&fontTexObj, texMap);
+#if DOLPHIN_REVISION >= 45
+    MTXScale(fontTMtx, 1.0f / (width), 1.0f / ((u16)height), 1.0f);
+#else
     MTXScale(fontTMtx, 1.0f / (width - !fontShift), 1.0f / ((u16)height - !fontShift), 1.0f);
+#endif
     GXLoadTexMtxImm(fontTMtx, texMtx, 1);
     GXSetNumTexGens(1);
     GXSetTexCoordGen(0, 1, 4, texMtx);
@@ -60,7 +71,11 @@ void DEMOSetupScrnSpc(long width, long height, float depth) {
     float pMtx[4][4];
     float mMtx[3][4];
 
+#if DOLPHIN_REVISION >= 45  // Why?
+    C_MTXOrtho(pMtx, 0.0f, height, 0.0f, width, 0.0f, -depth);
+#else
     MTXOrtho(pMtx, 0.0f, height, 0.0f, width, 0.0f, -depth);
+#endif
     GXSetProjection(pMtx, 1);
     MTXIdentity(mMtx);
     GXLoadPosMtxImm(mMtx, 0);
@@ -141,6 +156,9 @@ void DEMOPrintf(s16 x, s16 y, s16 z, char * fmt, ...) {
     va_end(vlist);
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 6 : 0)
+
 struct OSFontHeader * DEMOInitROMFont() {
     if (OSGetFontEncode() == 1) {
         FontData = OSAllocFromHeap(__OSCurrHeap, 0x120F00);
@@ -148,10 +166,10 @@ struct OSFontHeader * DEMOInitROMFont() {
         FontData = OSAllocFromHeap(__OSCurrHeap, 0x20120);
     }
     if (!FontData) {
-        OSPanic(__FILE__, 0x19D, "Ins. memory to load ROM font.");
+        OSPanic(__FILE__, 0x19D+LINE_OFFSET, "Ins. memory to load ROM font.");
     }
     if (OSInitFont(FontData) == 0) {
-        OSPanic(__FILE__, 0x1A1, "ROM font is available in boot ROM ver 0.8 or later.");
+        OSPanic(__FILE__, 0x1A1+LINE_OFFSET, "ROM font is available in boot ROM ver 0.8 or later.");
     }
     FontSize = FontData->cellWidth * 0x10;
     FontSpace = -0x10;
@@ -163,14 +181,36 @@ void DEMOSetROMFontSize(s16 size, s16 space) {
     FontSpace = space * 0x10;
 }
 
+#if DOLPHIN_REVISION >= 45
+void DEMOGetROMFontSize(s16 *size, s16 *space) {
+    if (size) {
+        *size = FontSize / 16;
+    }
+    if (space) {
+        *space = FontSpace / 16;
+    }
+}
+#endif
+
 static void DrawFontChar(int x, int y, int z, int xChar, int yChar) {
     s16 posLeft = x;
+#if DOLPHIN_REVISION >= 45
+    s16 posRight = posLeft + FontSize;
+    s16 posTop = y - (FontData->ascent * FontSize / FontData->cellWidth);
+    s16 posBottom = y + (FontData->descent * FontSize / FontData->cellWidth);
+#else
     s16 posRight = posLeft + ((FontSize * FontData->cellWidth) / FontData->cellWidth);
     s16 posBottom = y;
     s16 posTop = y - ((FontData->cellHeight * ((FontData->cellHeight * FontSize) / FontData->cellWidth)) / FontData->cellHeight);
+#endif
     s16 texLeft = xChar;
+#if DOLPHIN_REVISION >= 45
+    s16 texRight = xChar + FontData->cellWidth;
+    s16 texTop = yChar;
+#else
     s16 texTop = yChar;
     s16 texRight = (xChar + FontData->cellWidth);
+#endif
     s16 texBottom = (yChar + FontData->cellHeight);
 
     GXBegin(0x80, 0, 4);
@@ -201,6 +241,9 @@ static void LoadSheet(void * image, enum _GXTexMapID texMapID) {
     }
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 28 : 0)
+
 int DEMORFPuts(s16 x, s16 y, s16 z, char * string) {
     long cx;
     void * image;
@@ -208,7 +251,7 @@ int DEMORFPuts(s16 x, s16 y, s16 z, char * string) {
     long yChar;
     long width;
 
-    ASSERTLINE(0x210, FontData);
+    ASSERTLINE(0x210+LINE_OFFSET, FontData);
     LastSheet = NULL;
     GXClearVtxDesc();
     GXSetVtxDesc(9, 1);
@@ -224,7 +267,11 @@ int DEMORFPuts(s16 x, s16 y, s16 z, char * string) {
     while(*string != 0) {
         if (*string == 0xA) {
             width = 0;
-            y += FontData->leading * 0x10;
+#if DOLPHIN_REVISION >= 45
+            y += FontData->leading * FontSize / FontData->cellWidth;
+#else
+            y += FontData->leading * 16;
+#endif
             string++;
         } else {
             string = OSGetFontTexture(string, &image, &xChar, &yChar, &cx);
@@ -244,7 +291,7 @@ int DEMORFPutsEx(s16 x, s16 y, s16 z, char * string, s16 maxWidth, int length) {
     long width;
     char * end;
 
-    ASSERTLINE(0x23D, FontData);
+    ASSERTLINE(0x23D+LINE_OFFSET, FontData);
     LastSheet = NULL;
     GXClearVtxDesc();
     GXSetVtxDesc(9, 1);
@@ -262,13 +309,21 @@ int DEMORFPutsEx(s16 x, s16 y, s16 z, char * string, s16 maxWidth, int length) {
     while(*string && string < end) {
         if (*string == 0xA) {
             width = 0;
-            y += FontData->leading * 0x10;
+#if DOLPHIN_REVISION >= 45
+            y += FontData->leading * FontSize / FontData->cellWidth;
+#else
+            y += FontData->leading * 16;
+#endif
             string++;
         } else {
             string = OSGetFontTexture(string, &image, &xChar, &yChar, &cx);
             if (maxWidth < width + (FontSize * cx / FontData->cellWidth) + FontSpace) {
                 width = 0;
-                y += FontData->leading * 0x10;
+#if DOLPHIN_REVISION >= 45
+                y += FontData->leading * FontSize / FontData->cellWidth;
+#else
+                y += FontData->leading * 16;
+#endif
             }
             LoadSheet(image, 0);
             DrawFontChar(x + width, y, z, xChar, yChar);
@@ -294,7 +349,7 @@ char * DEMODumpROMFont(char * string) {
     int j;
     long width;
 
-    ASSERTLINE(0x295, FontData);
+    ASSERTLINE(0x295+LINE_OFFSET, FontData);
 
     if (OSGetFontEncode() == 1) {
         temp = (void*)((u32)FontData + 0xD3F00);
@@ -313,15 +368,57 @@ char * DEMODumpROMFont(char * string) {
     return string;
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 29 : 0)
+
 int DEMOGetRFTextWidth(char * string) {
     long cx;
     long width;
+#if DOLPHIN_REVISION >= 45
+    long maxWidth;
+#endif
 
-    ASSERTLINE(0x2C3, FontData);
+    ASSERTLINE(0x2C3+LINE_OFFSET, FontData);
+#if DOLPHIN_REVISION >= 45
+    maxWidth = width = 0;
+#else
     width = 0;
+#endif
     while(*string != 0) {
+#if DOLPHIN_REVISION >= 45
+        if (*string == '\n') {
+            if (maxWidth < width) {
+                maxWidth = width;
+            }
+            width = 0;
+        }
+#endif
         string = OSGetFontWidth(string, &cx);
         width = FontSpace + ((FontSize * cx) / FontData->cellWidth) + width;
     }
+#if DOLPHIN_REVISION >= 45
+    if (maxWidth < width) {
+        maxWidth = width;
+    }
+    return (maxWidth + 0xF) / 16;
+#else
     return (width + 0xF) / 16;
+#endif
 }
+
+#if DOLPHIN_REVISION >= 45
+int DEMOGetRFTextHeight(char * string) {
+    long height;
+
+    ASSERTLINE(0x304, FontData);
+    height = 1;
+    while (*string != 0) {
+        if (*string == '\n') {
+            height++;
+        }
+        string++;
+    }
+    height *= FontData->leading * FontSize / FontData->cellWidth;
+    return (height + 0xF) / 16;
+}
+#endif

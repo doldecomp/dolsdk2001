@@ -5,7 +5,7 @@
 // internal include
 #include "__os.h"
 
-static OSErrorHandler OSErrorTable[15];
+static OSErrorHandler OSErrorTable[OS_ERROR_MAX];
 
 void OSReport(char* msg, ...) {
   va_list marker;
@@ -36,7 +36,12 @@ void OSPanic(char* file, int line, char* msg, ...) {
 OSErrorHandler OSSetErrorHandler(OSError error, OSErrorHandler handler) {
     OSErrorHandler oldHandler;
 
+#if DOLPHIN_REVISION >= 45
+    // Is __OS_EXCEPTION_MAX supposed to be different?
+    ASSERTMSGLINE(0x8F, error < __OS_EXCEPTION_MAX+1, "OSSetErrorHandler(): unknown error.");
+#else
     ASSERTMSGLINE(0x8F, error < __OS_EXCEPTION_MAX, "OSSetErrorHandler(): unknown error.");
+#endif
     oldHandler = OSErrorTable[error];
     OSErrorTable[error] = handler;
     return oldHandler;

@@ -181,9 +181,16 @@ void __GXSetGenMode(void);
 
 struct __GXData_struct {
     // total size: 0x4F4
+#if DOLPHIN_REVISION >= 45
+    unsigned short vNumNot;
+    unsigned short bpSentNot;
+    unsigned short vNum;
+    unsigned short vLim;
+#else
     unsigned short vNum; // offset 0x0, size 0x2
     unsigned short bpSent; // offset 0x2, size 0x2
     unsigned long vLim; // offset 0x4, size 0x4
+#endif
     unsigned long cpEnable; // offset 0x8, size 0x4
     unsigned long cpStatus; // offset 0xC, size 0x4
     unsigned long cpClr; // offset 0x10, size 0x4
@@ -233,8 +240,8 @@ struct __GXData_struct {
     GXTexRegion * (* texRegionCallback)(GXTexObj *, GXTexMapID); // offset 0x410, size 0x4
     GXTlutRegion * (* tlutRegionCallback)(unsigned long); // offset 0x414, size 0x4
     GXAttrType nrmType; // offset 0x418, size 0x4
-    unsigned char hasNrms; // offset 0x41C, size 0x1
-    unsigned char hasBiNrms; // offset 0x41D, size 0x1
+    GXBool hasNrms; // offset 0x41C, size 0x1
+    GXBool hasBiNrms; // offset 0x41D, size 0x1
     unsigned long projType; // offset 0x420, size 0x4
     float projMtx[6]; // offset 0x424, size 0x18
     float vpLeft; // offset 0x43C, size 0x4
@@ -288,6 +295,9 @@ void __GXSetRange(float nearz, float fgSideX);
 void __GetImageTileCount(GXTexFmt fmt, u16 wd, u16 ht, u32 *rowTiles, u32 *colTiles, u32 *cmpTiles);
 void __GXSetSUTexRegs(void);
 void __GXGetSUTexSize(GXTexCoordID coord, u16 *width, u16 *height);
+#if DOLPHIN_REVISION >= 45
+void __GXSetTmemConfig(unsigned long config);
+#endif
 
 /* GXTransform.c */
 
@@ -301,7 +311,7 @@ void __GXVerifyTEX(void);
 void __GXVerifyTEV(void);
 void __GXVerifyPE(void);
 
-/* GXVerif.c */
+/* GXVerify.c */
 
 typedef enum {
     GXWARN_INVALID_VTX_FMT = 0,
@@ -420,19 +430,66 @@ typedef enum {
     GXWARN_MAX = 113,
 } GXWarnID;
 
+#if DOLPHIN_REVISION >= 45
+
+#define __GX_WARN(id) (__gxVerif->cb(__gxvWarnLev[(id)], (id), __gxvWarnings[(id)]))
+#define __GX_WARNF(id, ...) \
+do { \
+    sprintf(__gxvDummyStr, __gxvWarnings[(id)], __VA_ARGS__); \
+    __gxVerif->cb(__gxvWarnLev[(id)], (id), __gxvDummyStr); \
+} while (0)
+#define __GX_WARN2(level, id) (__gxVerif->cb(level, (id), __gxvWarnings[(id)]))
+#define __GX_WARN2F(level, id, ...) __GX_WARNF(id, __VA_ARGS__)
+
+#else
+
 #define __GX_WARN(id) (__gxVerif->cb(GX_WARN_SEVERE, (id), __gxvWarnings[(id)]))
 #define __GX_WARNF(id, ...) \
 do { \
     sprintf(__gxvDummyStr, __gxvWarnings[(id)], __VA_ARGS__); \
     __gxVerif->cb(GX_WARN_SEVERE, (id), __gxvDummyStr); \
 } while (0)
-
 #define __GX_WARN2(level, id) (__gxVerif->cb(level, (id), __gxvWarnings[(id)]))
 #define __GX_WARN2F(level, id, ...) \
 do { \
     sprintf(__gxvDummyStr, __gxvWarnings[(id)], __VA_ARGS__); \
     __gxVerif->cb(level, (id), __gxvDummyStr); \
 } while (0)
+
+#endif
+
+// On r45 and later, checks verify level before issuing warning
+#if DOLPHIN_REVISION >= 45
+#define __GX_WARN_CHECKED(id) \
+do { \
+    if (__gxVerif->verifyLevel >= __gxvWarnLev[(id)]) { \
+        __GX_WARN(id); \
+    } \
+} while (0)
+#define __GX_WARNF_CHECKED(id, ...) \
+do { \
+    if (__gxVerif->verifyLevel >= __gxvWarnLev[(id)]) { \
+        __GX_WARNF(id, __VA_ARGS__); \
+    } \
+} while (0)
+#define __GX_WARN2_CHECKED(level, id) \
+do { \
+    if (__gxVerif->verifyLevel >= __gxvWarnLev[(id)]) { \
+        __GX_WARN2(level, id); \
+    } \
+} while (0)
+#define __GX_WARN2F_CHECKED(level, id, ...) \
+do { \
+    if (__gxVerif->verifyLevel >= __gxvWarnLev[(id)]) { \
+        __GX_WARN2F(level, id, __VA_ARGS__); \
+    } \
+} while (0)
+#else
+#define __GX_WARN_CHECKED  __GX_WARN
+#define __GX_WARNF_CHECKED __GX_WARNF
+#define __GX_WARN2_CHECKED  __GX_WARN2
+#define __GX_WARN2F_CHECKED __GX_WARN2F
+#endif
 
 struct __GXVerifyData {
     // total size: 0x13F8
@@ -453,6 +510,9 @@ struct __GXVerifyData {
 
 extern struct __GXVerifyData *__gxVerif;
 extern char *__gxvWarnings[113];
+#if DOLPHIN_REVISION >= 45
+extern GXWarningLevel __gxvWarnLev[115];
+#endif
 extern char __gxvDummyStr[256];
 
 void __GXVerifyGlobal(void);

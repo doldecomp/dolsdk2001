@@ -63,7 +63,11 @@ void GXSetTevColorIn(GXTevStageID stage, GXTevColorArg a, GXTevColorArg b, GXTev
     SET_REG_FIELD(0xF0, *pTevReg, 4,  0, d);
 
     GX_WRITE_RAS_REG(*pTevReg);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
 }
 
 void GXSetTevAlphaIn(GXTevStageID stage, GXTevAlphaArg a, GXTevAlphaArg b, GXTevAlphaArg c, GXTevAlphaArg d)
@@ -84,7 +88,11 @@ void GXSetTevAlphaIn(GXTevStageID stage, GXTevAlphaArg a, GXTevAlphaArg b, GXTev
     SET_REG_FIELD(0x113, *pTevReg, 3,  4, d);
 
     GX_WRITE_RAS_REG(*pTevReg);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
 }
 
 void GXSetTevColorOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg)
@@ -107,7 +115,11 @@ void GXSetTevColorOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale 
     SET_REG_FIELD(0x141, *pTevReg, 2, 22, out_reg);
 
     GX_WRITE_RAS_REG(*pTevReg);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
 }
 
 void GXSetTevAlphaOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg)
@@ -130,7 +142,11 @@ void GXSetTevAlphaOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale 
     SET_REG_FIELD(0x16D, *pTevReg, 2, 22, out_reg);
 
     GX_WRITE_RAS_REG(*pTevReg);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
 }
 
 void GXSetTevColor(GXTevRegID id, GXColor color)
@@ -154,7 +170,11 @@ void GXSetTevColor(GXTevRegID id, GXColor color)
     GX_WRITE_RAS_REG(regBG);
     GX_WRITE_RAS_REG(regBG);
     GX_WRITE_RAS_REG(regBG);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
 }
 
 void GXSetTevColorS10(GXTevRegID id, GXColorS10 color)
@@ -183,7 +203,11 @@ void GXSetTevColorS10(GXTevRegID id, GXColorS10 color)
     GX_WRITE_RAS_REG(regBG);
     GX_WRITE_RAS_REG(regBG);
     GX_WRITE_RAS_REG(regBG);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
 }
 
 void GXSetTevKColor(GXTevKColorID id, GXColor color)
@@ -207,7 +231,11 @@ void GXSetTevKColor(GXTevKColorID id, GXColor color)
 
     GX_WRITE_RAS_REG(regRA);
     GX_WRITE_RAS_REG(regBG);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
 }
 
 void GXSetTevKColorSel(GXTevStageID stage, GXTevKColorSel sel)
@@ -225,7 +253,11 @@ void GXSetTevKColorSel(GXTevStageID stage, GXTevKColorSel sel)
     }
 
     GX_WRITE_RAS_REG(*Kreg);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
 }
 
 void GXSetTevKAlphaSel(GXTevStageID stage, GXTevKAlphaSel sel)
@@ -243,7 +275,11 @@ void GXSetTevKAlphaSel(GXTevStageID stage, GXTevKAlphaSel sel)
     }
 
     GX_WRITE_RAS_REG(*Kreg);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
 }
 
 void GXSetTevSwapMode(GXTevStageID stage, GXTevSwapSel ras_sel, GXTevSwapSel tex_sel)
@@ -258,7 +294,11 @@ void GXSetTevSwapMode(GXTevStageID stage, GXTevSwapSel ras_sel, GXTevSwapSel tex
     SET_REG_FIELD(0x24F, *pTevReg, 2, 2, tex_sel);
 
     GX_WRITE_RAS_REG(*pTevReg);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
 }
 
 void GXSetTevSwapModeTable(GXTevSwapSel table, GXTevColorChan red, GXTevColorChan green, GXTevColorChan blue, GXTevColorChan alpha)
@@ -287,7 +327,11 @@ void GXSetTevSwapModeTable(GXTevSwapSel table, GXTevColorChan red, GXTevColorCha
     SET_REG_FIELD(0x278, *Kreg, 2, 2, alpha);
 
     GX_WRITE_RAS_REG(*Kreg);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
 }
 
 void GXSetTevClampMode(void)
@@ -309,7 +353,11 @@ void GXSetAlphaCompare(GXCompare comp0, u8 ref0, GXAlphaOp op, GXCompare comp1, 
     SET_REG_FIELD(0x2B9, reg, 8, 24, 0xF3);
 
     GX_WRITE_RAS_REG(reg);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
 }
 
 void GXSetZTexture(GXZTexOp op, GXTexFmt fmt, u32 bias)
@@ -347,7 +395,11 @@ void GXSetZTexture(GXZTexOp op, GXTexFmt fmt, u32 bias)
 
     GX_WRITE_RAS_REG(zenv0);
     GX_WRITE_RAS_REG(zenv1);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
 }
 
 void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXChannelID color)
@@ -380,7 +432,11 @@ void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXCha
     }
 
     GX_WRITE_RAS_REG(*ptref);
+#if DOLPHIN_REVISION >= 45
+    gx->bpSentNot = 0;
+#else
     gx->bpSent = 1;
+#endif
     gx->dirtyState |= 1;
 }
 

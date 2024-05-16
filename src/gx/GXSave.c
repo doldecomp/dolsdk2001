@@ -76,8 +76,31 @@ static void __SaveCPRegs(u8 reg, u8 vatIdx, u32 data)
         }
         break;
     default:
+#if DOLPHIN_REVISION >= 45
+        if (__gxVerif->verifyLevel >= __gxvWarnLev[0x71]) {
+            __gxVerif->cb(__gxvWarnLev[0x71], 0x71, __gxvWarnings[0x71]);
+        }
+        OSReport("[Invalid CP Stream Register Address 0x%x\n]", reg);
+#else
         OSReport("GX DisplayList: Invalid CP Stream Register Address 0x%x\n", reg);
+#endif
         break;
+    }
+}
+
+static void __ReconstVtxStatus(u8 vatIdx)
+{
+    u32 vat;
+
+    if (GET_REG_FIELD(gx->vcdLo, 2, 11)) {
+        vat = gx->vatA[vatIdx & 0xFF];
+        if ((vat >> 9) & 1) {
+            gx->hasNrms = FALSE;
+            gx->hasBiNrms = TRUE;
+        } else {
+            gx->hasNrms = TRUE;
+            gx->hasBiNrms = FALSE;
+        }
     }
 }
 
@@ -124,6 +147,35 @@ static u32 GetAttrSize(u8 vatIdx, u32 attrIdx)
         }
         break;
     case 10:
+#if DOLPHIN_REVISION >= 45
+        vcd = gx->vcdLo;
+        vat = gx->vatA[vatIdx & 0xFF];
+        switch (GET_REG_FIELD(vcd, 2, 11)) {
+        case 0:
+            return 0;
+        case 2:
+            if (GET_REG_FIELD(vat, 1, 9) && GET_REG_FIELD(vat, 1, 31)) {
+                nc = 3;
+            } else {
+                nc = 1;
+            }
+            return nc;
+        case 3:
+            if (GET_REG_FIELD(vat, 1, 9) && GET_REG_FIELD(vat, 1, 31)) {
+                nc = 6;
+            } else {
+                nc = 2;
+            }
+            return nc;
+        case 1:
+            if (GET_REG_FIELD(vat, 1, 9)) {
+                nc = 9;
+            } else {
+                nc = 3;
+            }
+            return nc * vtxCompSize[(vat >> 10) & 7];
+        }
+#else
         vcd = gx->vcdLo;
         vat = gx->vatA[vatIdx & 0xFF];
         if ((vat >> 9) & 1) {
@@ -141,6 +193,7 @@ static u32 GetAttrSize(u8 vatIdx, u32 attrIdx)
         case 1:
             return (((vat >> 9) & 1) + nc) * vtxCompSize[(vat >> 10) & 7];
         }
+#endif
         break;
     case 11:
         switch (GET_REG_FIELD(gx->vcdLo, 2, 13)) {
@@ -314,6 +367,9 @@ void __GXShadowDispList(void *list, u32 nbytes)
     u32 i;
     u32 addr;
     u32 cnt;
+#if DOLPHIN_REVISION >= 45
+    u8 cpAddr;
+#endif
 
     if (__gxVerif->verifyLevel == GX_WARN_NONE) {
         return;
@@ -322,9 +378,12 @@ void __GXShadowDispList(void *list, u32 nbytes)
     dlist = list;
     dlistSize = nbytes;
     bytesRead = 0;
+#if DOLPHIN_REVISION >= 45
+    DPF("Displaylist IN\n");
+#endif
     while (dlistSize > bytesRead) {
         if (!__ReadMem(&cmd, 1)) {
-            return;
+            goto done;
         }
         cmdOp = (u32)GET_REG_FIELD((u32)cmd, 5, 3);
         vatIdx = cmd & 7;
@@ -339,12 +398,21 @@ void __GXShadowDispList(void *list, u32 nbytes)
         case 21:
         case 22:
         case 23:
+#if DOLPHIN_REVISION >= 45
+            __ReconstVtxStatus(vatIdx);
+#endif
             __GXVerifyState(vatIdx);
             __ParseVertexData(vatIdx);
             break;
         case 1:
             if (__ReadMem(&reg8, 1) && __ReadMem(&d32, 4)) {
+#if DOLPHIN_REVISION >= 45
+                vatIdx = reg8 & 0xF;
+                cpAddr = (int)((reg8 >> 4) & 0xF);
+                __SaveCPRegs(cpAddr, vatIdx, d32);
+#else
                 __SaveCPRegs(reg8, vatIdx, d32);
+#endif
             }
             break;
         case 2:
@@ -371,7 +439,13 @@ void __GXShadowDispList(void *list, u32 nbytes)
             }
             break;
         case 8:
+#if DOLPHIN_REVISION >= 45
+            if (__gxVerif->verifyLevel >= __gxvWarnLev[0x72]) {
+                __gxVerif->cb(__gxvWarnLev[0x72], 0x72, __gxvWarnings[0x72]);
+            }
+#else
             OSReport("GX DisplayList: Nested Display Lists\n");
+#endif
             return;
         case 12:
         case 13:
@@ -381,10 +455,22 @@ void __GXShadowDispList(void *list, u32 nbytes)
             }
             break;
         default:
+#if DOLPHIN_REVISION >= 45
+            if (__gxVerif->verifyLevel >= __gxvWarnLev[0x71]) {
+                __gxVerif->cb(__gxvWarnLev[0x71], 0x71, __gxvWarnings[0x71]);
+            }
+            OSReport("[Bad Display List Command: %d\n]", cmdOp);
+#else
             OSReport("GX DisplayList: Bad Display List Command: %d\n", cmdOp);
+#endif
             break;
         }
     }
+done:
+    ;
+#if DOLPHIN_REVISION >= 45
+    DPF("Displaylist OUT\n");
+#endif
 }
 
 void __GXShadowIndexState(u32 idx_reg, u32 reg_data)
@@ -405,7 +491,9 @@ void __GXShadowIndexState(u32 idx_reg, u32 reg_data)
     cnt = (reg_data >> 12) & 0xF;
     index = reg_data >> 16;
     memAddr = (u32 *)((u8 *)basePtr + (index * stride));
-
+#if DOLPHIN_REVISION >= 45
+    cnt++;
+#endif
     while (cnt-- != 0) {
         data = *memAddr;
         VERIF_MTXLIGHT(addr, data);

@@ -72,7 +72,11 @@ static void CountTextureTypes(void)
         } else if (texgen_type == 3) {
             numColor1Textures++;
         } else {
+#if DOLPHIN_REVISION >= 45
+            if (__gxVerif->verifyLevel >= __gxvWarnLev[GXWARN_INVALID_TG_TYPE]) {
+#else
             if (__gxVerif->verifyLevel >= 1) {
+#endif
                 __GX_WARNF(GXWARN_INVALID_TG_TYPE, texgen_type, i);
             }
         }
@@ -87,14 +91,22 @@ static void InitializeXFVerifyData(void)
 
 static void CheckDirty(u32 index, const char *name)
 {
+#if DOLPHIN_REVISION >= 45
+    if (!__gxVerif->xfRegsDirty[index - 0x1000] && __gxVerif->verifyLevel >= __gxvWarnLev[GXWARN_XF_CTRL_UNINIT]) {
+#else
     if (__gxVerif->verifyLevel >= 1 && !__gxVerif->xfRegsDirty[index - 0x1000]) {
+#endif
         __GX_WARNF(GXWARN_XF_CTRL_UNINIT, index, name);
     }
 }
 
 static void CheckClean(u32 index, const char *name)
 {
+#if DOLPHIN_REVISION >= 45
+    if (__gxVerif->xfRegsDirty[index - 0x1000] && __gxVerif->verifyLevel >= __gxvWarnLev[GXWARN_XF_CTRL_INIT]) {
+#else
     if (__gxVerif->verifyLevel >= 1 && __gxVerif->xfRegsDirty[index - 0x1000]) {
+#endif
         __GX_WARNF(GXWARN_XF_CTRL_INIT, index, name);
     }
 }
@@ -104,14 +116,14 @@ static void CheckCTGColors(void)
     if (BYTE3(__gxVerif->xfRegs[9]) & 3) {
         if ((u32)(BYTE3(__gxVerif->xfRegs[9]) & 3) == 1) {
             if (numColorTextures != 0 && numColorTextures != 1) {
-                __GX_WARNF(GXWARN_INV_COLOR_TG_COMB, (u8)(BYTE3(__gxVerif->xfRegs[9]) & 3), numColorTextures);
+                __GX_WARNF_CHECKED(GXWARN_INV_COLOR_TG_COMB, (u8)(BYTE3(__gxVerif->xfRegs[9]) & 3), numColorTextures);
             }
         } else if ((u32)(BYTE3(__gxVerif->xfRegs[9]) & 3) == 2) {
             if (numColorTextures != 0 && numColorTextures != 2) {
-                __GX_WARNF(GXWARN_INV_COLOR_TG_COMB, (u8)(BYTE3(__gxVerif->xfRegs[9]) & 3), numColorTextures);
+                __GX_WARNF_CHECKED(GXWARN_INV_COLOR_TG_COMB, (u8)(BYTE3(__gxVerif->xfRegs[9]) & 3), numColorTextures);
             }
         } else {
-            __GX_WARNF(GXWARN_INV_NUM_COLORS, (u8)(BYTE3(__gxVerif->xfRegs[9]) & 3));
+            __GX_WARNF_CHECKED(GXWARN_INV_NUM_COLORS, (u8)(BYTE3(__gxVerif->xfRegs[9]) & 3));
         }
     }
 }
@@ -152,52 +164,52 @@ static void CheckVertexPacket(void)
     u32 i;
 
     if (!__GXVertexPacketHas(GX_VA_POS)) {
-        __GX_WARN(GXWARN_VTX_NO_GEOM);
+        __GX_WARN_CHECKED(GXWARN_VTX_NO_GEOM);
     }
     if ((BYTE3(__gxVerif->xfRegs[8]) & 3) == 0) {
         if (__GXVertexPacketHas(GX_VA_CLR0) || __GXVertexPacketHas(GX_VA_CLR1)) {
-            __GX_WARN(GXWARN_CLR_XF0_CP1);
+            __GX_WARN_CHECKED(GXWARN_CLR_XF0_CP1);
         }
     } else if ((u32)(BYTE3(__gxVerif->xfRegs[8]) & 3) == 1) {
         if (!__GXVertexPacketHas(GX_VA_CLR0)) {
-            __GX_WARN(GXWARN_CLR_XF1_CP0);
+            __GX_WARN_CHECKED(GXWARN_CLR_XF1_CP0);
         }
         if (__GXVertexPacketHas(GX_VA_CLR1)) {
-            __GX_WARN(GXWARN_CLR_XF1_CP2);
+            __GX_WARN_CHECKED(GXWARN_CLR_XF1_CP2);
         }
     } else if ((u32)(BYTE3(__gxVerif->xfRegs[8]) & 3) == 2) {
         if (!__GXVertexPacketHas(GX_VA_CLR0)) {
-            __GX_WARN(GXWARN_CLR_XF2_CPN1);
+            __GX_WARN_CHECKED(GXWARN_CLR_XF2_CPN1);
         }
         if (!__GXVertexPacketHas(GX_VA_CLR1)) {
-            __GX_WARN(GXWARN_CLR_XF2_CPN2);
+            __GX_WARN_CHECKED(GXWARN_CLR_XF2_CPN2);
         }
     } else {
-        __GX_WARNF(GXWARN_INV_IVS_CLR, (u8)(BYTE3(__gxVerif->xfRegs[8]) & 3));
+        __GX_WARNF_CHECKED(GXWARN_INV_IVS_CLR, (u8)(BYTE3(__gxVerif->xfRegs[8]) & 3));
     }
     if (((BYTE3(__gxVerif->xfRegs[8]) >> 2) & 3) == 0) {
         if (__GXVertexPacketHas(GX_VA_NRM)) {
-            __GX_WARN(GXWARN_NRM_XF0_CP1);
+            __GX_WARN_CHECKED(GXWARN_NRM_XF0_CP1);
         }
         if (__GXVertexPacketHas(GX_VA_NBT)) {
-            __GX_WARN(GXWARN_NRM_XF0_CP3);
+            __GX_WARN_CHECKED(GXWARN_NRM_XF0_CP3);
         }
     } else if ((u32)((BYTE3(__gxVerif->xfRegs[8]) >> 2) & 3) == 1) {
         if (!__GXVertexPacketHas(GX_VA_NRM)) {
-            __GX_WARN(GXWARN_NRM_XF1_CP0);
+            __GX_WARN_CHECKED(GXWARN_NRM_XF1_CP0);
         }
         if (__GXVertexPacketHas(GX_VA_NBT)) {
-            __GX_WARN(GXWARN_NRM_XF1_CP3);
+            __GX_WARN_CHECKED(GXWARN_NRM_XF1_CP3);
         }
     } else if ((u32)((BYTE3(__gxVerif->xfRegs[8]) >> 2) & 3) == 2) {
         if (__GXVertexPacketHas(GX_VA_NRM)) {
-            __GX_WARN(GXWARN_NRM_XF3_CP1);
+            __GX_WARN_CHECKED(GXWARN_NRM_XF3_CP1);
         }
         if (!__GXVertexPacketHas(GX_VA_NBT)) {
-            __GX_WARN(GXWARN_NRM_XF3_CP0);
+            __GX_WARN_CHECKED(GXWARN_NRM_XF3_CP0);
         }
     } else {
-        __GX_WARNF(GXWARN_INV_IVS_NRM, (u8)((BYTE3(__gxVerif->xfRegs[8]) >> 2) & 3));
+        __GX_WARNF_CHECKED(GXWARN_INV_IVS_NRM, (u8)((BYTE3(__gxVerif->xfRegs[8]) >> 2) & 3));
     }
     numHostTextures = 0;
     for (i = 0; i <= 7; i++) {
@@ -206,7 +218,7 @@ static void CheckVertexPacket(void)
         }
     }
     if (numHostTextures != (u32)((BYTE3(__gxVerif->xfRegs[8]) >> 4) & 0xF)) {
-        __GX_WARNF(GXWARN_TEX_XFN_CPM, (u8)((BYTE3(__gxVerif->xfRegs[8]) >> 4) & 0xF), numHostTextures);
+        __GX_WARNF_CHECKED(GXWARN_TEX_XFN_CPM, (u8)((BYTE3(__gxVerif->xfRegs[8]) >> 4) & 0xF), numHostTextures);
     }
 }
 
@@ -218,26 +230,26 @@ static void CheckSourceRows(void)
         switch ((HIWORD(__gxVerif->xfRegs[i + 64]) >> 7) & 0x1F) {
         case 0:
             if (!__GXVertexPacketHas(GX_VA_POS)) {
-                __GX_WARNF(GXWARN_TEX_SRC_NPOS, i);
+                __GX_WARNF_CHECKED(GXWARN_TEX_SRC_NPOS, i);
             }
             break;
         case 1:
             if (!__GXVertexPacketHas(GX_VA_NRM) && !__GXVertexPacketHas(GX_VA_NBT)) {
-                __GX_WARNF(GXWARN_TEX_SRC_NNRM, i);
+                __GX_WARNF_CHECKED(GXWARN_TEX_SRC_NNRM, i);
             }
             break;
         case 2:
             if (!__GXVertexPacketHas(GX_VA_CLR0)) {
-                __GX_WARNF(GXWARN_TEX_SRC_NCLR0, i);
+                __GX_WARNF_CHECKED(GXWARN_TEX_SRC_NCLR0, i);
             }
             if (!__GXVertexPacketHas(GX_VA_CLR1)) {
-                __GX_WARNF(GXWARN_TEX_SRC_NCLR1, i);
+                __GX_WARNF_CHECKED(GXWARN_TEX_SRC_NCLR1, i);
             }
             break;
         case 3:
         case 4:
             if (!__GXVertexPacketHas(GX_VA_NBT)) {
-                __GX_WARNF(GXWARN_TEX_SRC_NNBT, i);
+                __GX_WARNF_CHECKED(GXWARN_TEX_SRC_NNBT, i);
             }
             break;
         case 5:
@@ -249,11 +261,11 @@ static void CheckSourceRows(void)
         case 11:
         case 12:
             if (!__GXVertexPacketHas(TextureEnums[((HIWORD(__gxVerif->xfRegs[i + 64]) >> 7) & 0x1F) - 5])) {
-                __GX_WARNF(GXWARN_TEX_SRC_NTEX, i, ((HIWORD(__gxVerif->xfRegs[i + 64]) >> 7) & 0x1F) - 5);
+                __GX_WARNF_CHECKED(GXWARN_TEX_SRC_NTEX, i, ((HIWORD(__gxVerif->xfRegs[i + 64]) >> 7) & 0x1F) - 5);
             }
             break;
         default:
-            __GX_WARNF(GXWARN_INV_TEX_SRC, i, (u8)((HIWORD(__gxVerif->xfRegs[i + 64]) >> 7) & 0x1F));
+            __GX_WARNF_CHECKED(GXWARN_INV_TEX_SRC, i, (u8)((HIWORD(__gxVerif->xfRegs[i + 64]) >> 7) & 0x1F));
             break;
         }
     }
@@ -278,7 +290,7 @@ static void CheckTextureOrder(void)
             done = 1;
         } else if ((u32)((BYTE3(__gxVerif->xfRegs[count + 64]) >> 4) & 7) != 1) {
             if (!((BYTE3(__gxVerif->xfRegs[count + 64]) >> 4) & 7)) {
-                __GX_WARN(GXWARN_INV_TG_ORDER);
+                __GX_WARN_CHECKED(GXWARN_INV_TG_ORDER);
             }
             done = 1;
         } else {
@@ -291,7 +303,7 @@ static void CheckTextureOrder(void)
         if (count == __gxVerif->xfRegs[0x3F]) {
             done = 1;
         } else if (!((BYTE3(__gxVerif->xfRegs[count + 64]) >> 4) & 7) || (u32)((BYTE3(__gxVerif->xfRegs[count + 64]) >> 4) & 7) == 1) {
-            __GX_WARN(GXWARN_INV_TG_ORDER);
+            __GX_WARN_CHECKED(GXWARN_INV_TG_ORDER);
             done = 1;
         } else {
             count += 1;
@@ -313,6 +325,15 @@ static void CheckRAM(u8 Normal, u32 StartingAddress, u32 Count, s32 WarnID, char
         } else {
             dirtyBit = __gxVerif->xfMtxDirty[i];
         }
+#if DOLPHIN_REVISION >= 45
+        if (dirtyBit == 0 && printedPreamble == 0) {
+            if (__gxVerif->verifyLevel >= __gxvWarnLev[WarnID]) {
+                __gxVerif->cb(__gxvWarnLev[WarnID], WarnID, Str);
+            }
+            printedPreamble = 1;
+            WarnID; printedPreamble;  // needed to match
+        }
+#else
         if (dirtyBit == 0) {
             if (printedPreamble == 0) {
                 __gxVerif->cb(1, WarnID, Str);
@@ -320,6 +341,7 @@ static void CheckRAM(u8 Normal, u32 StartingAddress, u32 Count, s32 WarnID, char
             }
             __GX_WARNF(GXWARN_ADDR_UNINIT, i);
         }
+#endif
     }
 }
 
@@ -333,7 +355,7 @@ static void CheckBumpmapTextures(void)
 
     if (!__GXVertexPacketHas(GX_VA_PNMTXIDX)) {
         if ((u32)(BYTE3(__gxVerif->xfRegs[24]) & 0x3F) > 30) {
-            __GX_WARNF(0x50, (u8)(BYTE3(__gxVerif->xfRegs[24]) & 0x3F));
+            __GX_WARNF_CHECKED(0x50, (u8)(BYTE3(__gxVerif->xfRegs[24]) & 0x3F));
         }
         sprintf(Preamble, __gxvWarnings[0x6A], (u8)(BYTE3(__gxVerif->xfRegs[24]) & 0x3F));
         CheckRAM(1, ((BYTE3(__gxVerif->xfRegs[24]) & 0x3F) * 3) + 0x400, 9U, 0x6A, Preamble);
@@ -343,22 +365,38 @@ static void CheckBumpmapTextures(void)
         BumpMapSource = BYTE2(__gxVerif->xfRegs[numRegularTextures + i + 64]);
         BumpMapSource = (BumpMapSource >> 4) & 7;
         if ((BYTE3(__gxVerif->xfRegs[BumpMapSource + 64]) >> 4) & 7) {
-            __GX_WARNF(0x51, i, i + numRegularTextures, BumpMapSource);
+#if DOLPHIN_REVISION >= 45
+            __GX_WARNF_CHECKED(0x51, i + numRegularTextures, BumpMapSource);
+#else
+            __GX_WARNF_CHECKED(0x51, i, i + numRegularTextures, BumpMapSource);
+#endif
         }
         BumpMapLight = __gxVerif->xfRegs[numRegularTextures + i + 0x40];
         BumpMapLight = (BumpMapLight >> 15) & 7;
         lightRAMOffset = (BumpMapLight * 0x10) + 0x60A;
         if (!__gxVerif->xfLightDirty[lightRAMOffset - 0x600 + 0]) {
-            __GX_WARNF(0x52, i, i + numRegularTextures, BumpMapLight, "X");
+#if DOLPHIN_REVISION >= 45
+            __GX_WARNF_CHECKED(0x52, i + numRegularTextures, BumpMapLight, "X");
+#else
+            __GX_WARNF_CHECKED(0x52, i, i + numRegularTextures, BumpMapLight, "X");
+#endif
         }
         if (!__gxVerif->xfLightDirty[lightRAMOffset - 0x600 + 1]) {
-            __GX_WARNF(0x52, i, i + numRegularTextures, BumpMapLight, "Y");
+#if DOLPHIN_REVISION >= 45
+            __GX_WARNF_CHECKED(0x52, i + numRegularTextures, BumpMapLight, "Y");
+#else
+            __GX_WARNF_CHECKED(0x52, i, i + numRegularTextures, BumpMapLight, "Y");
+#endif
         }
         if (!__gxVerif->xfLightDirty[lightRAMOffset - 0x600 + 2]) {
-            __GX_WARNF(0x52, i, i + numRegularTextures, BumpMapLight, "Z");
+#if DOLPHIN_REVISION >= 45
+            __GX_WARNF_CHECKED(0x52, i + numRegularTextures, BumpMapLight, "Z");
+#else
+            __GX_WARNF_CHECKED(0x52, i, i + numRegularTextures, BumpMapLight, "Z");
+#endif
         }
         if (!__GXVertexPacketHas(GX_VA_NBT)) {
-            __GX_WARNF(0x53, i);
+            __GX_WARNF_CHECKED(0x53, i);
         }
     }
 
@@ -426,10 +464,14 @@ static void CheckTextureTransformMatrices(void)
             MtxIndexInVertexPacket = __GXVertexPacketHas(GX_VA_TEX7MTXIDX);
             break;
         default:
-            __GX_WARNF(0x54, i);
+            __GX_WARNF_CHECKED(0x54, i);
             break;
         }
+#if DOLPHIN_REVISION >= 45
+        if (MtxIndexInVertexPacket == 0) {
+#else
         if (MtxIndexInVertexPacket != 0) {
+#endif
             sprintf(Preamble, __gxvWarnings[0x6B], i, i, Val);
             if (!((BYTE3(__gxVerif->xfRegs[i + 64]) >> 1) & 1)) {
                 Size = 8;
@@ -481,7 +523,9 @@ static void CheckInputForms(void)
 
     for (i = 0; i < numRegularTextures; i++) {
         switch ((HIWORD(__gxVerif->xfRegs[i + 64]) >> 7) & 0x1F) {
+#if DOLPHIN_REVISION < 45
         case 2:
+#endif
         case 5:
         case 6:
         case 7:
@@ -491,7 +535,7 @@ static void CheckInputForms(void)
         case 11:
         case 12:
             if ((BYTE3(__gxVerif->xfRegs[i + 64]) >> 2) & 1) {
-                __GX_WARNF(0x55, i, (u8)((HIWORD(__gxVerif->xfRegs[i + 64]) >> 7) & 0x1F));
+                __GX_WARNF_CHECKED(0x55, i, (u8)((HIWORD(__gxVerif->xfRegs[i + 64]) >> 7) & 0x1F));
             }
         }
     }
@@ -508,10 +552,12 @@ static void CheckLight(u32 lightSource)
     for (i = 0; i < 13; i++) {
         if (!__gxVerif->xfLightDirty[lightRAMOffset + i - 0x600]) {
             if (!printedPreamble) {
-                __GX_WARNF(0x6C, lightSource);
+                __GX_WARNF_CHECKED(0x6C, lightSource);
                 printedPreamble = 1;
             }
+#if DOLPHIN_REVISION < 45
             __GX_WARNF(0x70, lightRAMOffset + i, lightRegisterNames[i]);
+#endif
         }
     }
 }
@@ -525,16 +571,16 @@ static void CheckColor0(void)
 
     if ((u8)(BYTE3(__gxVerif->xfRegs[9]) & 3) || numColorTextures != 0) {
         if (!__gxVerif->xfRegsDirty[14]) {
-            __GX_WARNF(0x56, 0x100E, "Color 0 control register");
+            __GX_WARNF_CHECKED(0x56, 0x100E, "Color 0 control register");
         }
         if (!__gxVerif->xfRegsDirty[16]) {
-            __GX_WARNF(0x56, 0x1010, "Alpha 0 control register");
+            __GX_WARNF_CHECKED(0x56, 0x1010, "Alpha 0 control register");
         }
         if (!(BYTE3(__gxVerif->xfRegs[14]) & 1) && !__gxVerif->xfRegsDirty[12]) {
-            __GX_WARNF(0x57, 0, 0, 0x100C);
+            __GX_WARNF_CHECKED(0x57, 0, 0, 0x100C);
         }
         if (!((BYTE3(__gxVerif->xfRegs[14]) >> 6) & 1) && !__gxVerif->xfRegsDirty[10]) {
-            __GX_WARNF(0x58, 0, 0, 0x100A);
+            __GX_WARNF_CHECKED(0x58, 0, 0, 0x100A);
         }
         if ((u32)((BYTE3(__gxVerif->xfRegs[14]) >> 1) & 1) == 1 || (u32)((BYTE3(__gxVerif->xfRegs[16]) >> 1) & 1) == 1) {
             haveLight = 0;
@@ -589,21 +635,21 @@ static void CheckColor0(void)
             }
             if (haveLight != 0) {
                 if (!((BYTE2(__gxVerif->xfRegs[14]) >> 2) & 1) && ((HIWORD(__gxVerif->xfRegs[14]) >> 7) & 3)) {
-                    __GX_WARNF(0x59, "COLOR0", "COLOR0");
+                    __GX_WARNF_CHECKED(0x59, "COLOR0", "COLOR0");
                 }
                 if (!((BYTE2(__gxVerif->xfRegs[16]) >> 2) & 1) && ((HIWORD(__gxVerif->xfRegs[16]) >> 7) & 3)) {
-                    __GX_WARNF(0x59, "ALPHA0", "ALPHA0");
+                    __GX_WARNF_CHECKED(0x59, "ALPHA0", "ALPHA0");
                 }
                 if (((HIWORD(__gxVerif->xfRegs[14]) >> 7) & 3)
                  || ((u8)((BYTE2(__gxVerif->xfRegs[14]) >> 1) & 1) && ((u32)((BYTE2(__gxVerif->xfRegs[14]) >> 2) & 1) == 1))
                  || ((HIWORD(__gxVerif->xfRegs[16]) >> 7) & 3)
                  || ((u8)((BYTE2(__gxVerif->xfRegs[16]) >> 1) & 1) && ((u32)((BYTE2(__gxVerif->xfRegs[16]) >> 2) & 1) == 1))) {
                     if ((__GXVertexPacketHas(GX_VA_NRM) == 0) && (__GXVertexPacketHas(GX_VA_NBT) == 0)) {
-                        __GX_WARNF(0x5A, 0);
+                        __GX_WARNF_CHECKED(0x5A, 0);
                     }
                     if (__GXVertexPacketHas(GX_VA_PNMTXIDX) == 0) {
                         if ((u32)(BYTE3(__gxVerif->xfRegs[24]) & 0x3F) > 30) {
-                            __GX_WARNF(0x5B, 0, (u8)(BYTE3(__gxVerif->xfRegs[24]) & 0x3F));
+                            __GX_WARNF_CHECKED(0x5B, 0, (u8)(BYTE3(__gxVerif->xfRegs[24]) & 0x3F));
                         }
                         sprintf(Preamble, __gxvWarnings[0x6D], 0, (u8)(BYTE3(__gxVerif->xfRegs[24]) & 0x3F));
                         CheckRAM(1, ((BYTE3(__gxVerif->xfRegs[24]) & 0x3F) * 3) + 0x400, 9, 0x6D, Preamble);
@@ -630,16 +676,16 @@ static void CheckColor1(void)
 
     if ((u32)(BYTE3(__gxVerif->xfRegs[9]) & 3) == 2 || usingColor1) {
         if (!__gxVerif->xfRegsDirty[15]) {
-            __GX_WARNF(0x56, 0x100F, "Color 1 control register");
+            __GX_WARNF_CHECKED(0x56, 0x100F, "Color 1 control register");
         }
         if (!__gxVerif->xfRegsDirty[17]) {
-            __GX_WARNF(0x56, 0x1011, "Alpha 1 control register");
+            __GX_WARNF_CHECKED(0x56, 0x1011, "Alpha 1 control register");
         }
         if (!(BYTE3(__gxVerif->xfRegs[15]) & 1) && !__gxVerif->xfRegsDirty[13]) {
-            __GX_WARNF(0x57, 1, 1, 0x100D);
+            __GX_WARNF_CHECKED(0x57, 1, 1, 0x100D);
         }
         if (!((BYTE3(__gxVerif->xfRegs[15]) >> 6) & 1) && !__gxVerif->xfRegsDirty[11]) {
-            __GX_WARNF(0x58, 1, 1, 0x100B);
+            __GX_WARNF_CHECKED(0x58, 1, 1, 0x100B);
         }
         if ((u32)((BYTE3(__gxVerif->xfRegs[15]) >> 1) & 1) == 1 || (u32)((BYTE3(__gxVerif->xfRegs[17]) >> 1) & 1) == 1) {
             haveLight = 0;
@@ -694,21 +740,21 @@ static void CheckColor1(void)
             }
             if (haveLight != 0) {
                 if (!((BYTE2(__gxVerif->xfRegs[15]) >> 2) & 1) && ((HIWORD(__gxVerif->xfRegs[15]) >> 7) & 3)) {
-                    __GX_WARNF(0x59, "COLOR1", "COLOR1");
+                    __GX_WARNF_CHECKED(0x59, "COLOR1", "COLOR1");
                 }
                 if (!((BYTE2(__gxVerif->xfRegs[17]) >> 2) & 1) && ((HIWORD(__gxVerif->xfRegs[17]) >> 7) & 3)) {
-                    __GX_WARNF(0x59, "ALPHA1", "ALPHA1");
+                    __GX_WARNF_CHECKED(0x59, "ALPHA1", "ALPHA1");
                 }
                 if (((HIWORD(__gxVerif->xfRegs[15]) >> 7) & 3)
                  || ((u8)((BYTE2(__gxVerif->xfRegs[15]) >> 1) & 1) && ((u32)((BYTE2(__gxVerif->xfRegs[15]) >> 2) & 1) == 1))
                  || ((HIWORD(__gxVerif->xfRegs[17]) >> 7) & 3)
                  || ((u8)((BYTE2(__gxVerif->xfRegs[17]) >> 1) & 1) && ((u32)((BYTE2(__gxVerif->xfRegs[17]) >> 2) & 1) == 1))) {
                     if ((__GXVertexPacketHas(GX_VA_NRM) == 0) && (__GXVertexPacketHas(GX_VA_NBT) == 0)) {
-                        __GX_WARNF(0x5A, 1);
+                        __GX_WARNF_CHECKED(0x5A, 1);
                     }
                     if (__GXVertexPacketHas(GX_VA_PNMTXIDX) == 0) {
                         if ((u32)(BYTE3(__gxVerif->xfRegs[24]) & 0x3F) > 30) {
-                            __GX_WARNF(0x5B, 1, (u8)(BYTE3(__gxVerif->xfRegs[24]) & 0x3F));
+                            __GX_WARNF_CHECKED(0x5B, 1, (u8)(BYTE3(__gxVerif->xfRegs[24]) & 0x3F));
                         }
                         sprintf(Preamble, __gxvWarnings[0x6D], 1, (u8)(BYTE3(__gxVerif->xfRegs[24]) & 0x3F));
                         CheckRAM(1, ((BYTE3(__gxVerif->xfRegs[24]) & 0x3F) * 3) + 0x400, 9, 0x6D, Preamble);
@@ -751,19 +797,19 @@ static void CheckFloatingPointValue(u8 dirtyBit, u32 value, char *label)
         if (__gxVerif->verifyLevel >= 2) {
             if (mantissa == 0) {
                 if (sign != 0) {
-                    __GX_WARN2F(GX_WARN_MEDIUM, 0x5C, label, "-", *(u32 *)&valuef);
+                    __GX_WARN2F_CHECKED(GX_WARN_MEDIUM, 0x5C, label, "-", *(u32 *)&valuef);
                 } else {
-                    __GX_WARN2F(GX_WARN_MEDIUM, 0x5C, label, "+", *(u32 *)&valuef);
+                    __GX_WARN2F_CHECKED(GX_WARN_MEDIUM, 0x5C, label, "+", *(u32 *)&valuef);
                 }
             } else {
-                __GX_WARN2F(GX_WARN_MEDIUM, 0x5D, label, *(u32 *)&valuef);
+                __GX_WARN2F_CHECKED(GX_WARN_MEDIUM, 0x5D, label, *(u32 *)&valuef);
             }
         }
     } else if (__gxVerif->verifyLevel >= 3) {
         if (exponent < 0x6BU) {
-            __GX_WARN2F(GX_WARN_ALL, 0x5E, label, valuef, *(u32 *)&valuef);
+            __GX_WARN2F_CHECKED(GX_WARN_ALL, 0x5E, label, valuef, *(u32 *)&valuef);
         } else if (exponent > 0x96U) {
-            __GX_WARN2F(GX_WARN_ALL, 0x5F, label, valuef, *(u32 *)&valuef);
+            __GX_WARN2F_CHECKED(GX_WARN_ALL, 0x5F, label, valuef, *(u32 *)&valuef);
         }
     }
 }
@@ -865,7 +911,7 @@ static void CheckMatrixIndices(void)
      && numRegularTextures > 4
      && __gxVerif->verifyLevel >= 1
      && !__gxVerif->xfRegsDirty[0x19]) {
-        __GX_WARNF(0x60, numRegularTextures, 0x1019U);
+        __GX_WARNF_CHECKED(0x60, numRegularTextures, 0x1019U);
     }
 }
 
@@ -892,6 +938,7 @@ static void CheckErrors(void)
     CheckDirty(0x1026U, "Projection matrix orthographic/perspective select");
     CheckMatrixIndices();
     if (__gxVerif->verifyLevel >= 1) {
+#if DOLPHIN_REVISION < 45
         if ((u32)((__gxVerif->rasRegs[0] & 0xFF000000) + 0x01000000) == 0U) {
             __GX_WARN(0x61);
         }
@@ -901,24 +948,25 @@ static void CheckErrors(void)
         if ((u32)(BYTE3(__gxVerif->xfRegs[9]) & 3) != (u8)((__gxVerif->rasRegs[0] >> 4U) & 7)) {
             __GX_WARN(0x63);
         }
+#endif
         CheckCTGColors();
         if (__gxVerif->xfRegs[0x3F] > 8) {
-            __GX_WARNF(0x64, __gxVerif->xfRegs[0x3F], 8);
+            __GX_WARNF_CHECKED(0x64, __gxVerif->xfRegs[0x3F], 8);
         }
         if (numRegularTextures > 8) {
-            __GX_WARNF(0x65, numRegularTextures, 8);
+            __GX_WARNF_CHECKED(0x65, numRegularTextures, 8);
         }
         if (numBumpmapTextures > 3) {
-            __GX_WARNF(0x66, numBumpmapTextures, 3);
+            __GX_WARNF_CHECKED(0x66, numBumpmapTextures, 3);
         }
         if (numColorTextures > 2) {
-            __GX_WARNF(0x67, numColorTextures, 2);
+            __GX_WARNF_CHECKED(0x67, numColorTextures, 2);
         }
         if (numColor0Textures > 1) {
-            __GX_WARNF(0x69, 0);
+            __GX_WARNF_CHECKED(0x69, 0);
         }
         if (numColor1Textures > 1) {
-            __GX_WARNF(0x69, 1);
+            __GX_WARNF_CHECKED(0x69, 1);
         }
         CheckVertexPacket();
 
@@ -933,7 +981,7 @@ static void CheckErrors(void)
         }
         CheckTextureTransformMatrices();
         if (numColorTextures != 0 && (u32)((BYTE3(__gxVerif->xfRegs[numRegularTextures + numBumpmapTextures + 64]) >> 4) & 7) != 2) {//((u32) (((u8) *(__gxVerif + (((numRegularTextures + (numBumpmapTextures + 0x40)) * 4) + 0xB)) >> 4U) & 7) != 2)) {
-            __GX_WARN(0x68U);
+            __GX_WARN_CHECKED(0x68U);
         }
         CheckColor0();
         CheckColor1();

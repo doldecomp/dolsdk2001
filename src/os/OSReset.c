@@ -62,8 +62,10 @@ static struct OSResetFunctionQueue ResetFunctionQueue;
 static int CallResetFunctions(int final);
 static asm void Reset(unsigned long resetCode);
 
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 33 : 0)
+
 void OSRegisterResetFunction(struct OSResetFunctionInfo * info) {
-    ASSERTLINE(0x76, info->func);
+    ASSERTLINE(0x76+LINE_OFFSET, info->func);
 
     ENQUEUE_INFO_PRIO(info, &ResetFunctionQueue);
 }
@@ -72,7 +74,11 @@ void OSUnregisterResetFunction(struct OSResetFunctionInfo * info) {
     DEQUEUE_INFO(info, &ResetFunctionQueue);
 }
 
+#if DOLPHIN_REVISION >= 45
+int __OSCallResetFunctions(int final) {
+#else
 static int CallResetFunctions(int final) {
+#endif
     struct OSResetFunctionInfo * info;
     int err = 0;
 
@@ -127,6 +133,38 @@ L_00000208:
     b L_000001A0
 }
 
+#if DOLPHIN_REVISION >= 37
+static void KillThreads(void)
+{
+    OSThread *thread;
+    OSThread *next;
+
+    thread = UNK_800000DC;
+    while (thread) {
+        next = thread->linkActive.next;
+        switch (thread->state) {
+        case 1:
+        case 4:
+            OSCancelThread(thread);
+            break;
+        }
+        thread = next;
+    }
+}
+#endif
+
+#if DOLPHIN_REVISION >= 37
+void __OSDoHotReset(u32 resetCode) {
+    OSDisableInterrupts();
+    __VIRegs[1] = 0;
+    ICFlashInvalidate();
+    Reset(resetCode << 3);
+}
+#endif
+
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 69 : 0)
+
 void OSResetSystem(int reset, unsigned long resetCode, int forceMenu) {
     int rc;
     int enabled;
@@ -134,7 +172,11 @@ void OSResetSystem(int reset, unsigned long resetCode, int forceMenu) {
 
     OSDisableScheduler();
     __OSStopAudioSystem();
+#if DOLPHIN_REVISION >= 45
+    do {} while (__OSCallResetFunctions(0) == 0);
+#else
     do {} while (CallResetFunctions(0) == 0);
+#endif
 
     if ((reset != 0 && (forceMenu != 0))) {
         sram = __OSLockSram();
@@ -143,16 +185,43 @@ void OSResetSystem(int reset, unsigned long resetCode, int forceMenu) {
         do {} while(__OSSyncSram() == 0);
     }
     enabled = OSDisableInterrupts();
+#if DOLPHIN_REVISION >= 45
+    rc = __OSCallResetFunctions(1);
+#else
     rc = CallResetFunctions(1);
-    ASSERTLINE(0x117, rc);
+#endif
+    ASSERTLINE(0x117+LINE_OFFSET, rc);
+#if DOLPHIN_REVISION >= 45
+    LCDisable();
+#endif
+#if DOLPHIN_REVISION >= 37
+    if (reset == 1) {
+        __OSDoHotReset(resetCode);
+    } else {
+        KillThreads();
+        OSEnableScheduler();
+        __OSReboot(resetCode, forceMenu);
+    }
+#else
     if (reset != 0) {
         ICFlashInvalidate();
         Reset(resetCode * 8);
     }
+#endif
     OSRestoreInterrupts(enabled);
     OSEnableScheduler();
 }
 
 unsigned long OSGetResetCode() {
+#if DOLPHIN_REVISION >= 45
+    u32 resetCode;
+
+    if (UNK_800030E2 != 0) {
+        return 0x80000000;
+    }
+    resetCode = (__PIRegs[9] & 0xFFFFFFF8) / 8;
+    return resetCode;
+#else
     return (__PIRegs[9] & 0xFFFFFFF8) / 8;
+#endif
 }

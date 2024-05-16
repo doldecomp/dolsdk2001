@@ -121,13 +121,15 @@ _restore:
   // clang-format on
 }
 
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 3 : 0)
+
 __OSInterruptHandler
     __OSSetInterruptHandler(__OSInterrupt interrupt, __OSInterruptHandler handler) {
   __OSInterruptHandler oldHandler;
   
         
-  ASSERTMSGLINE(0x188, InterruptHandlerTable, "__OSSetInterruptHandler(): OSInit() must be called in advance.");
-  ASSERTMSGLINE(0x18A, interrupt < 0x20, "__OSSetInterruptHandler(): unknown interrupt.");
+  ASSERTMSGLINE(0x188+LINE_OFFSET, InterruptHandlerTable, "__OSSetInterruptHandler(): OSInit() must be called in advance.");
+  ASSERTMSGLINE(0x18A+LINE_OFFSET, interrupt < 0x20, "__OSSetInterruptHandler(): unknown interrupt.");
 
   oldHandler = InterruptHandlerTable[interrupt];
   InterruptHandlerTable[interrupt] = handler;
@@ -135,8 +137,8 @@ __OSInterruptHandler
 }
 
 __OSInterruptHandler __OSGetInterruptHandler(__OSInterrupt interrupt) {
-  ASSERTMSGLINE(0x19E, InterruptHandlerTable, "__OSGetInterruptHandler(): OSInit() must be called in advance.");
-  ASSERTMSGLINE(0x1A0, interrupt < 0x20, "__OSGetInterruptHandler(): unknown interrupt.");
+  ASSERTMSGLINE(0x19E+LINE_OFFSET, InterruptHandlerTable, "__OSGetInterruptHandler(): OSInit() must be called in advance.");
+  ASSERTMSGLINE(0x1A0+LINE_OFFSET, interrupt < 0x20, "__OSGetInterruptHandler(): unknown interrupt.");
   return InterruptHandlerTable[interrupt];
 }
 
@@ -168,6 +170,9 @@ static u32 SetInterruptMask(OSInterruptMask mask, OSInterruptMask current) {
   case __OS_INTERRUPT_MEM_1:
   case __OS_INTERRUPT_MEM_2:
   case __OS_INTERRUPT_MEM_3:
+#if DOLPHIN_REVISION >= 45
+  case __OS_INTERRUPT_MEM_ADDRESS:
+#endif
     reg = 0;
     if (!(current & OS_INTERRUPTMASK_MEM_0))
       reg |= 0x1;

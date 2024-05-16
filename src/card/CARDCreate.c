@@ -3,6 +3,9 @@
 
 #include "__card.h"
 
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 3 : 0)
+
 static void CreateCallbackFat(long chan, long result);
 
 static void CreateCallbackFat(long chan, long result) {
@@ -22,13 +25,16 @@ static void CreateCallbackFat(long chan, long result) {
         memcpy(ent->company,  __CARDDiskID->company, sizeof(ent->company));
         ent->permission = 4;
         ent->copyTimes = 0;
-        ASSERTLINE(0x66, CARDIsValidBlockNo(card, card->startBlock));
+        ASSERTLINE(0x66+LINE_OFFSET, CARDIsValidBlockNo(card, card->startBlock));
         ent->startBlock = (u16) card->startBlock;
         ent->bannerFormat = 0;
         ent->iconAddr = -1;
         ent->iconFormat = 0;
         ent->iconSpeed = 0;
         ent->commentAddr = -1;
+#if DOLPHIN_REVISION >= 37
+        __CARDSetIconSpeed(ent, 0, CARD_STAT_SPEED_FAST);
+#endif
         card->fileInfo->offset = 0;
         card->fileInfo->iBlock = ent->startBlock;
         ent->time = OSTicksToSeconds(OSGetTime());
@@ -45,6 +51,9 @@ after:;
     }
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 5 : 0)
+
 s32 CARDCreateAsync(s32 chan, const char* fileName, u32 size, CARDFileInfo* fileInfo,
                                         CARDCallback callback) {
     CARDControl* card;
@@ -55,8 +64,8 @@ s32 CARDCreateAsync(s32 chan, const char* fileName, u32 size, CARDFileInfo* file
     u16* fat;
     s32 result;
 
-    ASSERTLINE(0xA4, 0 <= chan && chan < 2);
-    ASSERTLINE(0xA5, strlen(fileName) <= CARD_FILENAME_MAX);
+    ASSERTLINE(0xA4+LINE_OFFSET, 0 <= chan && chan < 2);
+    ASSERTLINE(0xA5+LINE_OFFSET, strlen(fileName) <= CARD_FILENAME_MAX);
 
     if (strlen(fileName) > (u32)CARD_FILENAME_MAX) {
         return CARD_RESULT_NAMETOOLONG;
@@ -67,7 +76,7 @@ s32 CARDCreateAsync(s32 chan, const char* fileName, u32 size, CARDFileInfo* file
         return result;
     }
 
-    ASSERTLINE(0xB1, 0 < size && (size % card->sectorSize) == 0);
+    ASSERTLINE(0xB1+LINE_OFFSET, 0 < size && (size % card->sectorSize) == 0);
 
     if (size <= 0 || (size % card->sectorSize) != 0) {        
         return CARD_RESULT_FATAL_ERROR;

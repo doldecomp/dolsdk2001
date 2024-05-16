@@ -4,7 +4,11 @@
 #include "__os.h"
 
 long long __get_clock(void) {
+#if DOLPHIN_REVISION >= 45
+    return __OSGetSystemTime();
+#else
     return -1;
+#endif
 }
 
 unsigned long __get_time(void) {

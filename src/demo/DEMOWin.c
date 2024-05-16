@@ -29,13 +29,15 @@ void DEMOWinInit() {
     GXSetCopyClear((GXColor){0, 0, 0, 0}, 0xFFFFFF);
 }
 
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 4 : 0)
+
 struct STRUCT_DEMOWIN * DEMOWinCreateWindow(s32 x1, s32 y1, s32 x2, s32 y2, char * caption, u16 scroll, void * func) {
     struct STRUCT_DEMOWIN * handle;
 
-    ASSERTMSGLINE(0xB1, x1 < x2, "DEMOWIN: Illegal X coords for window\n");
-    ASSERTMSGLINE(0xB2, y1 < y2, "DEMOWIN: Illegal y coords for window\n");
+    ASSERTMSGLINE(0xB1+LINE_OFFSET, x1 < x2, "DEMOWIN: Illegal X coords for window\n");
+    ASSERTMSGLINE(0xB2+LINE_OFFSET, y1 < y2, "DEMOWIN: Illegal y coords for window\n");
     handle = (void*)OSAllocFromHeap(__OSCurrHeap, sizeof(struct STRUCT_DEMOWIN));
-    ASSERTMSGLINE(0xB6, handle, "DEMOWIN: FAILED TO ALLOCATE WINDOW!\n");
+    ASSERTMSGLINE(0xB6+LINE_OFFSET, handle, "DEMOWIN: FAILED TO ALLOCATE WINDOW!\n");
     handle->x1 = x1;
     handle->y1 = y1;
     handle->x2 = x2;
@@ -56,7 +58,7 @@ struct STRUCT_DEMOWIN * DEMOWinCreateWindow(s32 x1, s32 y1, s32 x2, s32 y2, char
     handle->flags = 0;
     handle->priority = 0;
     handle->buffer = (void*)OSAllocFromHeap(__OSCurrHeap, handle->total_lines * handle->char_width);
-    ASSERTMSGLINE(0xEE, handle->buffer, "DEMOWinCreateWindow(): Unable to allocation buffer!\n");
+    ASSERTMSGLINE(0xEE+LINE_OFFSET, handle->buffer, "DEMOWinCreateWindow(): Unable to allocation buffer!\n");
     memset(handle->buffer, ' ', handle->total_lines * handle->char_width); // set to all empty spaces
     DEMOWinSetWindowColor(handle, 3, 0, 0, 0, 0);
     handle->cursor_line = -1;
@@ -68,7 +70,7 @@ struct STRUCT_DEMOWIN * DEMOWinCreateWindow(s32 x1, s32 y1, s32 x2, s32 y2, char
 void DEMOWinDestroyWindow(struct STRUCT_DEMOWIN * handle) {
     int old;
 
-    ASSERTMSGLINE(0x114, handle, "DEMOWinDestroyWindow(): NULL handle!\n");
+    ASSERTMSGLINE(0x114+LINE_OFFSET, handle, "DEMOWinDestroyWindow(): NULL handle!\n");
     old = OSDisableInterrupts();
     __DEMOWin_delete_node(handle);
     OSFreeToHeap(__OSCurrHeap, handle->buffer);
@@ -77,17 +79,17 @@ void DEMOWinDestroyWindow(struct STRUCT_DEMOWIN * handle) {
 }
 
 void DEMOWinOpenWindow(struct STRUCT_DEMOWIN * handle) {
-    ASSERTMSGLINE(0x136, handle, "DEMOWinOpenWindow(): NULL handle!\n");
+    ASSERTMSGLINE(0x136+LINE_OFFSET, handle, "DEMOWinOpenWindow(): NULL handle!\n");
     handle->flags |= DEMOWIN_FLAGS_OPENED;
 }
 
 void DEMOWinCloseWindow(struct STRUCT_DEMOWIN * handle) {
-    ASSERTMSGLINE(0x146, handle, "DEMOWinCloseWindow(): NULL handle!\n");
+    ASSERTMSGLINE(0x146+LINE_OFFSET, handle, "DEMOWinCloseWindow(): NULL handle!\n");
     handle->flags &= ~(DEMOWIN_FLAGS_OPENED);
 }
 
 void DEMOWinSetWindowColor(struct STRUCT_DEMOWIN * handle, enum DEMOWinItem item, u8 r, u8 g, u8 b, u8 a) {
-    ASSERTMSGLINE(0x158, handle, "DEMOWinSetWinColor(): NULL window handle\n");
+    ASSERTMSGLINE(0x158+LINE_OFFSET, handle, "DEMOWinSetWinColor(): NULL window handle\n");
     switch(item) {
         case DEMOWIN_ITEM_CAP: // set cap
             handle->cap.r = r;
@@ -125,7 +127,7 @@ void DEMOWinSetWindowColor(struct STRUCT_DEMOWIN * handle, enum DEMOWinItem item
             handle->border.a = 255;
             return;
         default:
-            ASSERTMSGLINE(0x183, FALSE, "DEMOWinSetWinColor(): Unknown item\n");
+            ASSERTMSGLINE(0x183+LINE_OFFSET, FALSE, "DEMOWinSetWinColor(): Unknown item\n");
             return;
     }
 }
@@ -196,8 +198,8 @@ void DEMOWinScrollWindow(struct STRUCT_DEMOWIN * handle, u32 dir) {
     u16 n;
     u16 v_start;
 
-    ASSERTMSGLINE(0x21B, handle, "DEMOWinScrollWindow(): NULL handle!\n");
-    ASSERTMSGLINE(0x21C, handle->num_scroll_lines, "DEMOWinScrollWindow(): No scrollback buffer!\n");
+    ASSERTMSGLINE(0x21B+LINE_OFFSET, handle, "DEMOWinScrollWindow(): NULL handle!\n");
+    ASSERTMSGLINE(0x21C+LINE_OFFSET, handle->num_scroll_lines, "DEMOWinScrollWindow(): No scrollback buffer!\n");
 
     switch(dir) {
         case 1:
@@ -222,7 +224,7 @@ void DEMOWinScrollWindow(struct STRUCT_DEMOWIN * handle, u32 dir) {
             OSRestoreInterrupts(old);
             return;
         default:
-            ASSERTMSGLINE(0x23F, FALSE, "DEMOWinScrollWindow(): Unknown token\n");
+            ASSERTMSGLINE(0x23F+LINE_OFFSET, FALSE, "DEMOWinScrollWindow(): Unknown token\n");
             return;
     }
 }
@@ -230,8 +232,8 @@ void DEMOWinScrollWindow(struct STRUCT_DEMOWIN * handle, u32 dir) {
 void DEMOWinBringToFront(struct STRUCT_DEMOWIN * handle) {
     struct STRUCT_DEMOWIN * ptr;
 
-    ASSERTMSGLINE(0x256, __first_node, "DEMOWinBringToFront(): Window list is empty!\n");
-    ASSERTMSGLINE(0x257, handle, "DEMOWinBringToFront(): NULL handle!\n");
+    ASSERTMSGLINE(0x256+LINE_OFFSET, __first_node, "DEMOWinBringToFront(): Window list is empty!\n");
+    ASSERTMSGLINE(0x257+LINE_OFFSET, handle, "DEMOWinBringToFront(): NULL handle!\n");
     if (handle->priority) {
         for(ptr = __first_node; ptr; ptr = ptr->next) {
             ptr->priority = 1;
@@ -241,7 +243,7 @@ void DEMOWinBringToFront(struct STRUCT_DEMOWIN * handle) {
 }
 
 void DEMOWinSendToBack(struct STRUCT_DEMOWIN * handle) {
-    ASSERTMSGLINE(0x27A, handle, "DEMOWinSendToBack(): NULL handle!\n");
+    ASSERTMSGLINE(0x27A+LINE_OFFSET, handle, "DEMOWinSendToBack(): NULL handle!\n");
     handle->priority = 1;
 } 
 
@@ -251,7 +253,7 @@ void DEMOWinClearRow(struct STRUCT_DEMOWIN * handle, u16 row) {
     u16 i;
     int old;
 
-    ASSERTMSGLINE(0x292, handle, "DEMOWinClearRow(): NULL handle!\n");
+    ASSERTMSGLINE(0x292+LINE_OFFSET, handle, "DEMOWinClearRow(): NULL handle!\n");
     if (row < handle->char_height) {
         old = OSDisableInterrupts(); 
         buffer_row = (((handle->curr_view_line + handle->total_lines) - (handle->char_height - 1)) % handle->total_lines);
@@ -270,7 +272,7 @@ void DEMOWinClearWindow(struct STRUCT_DEMOWIN * handle) {
     u16 i;
     int old;
 
-    ASSERTMSGLINE(0x2C3, handle, "DEMOWinClearWindow(): NULL handle!\n");
+    ASSERTMSGLINE(0x2C3+LINE_OFFSET, handle, "DEMOWinClearWindow(): NULL handle!\n");
 
     old = OSDisableInterrupts();
     buffer_row = ((handle->curr_view_line + handle->total_lines) - (handle->char_height - 1)) % handle->total_lines;
@@ -285,7 +287,7 @@ void DEMOWinClearWindow(struct STRUCT_DEMOWIN * handle) {
 void DEMOWinClearBuffer(struct STRUCT_DEMOWIN * handle) {
     int old;
 
-    ASSERTMSGLINE(0x2E5, handle, "DEMOWinClearBuffer(): NULL handle!\n");
+    ASSERTMSGLINE(0x2E5+LINE_OFFSET, handle, "DEMOWinClearBuffer(): NULL handle!\n");
     old = OSDisableInterrupts();
     memset(handle->buffer, ' ', handle->total_lines * handle->char_width);
     OSRestoreInterrupts(old);
@@ -299,7 +301,7 @@ void DEMOWinRefresh() {
     unsigned short y;
     int old;
 
-    ASSERTMSGLINE(0x30D, __first_node, "DEMOWinRefresh(): Windowlist is empty!\n");
+    ASSERTMSGLINE(0x30D+LINE_OFFSET, __first_node, "DEMOWinRefresh(): Windowlist is empty!\n");
     for(ptr = __first_node; ptr; ptr = ptr->next) {
         if (ptr->flags & DEMOWIN_FLAGS_OPENED) {
             GXSetZMode(1, 3, 1);
@@ -444,7 +446,7 @@ void DEMOWinRefresh() {
 
 static void __DEMOWin_add_node(struct STRUCT_DEMOWIN * handle) {
 
-    ASSERTMSGLINE(0x3FD, handle, "__add_node(): you're adding a NULL node!\n");
+    ASSERTMSGLINE(0x3FD+LINE_OFFSET, handle, "__add_node(): you're adding a NULL node!\n");
 
     // WHY. why it backwards. who writes like this?
     if (NULL == __last_node) {
@@ -453,7 +455,7 @@ static void __DEMOWin_add_node(struct STRUCT_DEMOWIN * handle) {
         __first_node = handle;
         handle->next = 0;
         handle->prev = 0;
-        ASSERTMSGLINE(0x407, __first_node, "  > __first_node: NULL HANDLE!\n");
+        ASSERTMSGLINE(0x407+LINE_OFFSET, __first_node, "  > __first_node: NULL HANDLE!\n");
     } else {
         __last_node->next = handle;
         handle->next = 0;
@@ -465,7 +467,7 @@ static void __DEMOWin_add_node(struct STRUCT_DEMOWIN * handle) {
 
 static void __DEMOWin_delete_node(struct STRUCT_DEMOWIN * handle) {
     static unsigned short old;
-    ASSERTMSGLINE(0x424, handle, "__delete_node(): you're deleting a NULL node!\n");
+    ASSERTMSGLINE(0x424+LINE_OFFSET, handle, "__delete_node(): you're deleting a NULL node!\n");
 
     if (__first_node == handle) {
         if (handle->next) {
@@ -550,6 +552,9 @@ void DEMOWinDestroyMenuWindow(struct STRUCT_MENU * menu) {
     if (menu->handle) {
         DEMOWinCloseWindow(menu->handle);
         DEMOWinDestroyWindow(menu->handle);
+#if DOLPHIN_REVISION >= 45
+        menu->handle = NULL;
+#endif
     }
 }
 
@@ -811,10 +816,13 @@ void DEMOWinResetRepeat() {
     __DEMOWIN_PAD_repeat_rate = 2;
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 6 : 0)
+
 struct STRUCT_LISTBOX * DEMOWinCreateListWindow(struct STRUCT_LISTBOX * list, unsigned short x, unsigned short y) {
     struct STRUCT_LISTBOX_ITEM * ptr;
 
-    ASSERTMSGLINE(0x72A, list, "DEMOWinCreateListWindow(): List is NULL!\n");
+    ASSERTMSGLINE(0x72A+LINE_OFFSET, list, "DEMOWinCreateListWindow(): List is NULL!\n");
     ptr = list->items;
     list->max_str_len = strlen(list->title);
     list->num_items = 0;
@@ -842,6 +850,9 @@ void DEMOWinDestroyListWindow(struct STRUCT_LISTBOX * list) {
     if (list->handle) {
         DEMOWinCloseWindow(list->handle);
         DEMOWinDestroyWindow(list->handle);
+#if DOLPHIN_REVISION >= 45
+        list->handle = NULL;
+#endif
     }
 }
 
@@ -880,8 +891,11 @@ void DEMOWinListSetCursor(struct STRUCT_LISTBOX * list, int x) {
     list->cursor_state = x;
 }
 
+#undef LINE_OFFSET
+#define LINE_OFFSET ((DOLPHIN_REVISION >= 45) ? 8 : 0)
+
 long DEMOWinListScrollList(struct STRUCT_LISTBOX * list, unsigned long dir) {
-    ASSERTMSGLINE(0x7E2, list, "DEMOWinListScrollList(): NULL handle!\n");
+    ASSERTMSGLINE(0x7E2+LINE_OFFSET, list, "DEMOWinListScrollList(): NULL handle!\n");
     switch(dir) {
         case 1:
             if (list->display_pos) {
@@ -897,7 +911,7 @@ long DEMOWinListScrollList(struct STRUCT_LISTBOX * list, unsigned long dir) {
             list->display_pos = 0;
             break;
         default:
-            ASSERTMSGLINE(0x7FB, FALSE, "DEMOWinListScrollList(): Invalid dimension!\n");
+            ASSERTMSGLINE(0x7FB+LINE_OFFSET, FALSE, "DEMOWinListScrollList(): Invalid dimension!\n");
             break;
     }
     if (list->curr_pos > (list->display_pos + list->num_display_items - 1)) {
@@ -909,7 +923,7 @@ long DEMOWinListScrollList(struct STRUCT_LISTBOX * list, unsigned long dir) {
 }
 
 long DEMOWinListMoveCursor(struct STRUCT_LISTBOX * list, unsigned long dir) {
-    ASSERTMSGLINE(0x81E, list, "DEMOWinListScrollList(): NULL handle!\n");
+    ASSERTMSGLINE(0x81E+LINE_OFFSET, list, "DEMOWinListScrollList(): NULL handle!\n");
     switch(dir) {
         case 1:
             list->curr_pos = (list->curr_pos + list->num_items - 1) % list->num_items;
@@ -918,7 +932,7 @@ long DEMOWinListMoveCursor(struct STRUCT_LISTBOX * list, unsigned long dir) {
             list->curr_pos = (list->curr_pos + 1) % list->num_items;
             break;
         default:
-            ASSERTMSGLINE(0x82B, FALSE, "DEMOWinListMoveCursor(): Invalid dimension!\n");
+            ASSERTMSGLINE(0x82B+LINE_OFFSET, FALSE, "DEMOWinListMoveCursor(): Invalid dimension!\n");
             break;
     }
     return list->curr_pos;

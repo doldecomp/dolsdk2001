@@ -7,7 +7,11 @@
 extern "C" {
 #endif
 
+#if DOLPHIN_REVISION >= 45
+#define OS_MODULE_VERSION 2
+#else
 #define OS_MODULE_VERSION 1
+#endif
 typedef struct OSModuleHeader OSModuleHeader;
 
 typedef u32 OSModuleID;

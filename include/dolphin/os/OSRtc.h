@@ -38,7 +38,12 @@ typedef struct OSSramEx {
     unsigned char flashID[2][12];
     unsigned long wirelessKeyboardID;
     unsigned short wirelessPadID[4];
+#if DOLPHIN_REVISION >= 37
+    u8 dvdErrorCode;
+    u8 _padding0;
+#else
     unsigned short _padding0;
+#endif
     unsigned char flashIDCheckSum[2];
     unsigned char _padding1[4];
 } OSSramEx;
@@ -49,6 +54,11 @@ unsigned long OSGetVideoMode();
 void OSSetVideoMode(unsigned long mode);
 unsigned char OSGetLanguage();
 void OSSetLanguage(unsigned char language);
+
+#if DOLPHIN_REVISION >= 45
+u16 OSGetWirelessID(s32 chan);
+void OSSetWirelessID(s32 chan, u16 id);
+#endif
 
 #ifdef __cplusplus
 }

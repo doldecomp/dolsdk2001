@@ -74,6 +74,21 @@ long long __OSGetSystemTime() {
     return result;
 }
 
+#if DOLPHIN_REVISION >= 45
+OSTime __OSTimeToSystemTime(OSTime time)
+{
+    BOOL enabled;
+    OSTime *timeAdjustAddr;
+    OSTime result;
+
+    timeAdjustAddr = (OSTime *)0x800030D8;
+    enabled = OSDisableInterrupts();
+    result = *timeAdjustAddr + time;
+    OSRestoreInterrupts(enabled);
+    return result;
+}
+#endif
+
 asm void __OSSetTick(register unsigned long newTicks) {
     // clang-format off
     nofralloc
@@ -92,9 +107,11 @@ static int GetYearDays(int year, int mon) {
     return md[mon];
 }
 
+#define LINE_OFFSET (DOLPHIN_REVISION >= 45 ? 26 : 0)
+
 static int GetLeapDays(int year) {
-    ASSERTLINE(260, 0 <= year);
-    
+    ASSERTLINE(260+LINE_OFFSET, 0 <= year);
+
     if (year < 1) {
         return 0;
     }
@@ -107,7 +124,7 @@ static void GetDates(int days, OSCalendarTime* td) {
     int month;
     int * md;
 
-    ASSERTLINE(285, 0 <= days);
+    ASSERTLINE(285+LINE_OFFSET, 0 <= days);
 
     td->wday = (days + 6) % WEEK_DAY_MAX;
 
@@ -133,29 +150,29 @@ void OSTicksToCalendarTime(long long ticks, OSCalendarTime* td) {
     int secs;
     long long d;
 
-    d = ticks % OS_SEC_TO_TICKS(1);    
+    d = ticks % OS_SEC_TO_TICKS(1);
     if (d < 0) {
         d += OS_SEC_TO_TICKS(1);
-        ASSERTLINE(330, 0 <= d);
+        ASSERTLINE(330+LINE_OFFSET, 0 <= d);
     }
 
     td->usec = OS_TICKS_TO_USEC(d) % USEC_MAX;
     td->msec = OS_TICKS_TO_MSEC(d) % MSEC_MAX;
 
-    ASSERTLINE(334, 0 <= td->usec);
-    ASSERTLINE(335, 0 <= td->msec);
+    ASSERTLINE(334+LINE_OFFSET, 0 <= td->usec);
+    ASSERTLINE(335+LINE_OFFSET, 0 <= td->msec);
 
     ticks -= d;
 
-    ASSERTLINE(338, ticks % OSSecondsToTicks(1) == 0);
-    ASSERTLINE(342, 0 <= OSTicksToSeconds(ticks) / 86400 + BIAS && OSTicksToSeconds(ticks) / 86400 + BIAS <= INT_MAX);
+    ASSERTLINE(338+LINE_OFFSET, ticks % OSSecondsToTicks(1) == 0);
+    ASSERTLINE(342+LINE_OFFSET, 0 <= OSTicksToSeconds(ticks) / 86400 + BIAS && OSTicksToSeconds(ticks) / 86400 + BIAS <= INT_MAX);
 
-    days = (OS_TICKS_TO_SEC(ticks) / SECS_IN_DAY) + BIAS;    
+    days = (OS_TICKS_TO_SEC(ticks) / SECS_IN_DAY) + BIAS;
     secs = OS_TICKS_TO_SEC(ticks) % SECS_IN_DAY;
     if (secs < 0) {
         days -= 1;
         secs += SECS_IN_DAY;
-        ASSERTLINE(349, 0 <= secs);
+        ASSERTLINE(349+LINE_OFFSET, 0 <= secs);
     }
 
     GetDates(days, td);
@@ -178,8 +195,8 @@ OSTime OSCalendarTimeToTicks(OSCalendarTime* td) {
         ov_mon--;
     }
 
-    ASSERTLINE(0x182, (ov_mon <= 0 && 0 <= td->year + ov_mon) || (0 < ov_mon && td->year <= INT_MAX - ov_mon));
-    
+    ASSERTLINE(0x182+LINE_OFFSET, (ov_mon <= 0 && 0 <= td->year + ov_mon) || (0 < ov_mon && td->year <= INT_MAX - ov_mon));
+
     year = td->year + ov_mon;
 
     // clang-format off
