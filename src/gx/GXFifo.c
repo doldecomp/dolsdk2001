@@ -6,6 +6,9 @@
 
 #include "__gx.h"
 
+#define PHYSICAL(x) (((u32)x) & 0x3FFFFFFF)
+#define GX_PHYSICAL_ADDR(x) ((u32)x & ~((~OS_PHYSICAL_MASK) << 16))
+
 static OSThread *__GXCurrentThread;
 static GXBool CPGPLinked;
 static BOOL GXOverflowSuspendInProgress;
@@ -25,15 +28,11 @@ static void __GXFifoLink(u8 arg0);
 static void __GXWriteFifoIntEnable(u8 arg0, u8 arg1);
 static void __GXWriteFifoIntReset(u8 arg0, u8 arg1);
 
-#if DEBUG
-static char __data_0[] = "[GXOverflowHandler]";
-#endif
-
 static void GXOverflowHandler(s16 interrupt, OSContext *context)
 {
 #if DEBUG
     if (__gxVerif->verifyLevel > 1) {
-        OSReport(__data_0);
+        OSReport("[GXOverflowHandler]");
     }
 #endif
     ASSERTLINE(0x15A, !GXOverflowSuspendInProgress);
@@ -150,22 +149,6 @@ void GXInitFifoLimits(GXFifoObj *fifo, u32 hiWatermark, u32 loWatermark)
     realFifo->loWatermark = loWatermark;
 }
 
-#if DEBUG  // currently doesn't match
-// HACK: Please match this function, so I can get rid of this mess!
-static char str_reg_field_out_of_range[] = "GX Internal: Register field out of range";
-#undef SET_REG_FIELD
-#define SET_REG_FIELD(line, reg, size, shift, val) \
-do { \
-    ASSERTMSGLINE(line, ((u32)(val) & ~((1 << (size)) - 1)) == 0, str_reg_field_out_of_range); \
-    (reg) = ((u32)(reg) & ~(((1 << (size)) - 1) << (shift))) | ((u32)(val) << (shift)); \
-} while (0)
-asm void GXSetCPUFifo(GXFifoObj *fifo)
-{
-    nofralloc
-#include "../../nonmatchings/GXSetCPUFifo.s"
-}
-#pragma peephole on
-#else
 void GXSetCPUFifo(GXFifoObj *fifo)
 {
     struct __GXFifoObj *realFifo = (struct __GXFifoObj *)fifo;
@@ -176,9 +159,9 @@ void GXSetCPUFifo(GXFifoObj *fifo)
     {
         u32 reg = 0;
 
-        __piReg[3] = (u32)realFifo->base & 0x3FFFFFFF;
-        __piReg[4] = (u32)realFifo->top & 0x3FFFFFFF;
-        SET_REG_FIELD(0x294, reg, 21, 5, ((u32)realFifo->wrPtr & 0x3FFFFFFF) >> 5);
+        __piReg[3] = PHYSICAL(realFifo->base);
+        __piReg[4] = PHYSICAL(realFifo->top);
+        SET_REG_FIELD(0x294, reg, 21, 5, GX_PHYSICAL_ADDR(PHYSICAL(realFifo->wrPtr)) >> 5);
         SET_REG_FIELD(0x295, reg, 1, 26, 0);
         __piReg[5] = reg;
         CPGPLinked = GX_TRUE;
@@ -195,11 +178,11 @@ void GXSetCPUFifo(GXFifoObj *fifo)
             __GXFifoLink(0);
             CPGPLinked = GX_FALSE;
         }
-        __GXWriteFifoIntEnable(0, 0);
+        __GXWriteFifoIntEnable(GX_FALSE, FALSE);
         reg = 0;
-        __piReg[3] = (u32)realFifo->base & 0x3FFFFFFF;
-        __piReg[4] = (u32)realFifo->top & 0x3FFFFFFF;
-        SET_REG_FIELD(0x2B7, reg, 21, 5, ((u32)realFifo->wrPtr & 0x3FFFFFFF) >> 5);
+        __piReg[3] = PHYSICAL(realFifo->base);
+        __piReg[4] = PHYSICAL(realFifo->top);
+        SET_REG_FIELD(0x2B7, reg, 21, 5, GX_PHYSICAL_ADDR(PHYSICAL(realFifo->wrPtr)) >> 5);
         SET_REG_FIELD(0x2B8, reg, 1, 26, 0);
         __piReg[5] = reg;
     }
@@ -208,7 +191,6 @@ void GXSetCPUFifo(GXFifoObj *fifo)
 
     OSRestoreInterrupts(enabled);
 }
-#endif
 
 void GXSetGPFifo(GXFifoObj *fifo)
 {
@@ -226,11 +208,11 @@ void GXSetGPFifo(GXFifoObj *fifo)
     __cpReg[28] = (u32)realFifo->rdPtr & 0xFFFF;
     __cpReg[20] = (u32)realFifo->hiWatermark & 0xFFFF;
     __cpReg[22] = (u32)realFifo->loWatermark & 0xFFFF;
-    __cpReg[17] = ((u32)realFifo->base & 0x3FFFFFFF) >> 16;
-    __cpReg[19] = ((u32)realFifo->top & 0x3FFFFFFF) >> 16;
+    __cpReg[17] = PHYSICAL(realFifo->base) >> 16;
+    __cpReg[19] = PHYSICAL(realFifo->top) >> 16;
     __cpReg[25] = realFifo->count >> 16;
-    __cpReg[27] = ((u32)realFifo->wrPtr & 0x3FFFFFFF) >> 16;
-    __cpReg[29] = ((u32)realFifo->rdPtr & 0x3FFFFFFF) >> 16;
+    __cpReg[27] = PHYSICAL(realFifo->wrPtr) >> 16;
+    __cpReg[29] = PHYSICAL(realFifo->rdPtr) >> 16;
     __cpReg[21] = (u32)realFifo->hiWatermark >> 16;
     __cpReg[23] = (u32)realFifo->loWatermark >> 16;
 
@@ -467,8 +449,8 @@ void __GXInsaneWatermark(void)
     struct __GXFifoObj *realFifo = GPFifo;
 
     realFifo->hiWatermark = realFifo->loWatermark + 512;
-    __cpReg[20] = (realFifo->hiWatermark & 0x3FFFFFFF) & 0xFFFF;
-    __cpReg[21] = (realFifo->hiWatermark & 0x3FFFFFFF) >> 16;
+    __cpReg[20] = PHYSICAL(realFifo->hiWatermark) & 0xFFFF;
+    __cpReg[21] = PHYSICAL(realFifo->hiWatermark) >> 16;
 }
 
 void __GXCleanGPFifo(void)
@@ -533,24 +515,7 @@ u32 GXResetOverflowCount(void)
     return oldcount;
 }
 
-#define SET_REG_FIELD2(line, reg, mask, val) \
-do { \
-    ASSERTMSGLINE(line, ((val) & ~(mask)) == 0, "GX Internal: Register field out of range"); \
-    (reg) = ((u32)(reg) & ~(mask)) | ((u32)(val)); \
-} while (0)
 
-#if DEBUG  // currently doesn't match
-static char str_GXRedirectWriteGatherPipe_gxbegin[] = "'GXRedirectWriteGatherPipe' is not allowed between GXBegin/GXEnd";
-static char str_failed_assertion_offset[] = "Failed assertion OFFSET(ptr, 32) == 0";
-static char str_failed_assertion_pipenotredirected[] = "Failed assertion !IsWGPipeRedirected";
-static char str_failed_assertion_piperedirected[] = "Failed assertion IsWGPipeRedirected";
-asm volatile void *GXRedirectWriteGatherPipe(void *ptr)
-{
-    nofralloc
-#include "../../nonmatchings/GXRedirectWriteGatherPipe.s"
-}
-#pragma peephole on
-#else
 volatile void *GXRedirectWriteGatherPipe(void *ptr)
 {
     u32 reg = 0;
@@ -574,26 +539,14 @@ volatile void *GXRedirectWriteGatherPipe(void *ptr)
     CPUFifo->wrPtr = OSPhysicalToCached(__piReg[5] & 0xFBFFFFFF);
     __piReg[3] = 0;
     __piReg[4] = 0x04000000;
-    SET_REG_FIELD(0x5C8, reg, 21, 5, ((u32)ptr & 0x3FFFFFFF) >> 5);
-    /*if (((u32)ptr >> 5) & 0x1E00000)
-        OSPanic(__FILE__, 0x5FB, "GX Internal: Register field out of range");
-    //SET_REG_FIELD(0x5C8, reg, 25, 5, ((u32)ptr & 0x3FFFFFFF) >> 5);*/
-    //reg = (reg & ~0x3FFFFE0) | ((u32)ptr & 0x3FFFFFE0);
+    SET_REG_FIELD(0x5C8, reg, 21, 5, GX_PHYSICAL_ADDR(PHYSICAL(ptr)) >> 5);
     reg &= 0xFBFFFFFF;
     __piReg[5] = reg;
     __sync();
     OSRestoreInterrupts(enabled);
-    return (volatile void *)GXFIFO_ADDR;
+    return (void *)GXFIFO_ADDR;
 }
-#endif
 
-#if DEBUG  // currently doesn't match
-asm void GXRestoreWriteGatherPipe(void)
-{
-    nofralloc
-#include "../../nonmatchings/GXRestoreWriteGatherPipe.s"
-}
-#else
 void GXRestoreWriteGatherPipe(void)
 {
     u32 reg = 0; // r31
@@ -612,13 +565,9 @@ void GXRestoreWriteGatherPipe(void)
     while (PPCMfwpar() & 1) {
     }
     PPCMtwpar((u32)OSUncachedToPhysical((void *)GXFIFO_ADDR));
-    __piReg[3] = (u32)CPUFifo->base & 0x3FFFFFFF;
-    __piReg[4] = (u32)CPUFifo->top & 0x3FFFFFFF;
-    SET_REG_FIELD(0x5FB, reg, 21, 5, ((u32)CPUFifo->wrPtr & 0x3FFFFFFF) >> 5);
-    /*if ((((u32)CPUFifo->wrPtr & 0x3FFFFFFF) >> 5) & 0x7E00000)
-        OSPanic(__FILE__, 0x5FB, "GX Internal: Register field out of range");
-    reg = (reg & ~0x3FFFFE0) | (((u32)CPUFifo->wrPtr & 0x3FFFFFFF) & ~0x1F);*/
-    //SET_REG_FIELD(0x5FB, reg, 25, 5, ((u32)CPUFifo->wrPtr & 0x3FFFFFFF) >> 5);
+    __piReg[3] = PHYSICAL(CPUFifo->base);
+    __piReg[4] = PHYSICAL(CPUFifo->top);
+    SET_REG_FIELD(0x5FB, reg, 21, 5, GX_PHYSICAL_ADDR(PHYSICAL(CPUFifo->wrPtr)) >> 5);
     reg &= 0xFBFFFFFF;
     __piReg[5] = reg;
     if (CPGPLinked) {
@@ -629,4 +578,3 @@ void GXRestoreWriteGatherPipe(void)
     __sync();
     OSRestoreInterrupts(enabled);
 }
-#endif
