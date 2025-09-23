@@ -32,7 +32,11 @@ static void cb(long result, struct DVDCommandBlock * block) {
     }
     if (result == -1) {
         return;
+#if DOLPHIN_REVISION >= 37
+    } else if (result == -4) {
+#else
     } else if (result == -2) {
+#endif
         status = 0;
         DVDReset();
         DVDReadDiskID(block, idTmp, cb);

@@ -3,11 +3,16 @@
 
 #include <dolphin/os.h>
 
+OSThread *UNK_800000DC : 0x800000DC;
+
 // OS.c
 extern char * __OSExceptionNames[15]; // D ONLY
 
 unsigned long __OSIsDebuggerPresent(void);
 void __OSPSInit(void);
+#if DOLPHIN_REVISION >= 37
+u32 __OSGetDIConfig(void);
+#endif
 
 // OSAlloc.c
 extern volatile int __OSCurrHeap;
@@ -45,6 +50,16 @@ void __OSModuleInit(void);
 void __OSUnlockAllMutex(struct OSThread *thread);
 int __OSCheckDeadLock(struct OSThread *thread);
 int __OSCheckMutexes(struct OSThread *thread);
+
+#if DOLPHIN_REVISION >= 37
+// OSReboot.c
+void __OSReboot(unsigned long resetCode, int forceMenu);
+#endif
+
+// OSReset.c
+#if DOLPHIN_REVISION >= 37
+void __OSDoHotReset(u32 resetCode);
+#endif
 
 // OSResetSW.c
 void __OSResetSWInterruptHandler(short exception, struct OSContext *context);

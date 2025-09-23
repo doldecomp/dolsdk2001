@@ -2,6 +2,8 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+#include "__os.h"
+
 typedef void (*EXICallback)(s32, OSContext*);
 
 struct EXIControl {
@@ -35,6 +37,9 @@ struct EXIControl {
 #define EXI_WRITE 1
 
 static struct EXIControl Ecb[3];
+#if DOLPHIN_REVISION >= 37
+static u8 bssFiller[0x10];
+#endif
 
 static void SetExiInterruptMask(long chan, struct EXIControl * exi);
 static void CompleteTransfer(long chan);
@@ -208,7 +213,13 @@ int EXISync(long chan) {
             enabled = OSDisableInterrupts();
             if (exi->state & 4) {
                 CompleteTransfer(chan);
+#if DOLPHIN_REVISION >= 37
+            if (__OSGetDIConfig() != 0xFFu || exi->immLen != 4
+             || ((u32)__EXIRegs[(chan * 5)] & 0x70) || (u32)__EXIRegs[chan * 5 + 4] != 0x01010000)
                 rc = 1;
+#else
+                rc = 1;
+#endif
             }
             OSRestoreInterrupts(enabled);
             break;
@@ -420,7 +431,11 @@ int EXIDeselect(long chan) {
         }
     }
     OSRestoreInterrupts(enabled);
+#if DOLPHIN_REVISION >= 37
+    if ((chan != 2) && (cpr & 0x80)) {
+#else
     if ((chan == 0) && (cpr & 0x80)) {
+#endif
         if (EXIProbe(chan) != 0) {
             return 1;
         }

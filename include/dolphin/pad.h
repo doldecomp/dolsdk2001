@@ -57,7 +57,11 @@ typedef struct PADStatus
 int PADReset(unsigned long mask);
 BOOL PADRecalibrate(u32 mask);
 BOOL PADInit();
-void PADRead(struct PADStatus * status);
+#if DOLPHIN_REVISION >= 37
+u32 PADRead(struct PADStatus *status);
+#else
+void PADRead(struct PADStatus *status);
+#endif
 void PADSetSamplingRate(unsigned long msec);
 void __PADTestSamplingRate(unsigned long tvmode);
 void PADControlAllMotors(const u32 *commandArray);

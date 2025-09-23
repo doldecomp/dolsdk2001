@@ -4,6 +4,9 @@
 #include <dolphin/card.h>
 #include <dolphin/exi.h>
 
+#define __CARDSetIconSpeed(stat, n, f)                                                                                   \
+    ((stat)->iconSpeed = (u16)(((stat)->iconSpeed & ~(CARD_STAT_SPEED_MASK << (2 * (n)))) | ((f) << (2 * (n)))))
+
 // CARDStatEx.c
 long __CARDGetStatusEx(long chan, long fileNo, struct CARDDir * dirent);
 long __CARDSetStatusExAsync(long chan, long fileNo, struct CARDDir * dirent, void (* callback)(long, long));

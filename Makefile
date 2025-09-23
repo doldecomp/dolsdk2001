@@ -20,6 +20,8 @@ else
   $(error Unsupported host/building OS <$(UNAME_S)>)
 endif
 
+DOLPHIN_REVISION ?= 36
+
 BUILD_DIR := build
 TOOLS_DIR := $(BUILD_DIR)/tools
 BASEROM_DIR := baserom
@@ -111,8 +113,7 @@ CC        = $(MWCC)
 ######################## Flags #############################
 
 CHARFLAGS := -char unsigned
-
-CFLAGS = $(CHARFLAGS) -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn pragmas -requireprotos -pragma 'cats off'
+CFLAGS = $(CHARFLAGS) -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn pragmas -requireprotos -pragma 'cats off' -DDOLPHIN_REVISION=$(DOLPHIN_REVISION)
 INCLUDES := -Iinclude -Iinclude/libc -ir src
 
 ASFLAGS = -mgekko -I src -I include
@@ -126,8 +127,10 @@ build/debug/src/card/CARDRename.o: CHARFLAGS := -char signed
 build/release/src/card/CARDRename.o: CHARFLAGS := -char signed
 build/debug/src/card/CARDOpen.o: CHARFLAGS := -char signed
 build/release/src/card/CARDOpen.o: CHARFLAGS := -char signed
+ifneq ($(DOLPHIN_REVISION),37)
 build/debug/src/dvd/%.o: CFLAGS += -char signed
 build/release/src/dvd/%.o: CFLAGS += -char signed
+endif
 
 build/debug/src/demo/%.o: CFLAGS += -char signed
 build/release/src/demo/%.o: CFLAGS += -char signed
@@ -293,6 +296,7 @@ dvd_c_files := \
 	src/dvd/dvdfs.c \
 	src/dvd/dvd.c \
 	src/dvd/dvdqueue.c \
+	src/dvd/dvderror.c \
 	src/dvd/fstload.c
 dvd.a  : $(addprefix $(BUILD_DIR)/release/,$(dvd_c_files:.c=.o))
 dvdD.a : $(addprefix $(BUILD_DIR)/debug/,$(dvd_c_files:.c=.o))
@@ -377,6 +381,7 @@ os_c_files := \
 	src/os/OSMessage.c \
 	src/os/OSMemory.c \
 	src/os/OSMutex.c \
+	src/os/OSReboot.c \
 	src/os/OSReset.c \
 	src/os/OSResetSW.c \
 	src/os/OSRtc.c \

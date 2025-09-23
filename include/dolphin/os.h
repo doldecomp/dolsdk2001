@@ -70,6 +70,7 @@ unsigned int __gUnknown800030C0[2] : (OS_BASE_CACHED | 0x30C0);
 #define OSTicksToMicroseconds(ticks) ((ticks)*8 / (OS_TIMER_CLOCK/125000))
 #define OSSecondsToTicks(sec) ((sec) * (OS_TIMER_CLOCK))
 #define OSMillisecondsToTicks(msec) ((msec) * (OS_TIMER_CLOCK / 1000))
+#define OSMicrosecondsToTicks(usec) (((usec) * (OS_TIMER_CLOCK / 125000)) / 8)
 #define OSNanosecondsToTicks(nsec) (((nsec) * (OS_TIMER_CLOCK / 125000)) / 8000)
 #define OSMicrosecondsToTicks(usec) (((usec) * (OS_TIMER_CLOCK / 125000)) / 8)
 
